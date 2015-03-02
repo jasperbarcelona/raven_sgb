@@ -61,7 +61,7 @@ def time_out():
     id_no = flask.request.args.get('id_no')
     time_out = flask.request.args.get('time_out')
 
-    a = Log.query.filter_by(id_no=id_no).order_by(Log.timestamp.desc()).first()
+    a = Log.query.filter_by(id_no=id_no).order_by(Log.timestamp).first()
     a.time_out=time_out  
     
     db.session.commit()
