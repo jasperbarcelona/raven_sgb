@@ -10,7 +10,6 @@ from flask import render_template, request
 from flask import session, redirect
 from flask_oauth import OAuth
 from functools import wraps
-import epub
 import time
 import os
 
