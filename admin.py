@@ -28,6 +28,7 @@ class Log(db.Model):
     section = db.Column(db.String(30))
     time_in = db.Column(db.String(10))
     time_out = db.Column(db.String(10))
+    timestamp = db.Column(db.String(20))
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -49,6 +50,19 @@ def add_log():
             level=level, section=section, time_in=time_in)
     
     db.session.add(add_this)
+    db.session.commit()
+
+    return 'ok'
+
+
+@app.route('/timeout', methods=['GET', 'POST'])
+def time_out():
+    id_no = flask.request.args.get('id_no')
+    time_out = flask.request.args.get('time_out')
+
+    a = Log.query.filter_by(id_no=id_no).order_by(Log.timestamp.desc()).first()
+    a.time_out=time_out  
+    
     db.session.commit()
 
     return 'ok'
