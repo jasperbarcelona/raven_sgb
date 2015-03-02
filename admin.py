@@ -47,7 +47,8 @@ def add_log():
     time_in = flask.request.args.get('time_in')
 
     add_this = Log(date=date, id_no=id_no, name=name,
-            level=level, section=section, time_in=time_in)
+            level=level, section=section, time_in=time_in,
+            timestamp=time.strftime('%Y-%m-%d %H:%M:%S'))
     
     db.session.add(add_this)
     db.session.commit()
