@@ -61,7 +61,7 @@ def time_out():
     id_no = flask.request.args.get('id_no')
     time_out = flask.request.args.get('time_out')
 
-    a = Log.query.filter_by(id_no=id_no).order_by(Log.timestamp).first()
+    a = Log.query.filter_by(id_no=id_no).order_by(Log.timestamp.desc()).first()
     a.time_out=time_out  
     
     db.session.commit()
@@ -74,10 +74,6 @@ def rebuild_database():
     db.drop_all()
     db.create_all()
 
-    a = Log(date='March 10, 2015', id_no='2011334281', name='Barcelona, Jasper Oliver E',
-            level='2nd Year', section='Fidelity', time_in='08:00 AM')
-
-    db.session.add(a)
     db.session.commit()
 
     return 'ok'
