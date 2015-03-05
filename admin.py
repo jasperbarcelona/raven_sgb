@@ -13,11 +13,14 @@ from functools import wraps
 import time
 import os
 
+
 app = flask.Flask(__name__)
 db = SQLAlchemy(app)
 app.secret_key = '234234rfascasascqweqscasefsdvqwefe2323234dvsv'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
 # os.environ['DATABASE_URL']
+
 
 class Log(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -33,12 +36,21 @@ class Log(db.Model):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    log = Log.query.all()
-    return flask.render_template('index.html',date=time.strftime("%B %d, %Y"),log=log)
+    log = Log.query.order_by(Log.timestamp.desc())
+    return flask.render_template(
+        'index.html',
+        date=time.strftime("%B %d, %Y"),
+        log=log
+        )
 
 
 @app.route('/addlog', methods=['GET', 'POST'])
 def add_log():
+    api_key = flask.request.form.get('api_key')
+
+    if not api_key or api_key != API_KEY:
+        return 'Invalid API Key!'
+
     id_no = flask.request.form.get('id_no')
     name = flask.request.form.get('name')
     level = flask.request.form.get('level')
@@ -46,9 +58,15 @@ def add_log():
     date = flask.request.form.get('date')
     time_in = flask.request.form.get('time_in')
 
-    add_this = Log(date=date, id_no=id_no, name=name,
-            level=level, section=section, time_in=time_in,
-            timestamp=time.strftime('%Y-%m-%d %H:%M:%S'))
+    add_this = Log(
+            date=date,
+            id_no=id_no,
+            name=name,
+            level=level,
+            section=section,
+            time_in=time_in,
+            timestamp=time.strftime('%Y-%m-%d %H:%M:%S')
+            )
     
     db.session.add(add_this)
     db.session.commit()
@@ -58,12 +76,16 @@ def add_log():
 
 @app.route('/timeout', methods=['GET', 'POST'])
 def time_out():
+    api_key = flask.request.form.get('api_key')
+
+    if not api_key or api_key != API_KEY:
+        return 'Invalid API Key!'
+
     id_no = flask.request.form.get('id_no')
     time_out = flask.request.form.get('time_out')
 
     a = Log.query.filter_by(id_no=id_no).order_by(Log.timestamp.desc()).first()
     a.time_out=time_out  
-    
     db.session.commit()
 
     return 'ok'
