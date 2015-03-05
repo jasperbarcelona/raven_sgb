@@ -39,12 +39,12 @@ def index():
 
 @app.route('/addlog', methods=['GET', 'POST'])
 def add_log():
-    id_no = flask.request.args.get('id_no')
-    name = flask.request.args.get('name')
-    level = flask.request.args.get('level')
-    section = flask.request.args.get('section')
-    date = flask.request.args.get('date')
-    time_in = flask.request.args.get('time_in')
+    id_no = flask.request.form.get('id_no')
+    name = flask.request.form.get('name')
+    level = flask.request.form.get('level')
+    section = flask.request.form.get('section')
+    date = flask.request.form.get('date')
+    time_in = flask.request.form.get('time_in')
 
     add_this = Log(date=date, id_no=id_no, name=name,
             level=level, section=section, time_in=time_in,
@@ -58,8 +58,8 @@ def add_log():
 
 @app.route('/timeout', methods=['GET', 'POST'])
 def time_out():
-    id_no = flask.request.args.get('id_no')
-    time_out = flask.request.args.get('time_out')
+    id_no = flask.request.form.get('id_no')
+    time_out = flask.request.form.get('time_out')
 
     a = Log.query.filter_by(id_no=id_no).order_by(Log.timestamp.desc()).first()
     a.time_out=time_out  
