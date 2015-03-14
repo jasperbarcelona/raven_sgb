@@ -17,6 +17,7 @@ import os
 
 
 app = flask.Flask(__name__)
+cors = CORS(app)
 db = SQLAlchemy(app)
 app.secret_key = '234234rfascasascqweqscasefsdvqwefe2323234dvsv'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
