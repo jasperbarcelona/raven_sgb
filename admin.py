@@ -67,7 +67,7 @@ class Log(db.Model, Serializer):
     section = db.Column(db.String(30))
     time_in = db.Column(db.String(10))
     time_out = db.Column(db.String(10))
-    timestamp = db.Column(db.String(20))
+    timestamp = db.Column(db.String(50))
 
 
 class Late(db.Model):
