@@ -149,6 +149,7 @@ def get_hour(time):
 
 
 @app.route('/', methods=['GET', 'POST'])
+@crossdomain(origin='*')
 def index():
     a = Log.query.filter_by().order_by(Log.timestamp.desc()).all()
     return SWJsonify({'Logs': a})
