@@ -112,8 +112,8 @@ def index():
 def add_log():
     api_key = flask.request.form.get('api_key')
 
-    # if not api_key or api_key != API_KEY:
-    #     return 'Invalid API Key!'
+    if not api_key or api_key != API_KEY:
+        return 'Invalid API Key!'
 
     id_no = flask.request.form.get('id_no')
     name = flask.request.form.get('name')
@@ -126,7 +126,7 @@ def add_log():
             date=date,
             id_no=id_no,
             name=name,
-            level=level,form
+            level=level,
             section=section,
             time_in=time_in,
             time_out='None',
@@ -153,8 +153,8 @@ def add_log():
 def time_out():
     api_key = flask.request.form.get('api_key')
 
-    # if not api_key or api_key != API_KEY:
-    #     return 'Invalid API Key!'
+    if not api_key or api_key != API_KEY:
+        return 'Invalid API Key!'
 
     id_no = flask.request.form.get('id_no')
     time_out = flask.request.form.get('time_out')
