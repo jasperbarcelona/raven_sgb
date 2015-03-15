@@ -118,6 +118,7 @@ class IngAdmin(sqla.ModelView):
     column_display_pk = True
 admin = Admin(app)
 admin.add_view(IngAdmin(School, db.session))
+admin.add_view(IngAdmin(Log, db.session))
 admin.add_view(IngAdmin(Student, db.session))
 admin.add_view(IngAdmin(Late, db.session))
 
