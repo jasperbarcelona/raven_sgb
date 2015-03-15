@@ -3,46 +3,54 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0, user-scalable=no">
-	<link rel="stylesheet" href="../static/css/bootstrap.css">
 	<link rel="stylesheet" href="../static/css/bootstrap.min.css">
 	<link rel="stylesheet" href="../static/css/style.css">
 </head>
-<body onload="startTime()">
-	<div id="container">
-		<div class="header">
-			<div id="date">{{date}}</div>
-			<img class="logo" src="../static/images/logo.png">
-			<div id="clock"></div>	
-		</div>
-		<div class="main">
-			<div class="search-container">
-				<input type="date">
-			</div>
-			<table class="table">
-				<th id="log-id">Log ID</th>
-				<th id="log-date">Date</th>
-				<th id="student-number">ID Number</th>
-				<th id="student-name">Name</th>
-				<th id="student-level">Level</th>
-				<th id="student-section">Section</th>
-				<th id="student-in">In</th>
-				<th id="student-out">Out</th>
+<body>
+	<div class="container">
+		<h1>Dashboard</h1>
+		<div id="tabs">
 
-				{% for i in log %}
-				<tr>
-					<td>{{i.id}}</td>
-					<td>{{i.date}}</td>
-					<td>{{i.id_no}}</td>
-					<td>{{i.name}}</td>
-					<td>{{i.level}}</td>
-					<td>{{i.section}}</td>
-					<td>{{i.time_in}}</td>
-					<td>{{i.time_out}}</td>
-				</tr>
-				{% endfor %}
-			</table>
-		</div>
+		<ul class="nav nav-tabs">
+		  <li role="presentation" class="active"><a href="#">Gate Logs</a></li>
+		  <li role="presentation"><a href="#">Attendance</a></li>
+		  <li role="presentation"><a href="#">Absents</a></li>
+		  <li role="presentation"><a href="#">Lates</a></li>
+		  <input type="text" class="form-control searchbox" placeholder="Search">
+		</ul>
 
+		<br />
+		</div>
+		<div class="page">
+			<center>
+				<table class="table">
+					<thead>
+						<th>Log ID</th>
+						<th class="name">Name</th>
+						<th>ID Number</th>
+						<th>Grade/Year</th>
+						<th>Section</th>
+						<th>Date</th>			
+						<th>In</th>
+						<th>Out</th>
+					</thead>
+					<tbody>
+						{% for i in log %}
+						<tr>
+							<td>{{i.id}}</td>
+							<td class="name">{{i.name}}</td>
+							<td>{{i.id_no}}</td>						
+							<td>{{i.level}}</td>
+							<td>{{i.section}}</td>
+							<td>{{i.date}}</td>						
+							<td>{{i.time_in}}</td>
+							<td>{{i.time_out}}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</center>
+		</div>
 	</div>
 
 	<script src="../static/js/jquery-1.11.0.min.js"></script>
@@ -50,3 +58,30 @@
 	<script src="../static/js/functions.js"></script>
 </body>
 </html>
+
+
+
+
+<!-- <table class="table">
+					<th id="log-id">Log ID</th>
+					<th id="log-date">Date</th>
+					<th id="student-number">ID Number</th>
+					<th id="student-name">Name</th>
+					<th id="student-level">Level</th>
+					<th id="student-section">Section</th>
+					<th id="student-in">In</th>
+					<th id="student-out">Out</th>
+
+					{% for i in log %}
+					<tr>
+						<td>{{i.id}}</td>
+						<td>{{i.date}}</td>
+						<td>{{i.id_no}}</td>
+						<td>{{i.name}}</td>
+						<td>{{i.level}}</td>
+						<td>{{i.section}}</td>
+						<td>{{i.time_in}}</td>
+						<td>{{i.time_out}}</td>
+					</tr>
+					{% endfor %}
+				</table> -->

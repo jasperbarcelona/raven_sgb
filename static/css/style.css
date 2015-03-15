@@ -7,102 +7,21 @@ body{
 	width: 100%;
 }
 
-#container{
-	height: 100%;
-	width: 100%;
-}
-
-.header{
-	height: 100px;
-	width: 100%;
-	background-color: #161616;
-}
-
-.logo{
-	position: absolute;
-	left: 0;
-	right: 0;
-	margin-left: auto;
-	margin-right: auto;
-	height: 140px;
-	width: 130px;
-}
-
-#date{
-	float: left;
-	margin-top: 37px;
-	margin-left: 20px;
-	font-size: 22px;
-	color: #FFFFFF;
-}
-
-#clock{
+.searchbox{
 	float: right;
-	margin-top: 37px;
-	margin-right: 20px;
-	font-size: 22px;
-	color: #FFFFFF;
+	width: 250px;
+	height: 32px;
+	margin-top: 1px;
+	margin-right: 10px;
+	border-radius: 5px;
+	background-color: #ffffff;
 }
 
-.main{
-	padding-top: 50px;
-	width: 100%;
-}
 
-.search-container{
-	height: 50px;
-	width: 100%;
-	border: 1px solid red;
-}
-
-th{
-	font-size: 16px;
-}
-
-td{
-	font-size: 16px;
-}
-
-#log-id{
-	text-align: center;
+.table th{
 	width: 100px;
 }
 
-#student-number{
-	text-align: center;
-	width: 100px;
-}
-
-#student-name{
-	text-align: center;
-	width: 300px;
-}
-
-#student-level{
-	text-align: center;
-	width: 100px;
-}
-
-#student-section{
-	text-align: center;
+.name{
 	width: 150px;
-}
-
-#log-date{
-	text-align: center;
-	width: 150px;
-}
-
-#student-in{
-	text-align: center;
-	width: 100px;
-}
-
-#student-out{
-	text-align: center;
-	width: 100px;
-}
-
-.table td{
-	text-align: center;
 }

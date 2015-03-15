@@ -76,7 +76,7 @@ class Log(db.Model, Serializer):
     __public__ = ['id','school_id','date','id_no','name','level',
                   'section','time_in','time_out','timestamp']
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=False)
     school_id = db.Column(db.Integer)
     date = db.Column(db.String(20))
     id_no = db.Column(db.String(20))
@@ -187,33 +187,39 @@ def authenticate_user(school_id, password):
 @app.route('/', methods=['GET', 'POST'])
 @crossdomain(origin='*')
 def index():
-    api_key=flask.request.args.get('api_key')
-    a = Log.query.filter_by(api_key=api_key).order_by(Log.timestamp.desc()).all()
-    return SWJsonify({'Logs':a}), 200
+    if not session:
+        return redirect('/loginpage')
+
+    a = Log.query.filter_by(school_id=session['school_id']).order_by(Log.timestamp).all()
+    return flask.render_template(
+        'index.html',
+        log=a,
+        )
 
 
-# @app.route('/login', methods=['GET', 'POST'])
-# @crossdomain(origin='*')
-# def login():
-#     if session:
-#         a = Log.query.filter_by().order_by(Log.timestamp.desc()).all()
-#         return SWJsonify({'Logs': a}), 200
+
+
+@app.route('/login', methods=['GET', 'POST'])
+@crossdomain(origin='*')
+def login():
+    if session:
+        return redirect('/')
     
-#     school_id = flask.request.args.get('school_id')
-#     password = flask.request.args.get('password')
+    school_id = flask.request.form.get('school_id')
+    password = flask.request.form.get('password')
 
-#     if not authenticate_user(school_id, password):
-#         return SWJsonify({'Error': 'Not Logged In'}), 400
+    if not authenticate_user(school_id, password):
+        return redirect('/loginpage')
 
-#     session['school_id'] = school_id
-#     return redirect('/')
+    session['school_id'] = school_id
+    return redirect('/')
 
 
-# @app.route('/logout', methods=['GET', 'POST'])
-# @crossdomain(origin='*')
-# def logout():
-#     session.clear()
-#     return redirect('/')
+@app.route('/logout', methods=['GET', 'POST'])
+@crossdomain(origin='*')
+def logout():
+    session.clear()
+    return redirect('/')
 
 
 @app.route('/addlog', methods=['GET', 'POST'])
@@ -232,6 +238,7 @@ def add_log():
     time_in = flask.request.form.get('time_in')
 
     add_this = Log(
+            id=int(datetime.datetime.now().strftime('%Y%m%d%H%M%S')),
             school_id=school_id,
             date=date,
             id_no=id_no,
