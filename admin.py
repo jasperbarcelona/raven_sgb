@@ -233,6 +233,7 @@ def add_log():
     time_in = flask.request.form.get('time_in')
 
     add_this = Log(
+            school_id=school_id,
             date=date,
             id_no=id_no,
             name=name,
