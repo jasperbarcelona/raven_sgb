@@ -25,26 +25,26 @@
 			<center>
 				<table class="table">
 					<thead>
-						<th>Log ID</th>
-						<th class="name">Name</th>
-						<th>ID Number</th>
-						<th>Grade/Year</th>
-						<th>Section</th>
-						<th>Date</th>			
-						<th>In</th>
-						<th>Out</th>
+						<th class="short" class="small">Log ID</th>
+						<th class="long">Name</th>
+						<th class="short">ID Number</th>
+						<th class="short">Grade/Year</th>
+						<th class="short">Section</th>
+						<th class="short">Date</th>			
+						<th class="short">In</th>
+						<th class="short">Out</th>
 					</thead>
 					<tbody>
 						{% for i in log %}
 						<tr>
-							<td>{{i.id}}</td>
-							<td class="name">{{i.name}}</td>
-							<td>{{i.id_no}}</td>						
-							<td>{{i.level}}</td>
-							<td>{{i.section}}</td>
-							<td>{{i.date}}</td>						
-							<td>{{i.time_in}}</td>
-							<td>{{i.time_out}}</td>
+							<td class="short">{{i.id}}</td>
+							<td class="long">{{i.name}}</td>
+							<td class="short">{{i.id_no}}</td>						
+							<td class="short">{{i.level}}</td>
+							<td class="short">{{i.section}}</td>
+							<td class="short">{{i.date}}</td>						
+							<td class="short">{{i.time_in}}</td>
+							<td class="short">{{i.time_out}}</td>
 						</tr>
 						{% endfor %}
 					</tbody>

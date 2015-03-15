@@ -7,6 +7,10 @@ body{
 	width: 100%;
 }
 
+.container{
+	min-width: 700px;
+}
+
 .searchbox{
 	float: right;
 	width: 250px;
@@ -17,11 +21,24 @@ body{
 	background-color: #ffffff;
 }
 
-
-/*.table th{
+.table th{
 	width: 100px;
 }
 
-.name{
-	width: 150px;
-}*/
+.long{
+	width: 180px;
+	max-width: 180px;
+	min-width: 150px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.short{
+	width: 100px;
+	max-width: 100px;
+	min-width: 70px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
