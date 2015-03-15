@@ -206,7 +206,6 @@ def login():
         return SWJsonify({'Error': 'Not Logged In'}), 400
 
     session['school_id'] = school_id
-    session['api_key'] = School.query.filter_by(id=school_id).first().api_key
     return redirect('/')
 
 
@@ -219,9 +218,10 @@ def logout():
 
 @app.route('/addlog', methods=['GET', 'POST'])
 def add_log():
+    school_id = flask.request.form.get('school_id')
     api_key = flask.request.form.get('api_key')
 
-    if not api_key or api_key != session['api_key']:
+    if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
         return SWJsonify({'Error': 'Unauthorized'}), 400
 
     id_no = flask.request.form.get('id_no')
@@ -262,7 +262,11 @@ def add_log():
 
 @app.route('/timeout', methods=['GET', 'POST'])
 def time_out():
+    school_id = flask.request.form.get('school_id')
     api_key = flask.request.form.get('api_key')
+
+    if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
+        return SWJsonify({'Error': 'Unauthorized'}), 400
 
     if not api_key or api_key != session['api_key']:
         return SWJsonify({'Error': 'Unauthorized'}), 400
