@@ -187,34 +187,33 @@ def authenticate_user(school_id, password):
 @app.route('/', methods=['GET', 'POST'])
 @crossdomain(origin='*')
 def index():
-    # if not session:
-    #     return SWJsonify({'Error': 'Not Logged In'}), 400
-    a = Log.query.filter_by().order_by(Log.timestamp.desc()).all()
+    api_key=flask.request.args.get('api_key')
+    a = Log.query.filter_by(api_key=api_key).order_by(Log.timestamp.desc()).all()
     return SWJsonify({'Logs':a}), 200
 
 
-@app.route('/login', methods=['GET', 'POST'])
-@crossdomain(origin='*')
-def login():
-    if session:
-        a = Log.query.filter_by().order_by(Log.timestamp.desc()).all()
-        return SWJsonify({'Logs': a}), 200
+# @app.route('/login', methods=['GET', 'POST'])
+# @crossdomain(origin='*')
+# def login():
+#     if session:
+#         a = Log.query.filter_by().order_by(Log.timestamp.desc()).all()
+#         return SWJsonify({'Logs': a}), 200
     
-    school_id = flask.request.args.get('school_id')
-    password = flask.request.args.get('password')
+#     school_id = flask.request.args.get('school_id')
+#     password = flask.request.args.get('password')
 
-    if not authenticate_user(school_id, password):
-        return SWJsonify({'Error': 'Not Logged In'}), 400
+#     if not authenticate_user(school_id, password):
+#         return SWJsonify({'Error': 'Not Logged In'}), 400
 
-    session['school_id'] = school_id
-    return redirect('/')
+#     session['school_id'] = school_id
+#     return redirect('/')
 
 
-@app.route('/logout', methods=['GET', 'POST'])
-@crossdomain(origin='*')
-def logout():
-    session.clear()
-    return redirect('/')
+# @app.route('/logout', methods=['GET', 'POST'])
+# @crossdomain(origin='*')
+# def logout():
+#     session.clear()
+#     return redirect('/')
 
 
 @app.route('/addlog', methods=['GET', 'POST'])
