@@ -187,8 +187,8 @@ def authenticate_user(school_id, password):
 @app.route('/', methods=['GET', 'POST'])
 @crossdomain(origin='*')
 def index():
-    if not session:
-        return redirect('/loginpage')
+    # if not session:
+    #     return redirect('/loginpage')
 
     a = Log.query.filter_by(school_id=session['school_id']).order_by(Log.timestamp).all()
     return flask.render_template(
