@@ -275,9 +275,6 @@ def time_out():
     if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
         return SWJsonify({'Error': 'Unauthorized'}), 400
 
-    if not api_key or api_key != session['api_key']:
-        return SWJsonify({'Error': 'Unauthorized'}), 400
-
     id_no = flask.request.form.get('id_no')
     time_out = flask.request.form.get('time_out')
 
