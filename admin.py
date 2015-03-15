@@ -189,7 +189,7 @@ def authenticate_user(school_id, password):
 def index():
     # if not session:
     #     return SWJsonify({'Error': 'Not Logged In'}), 400
-    a = Log.query.filter_by(school_id=session['school_id']).order_by(Log.timestamp.desc()).all()
+    a = Log.query.filter_by().order_by(Log.timestamp.desc()).all()
     return SWJsonify({'Logs':a}), 200
 
 
