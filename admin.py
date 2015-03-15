@@ -76,7 +76,7 @@ class Log(db.Model, Serializer):
     __public__ = ['id','school_id','date','id_no','name','level',
                   'section','time_in','time_out','timestamp']
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=False)
+    id = db.Column(db.Column(db.String(50), primary_key=True, autoincrement=False)
     school_id = db.Column(db.Integer)
     date = db.Column(db.String(20))
     id_no = db.Column(db.String(20))
