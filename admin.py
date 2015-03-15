@@ -289,6 +289,7 @@ def rebuild_database():
     school = School(
         id=1234,
         api_key='ecc67d28db284a2fb351d58fe18965f9',
+        password='test',
         name="Scuola Gesu Bambino",
         address="10, Brgy Isabang",
         city="Lucena City",
