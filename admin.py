@@ -21,7 +21,7 @@ from functools import update_wrapper
 app = flask.Flask(__name__)
 db = SQLAlchemy(app)
 app.secret_key = '234234rfascasascqweqscasefsdvqwefe2323234dvsv'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
 # os.environ['DATABASE_URL']
 
@@ -73,7 +73,7 @@ class School(db.Model, Serializer):
 
 
 class Log(db.Model, Serializer):
-    __public__ = ['id','school_id','date','id_no','name',
+    __public__ = ['id','school_id','date','id_no','name','level'
                   'section','time_in','time_out','timestamp']
 
     id = db.Column(db.Integer, primary_key=True)
@@ -177,7 +177,7 @@ def get_hour(time):
 
 
 def authenticate_user(school_id, password):
-    if not School.query.filter_by(school_id=school_id, password=password).first():
+    if not School.query.filter_by(id=school_id, password=password).first():
         return False
     return True
 
@@ -187,9 +187,9 @@ def authenticate_user(school_id, password):
 @crossdomain(origin='*')
 def index():
     if not session:
-        return SWJsonify({'Error': 'Not Logged In'})
-    a = Log.query.filter_by().order_by(Log.timestamp.desc()).all()
-    return SWJsonify({'Logs': a})
+        return SWJsonify({'Error': 'Not Logged In'}), 400
+    a = Log.query.filter_by(school_id=session['school_id']).order_by(Log.timestamp.desc()).all()
+    return SWJsonify({'Logs':a}), 200
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -197,23 +197,32 @@ def index():
 def login():
     if session:
         a = Log.query.filter_by().order_by(Log.timestamp.desc()).all()
-        return SWJsonify({'Logs': a})
+        return SWJsonify({'Logs': a}), 200
     
-    school_id = flask.request.form.get('school_id')
-    password = flask.request.form.get('password')
+    school_id = flask.request.args.get('school_id')
+    password = flask.request.args.get('password')
 
-    if authenticate_user(school_id, password):
-        return SWJsonify({'Logs': a})
+    if not authenticate_user(school_id, password):
+        return SWJsonify({'Error': 'Not Logged In'}), 400
 
-    return SWJsonify({'Error': 'Not Logged In'})
+    session['school_id'] = school_id
+    session['api_key'] = School.query.filter_by(id=school_id).first().api_key
+    return redirect('/')
+
+
+@app.route('/logout', methods=['GET', 'POST'])
+@crossdomain(origin='*')
+def logout():
+    session.clear()
+    return redirect('/')
 
 
 @app.route('/addlog', methods=['GET', 'POST'])
 def add_log():
     api_key = flask.request.form.get('api_key')
 
-    if not api_key or api_key != API_KEY:
-        return 'Invalid API Key!'
+    if not api_key or api_key != session['api_key']:
+        return SWJsonify({'Error': 'Unauthorized'}), 400
 
     id_no = flask.request.form.get('id_no')
     name = flask.request.form.get('name')
@@ -248,15 +257,15 @@ def add_log():
     return SWJsonify({
         'Status': 'Logged In',
         'Log': Log.query.all()
-        })
+        }), 201
 
 
 @app.route('/timeout', methods=['GET', 'POST'])
 def time_out():
     api_key = flask.request.form.get('api_key')
 
-    if not api_key or api_key != API_KEY:
-        return 'Invalid API Key!'
+    if not api_key or api_key != session['api_key']:
+        return SWJsonify({'Error': 'Unauthorized'}), 400
 
     id_no = flask.request.form.get('id_no')
     time_out = flask.request.form.get('time_out')
@@ -269,7 +278,7 @@ def time_out():
         'Status': 'Logged Out',
         'Log': Log.query.filter_by(id_no=id_no)\
         .order_by(Log.timestamp.desc()).first()
-        })
+        }), 201
 
 
 @app.route('/db/rebuild', methods=['GET', 'POST'])
@@ -277,6 +286,17 @@ def rebuild_database():
     db.drop_all()
     db.create_all()
 
+    school = School(
+        id=1234,
+        api_key='ecc67d28db284a2fb351d58fe18965f9',
+        name="Scuola Gesu Bambino",
+        address="10, Brgy Isabang",
+        city="Lucena City",
+        email="sgb.edu@gmail.com",
+        tel="555-8898",
+        )
+
+    db.session.add(school)
     db.session.commit()
 
     return SWJsonify({'Status': 'Database Rebuild Success'})
@@ -284,6 +304,6 @@ def rebuild_database():
 
 if __name__ == '__main__':
     app.debug = True
-    app.run()
+    app.run(port=int(os.environ['PORT']), host='0.0.0.0'name = db.Column(db.String(50)))
 
-    # port=int(os.environ['PORT']), host='0.0.0.0'
+    # port=int(os.environ['PORT']), host='0.0.0.0'name = db.Column(db.String(50))
