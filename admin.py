@@ -21,7 +21,7 @@ from functools import update_wrapper
 app = flask.Flask(__name__)
 db = SQLAlchemy(app)
 app.secret_key = '234234rfascasascqweqscasefsdvqwefe2323234dvsv'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'
 API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
 # os.environ['DATABASE_URL']
 
@@ -55,13 +55,29 @@ class SWEncoder(json.JSONEncoder):
 
 
 def SWJsonify(*args, **kwargs):
-  return app.response_class(json.dumps(dict(*args, **kwargs), cls=SWEncoder, indent=None if request.is_xhr else 2), mimetype='application/json')
-  # from https://github.com/mitsuhiko/flask/blob/master/flask/helpers.py
+  return app.response_class(json.dumps(dict(*args, **kwargs), cls=SWEncoder, 
+         indent=None if request.is_xhr else 2), mimetype='application/json')
+        # from https://github.com/mitsuhiko/flask/blob/master/flask/helpers.py
+
+class School(db.Model, Serializer):
+    __public__= ['id','api_key','password','id_no','name','address','city','email','tel']
+
+    id = db.Column(db.Integer, primary_key=True)
+    api_key = db.Column(db.String(32))
+    password = db.Column(db.String(20))
+    name = db.Column(db.String(50))
+    address = db.Column(db.String(120))
+    city = db.Column(db.String(30))
+    email = db.Column(db.String(60))
+    tel = db.Column(db.String(15))
 
 
 class Log(db.Model, Serializer):
-    __public__ = ['id','date','id_no','name','section','time_in','time_out','timestamp']
+    __public__ = ['id','school_id','date','id_no','name',
+                  'section','time_in','time_out','timestamp']
+
     id = db.Column(db.Integer, primary_key=True)
+    school_id = db.Column(db.Integer)
     date = db.Column(db.String(20))
     id_no = db.Column(db.String(20))
     name = db.Column(db.String(60))
@@ -73,22 +89,35 @@ class Log(db.Model, Serializer):
 
 
 class Late(db.Model):
+    __public__ = ['id','school_id','date','id_no','time_in']
+
     id = db.Column(db.Integer, primary_key=True)
+    school_id = db.Column(db.Integer)
     date = db.Column(db.String(20))
     id_no = db.Column(db.String(20))
     time_in = db.Column(db.String(10))
 
 
 class Student(db.Model):
+    __public__ = ['id','school_id','id_no','first_name','last_name','middle_name',
+                  'level','department','section','parent_contact']
+
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(60))
-    level = db.Column(db.String(10))
+    school_id = db.Column(db.Integer)
+    id_no = db.Column(db.String(20))
+    first_name = db.Column(db.String(30))
+    last_name = db.Column(db.String(30))
+    middle_name = db.Column(db.String(30))
+    level = db.Column(db.Integer)
+    department = db.Column(db.String(30))
     section = db.Column(db.String(30))
-    department = db.Column(db.String(20))
+    parent_contact = db.Column(db.String(12))
+
 
 class IngAdmin(sqla.ModelView):
     column_display_pk = True
 admin = Admin(app)
+admin.add_view(IngAdmin(School, db.session))
 admin.add_view(IngAdmin(Student, db.session))
 admin.add_view(IngAdmin(Late, db.session))
 
@@ -147,12 +176,36 @@ def get_hour(time):
     return hour
 
 
+def authenticate_user(school_id, password):
+    if not School.query.filter_by(school_id=school_id, password=password).first():
+        return False
+    return True
+
+
 
 @app.route('/', methods=['GET', 'POST'])
 @crossdomain(origin='*')
 def index():
+    if not session:
+        return SWJsonify({'Error': 'Not Logged In'})
     a = Log.query.filter_by().order_by(Log.timestamp.desc()).all()
     return SWJsonify({'Logs': a})
+
+
+@app.route('/login', methods=['GET', 'POST'])
+@crossdomain(origin='*')
+def login():
+    if session:
+        a = Log.query.filter_by().order_by(Log.timestamp.desc()).all()
+        return SWJsonify({'Logs': a})
+    
+    school_id = flask.request.form.get('school_id')
+    password = flask.request.form.get('password')
+
+    if authenticate_user(school_id, password):
+        return SWJsonify({'Logs': a})
+
+    return SWJsonify({'Error': 'Not Logged In'})
 
 
 @app.route('/addlog', methods=['GET', 'POST'])
@@ -185,7 +238,9 @@ def add_log():
 
     time_now = now.replace(hour=get_hour(time_in), minute=int(time_in[3:5]))
 
-    if (time_now >= MORNING_START and time_now < MORNING_END) or (time_now > AFTERNOON_START and time_now < AFTERNOON_END):
+    if (time_now >= MORNING_START and time_now < MORNING_END) or \
+       (time_now > AFTERNOON_START and time_now < AFTERNOON_END):
+
         late = Late(date=date,id_no=id_no,time_in=time_in)
         db.session.add(late)
         db.session.commit()
@@ -210,10 +265,11 @@ def time_out():
     a.time_out=time_out  
     db.session.commit()
 
-    return SWJsonify({'Status': 'Logged Out',
-                      'Log': Log.query.filter_by(id_no=id_no)\
-                      .order_by(Log.timestamp.desc()).first()
-                      })
+    return SWJsonify({
+        'Status': 'Logged Out',
+        'Log': Log.query.filter_by(id_no=id_no)\
+        .order_by(Log.timestamp.desc()).first()
+        })
 
 
 @app.route('/db/rebuild', methods=['GET', 'POST'])
@@ -228,6 +284,6 @@ def rebuild_database():
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(port=int(os.environ['PORT']), host='0.0.0.0')
+    app.run()
 
     # port=int(os.environ['PORT']), host='0.0.0.0'
