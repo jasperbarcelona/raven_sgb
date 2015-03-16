@@ -10,6 +10,7 @@ from flask import render_template, request
 from flask import session, redirect
 from flask_oauth import OAuth
 from functools import wraps
+from dateutil.parser import parse as parse_date
 import json
 import datetime
 from datetime import timedelta
@@ -26,11 +27,6 @@ API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
 # os.environ['DATABASE_URL']
 
 now = datetime.datetime.now()
-MORNING_START = now.replace(hour=8, minute=0, second=0, microsecond=0)
-MORNING_END = now.replace(hour=12, minute=0, second=0, microsecond=0)
-
-AFTERNOON_START = now.replace(hour=13, minute=0, second=0, microsecond=0)
-AFTERNOON_END = now.replace(hour=16, minute=0, second=0, microsecond=0)
 
 
 class Serializer(object):
@@ -70,6 +66,14 @@ class School(db.Model, Serializer):
     city = db.Column(db.String(30))
     email = db.Column(db.String(60))
     tel = db.Column(db.String(15))
+    high_morning_start = db.Column(db.String(30))
+    high_morning_end = db.Column(db.String(30))
+    high_afternoon_start = db.Column(db.String(30))
+    high_afternoon_end = db.Column(db.String(30))
+    elem_morning_start = db.Column(db.String(30))
+    elem_morning_end = db.Column(db.String(30))
+    elem_afternoon_start = db.Column(db.String(30))
+    elem_afternoon_end = db.Column(db.String(30))
 
 
 class Log(db.Model, Serializer):
@@ -228,18 +232,18 @@ def logout():
 @app.route('/addlog', methods=['GET', 'POST'])
 def add_log():
     school_id = flask.request.form.get('school_id')
-    api_key = flask.request.form.get('api_key')
+    api_key = flask.request.args.get('api_key')
 
-    if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
-        return SWJsonify({'Error': 'Unauthorized'}), 400
+    # if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
+    #     return SWJsonify({'Error': 'Unauthorized'}), 400
 
-    id_no = flask.request.form.get('id_no')
-    name = flask.request.form.get('name')
-    level = flask.request.form.get('level')
-    section = flask.request.form.get('section')
-    date = flask.request.form.get('date')
-    department = flask.request.form.get('department')
-    time_in = flask.request.form.get('time_in')
+    id_no = flask.request.args.get('id_no')
+    name = flask.request.args.get('name')
+    level = flask.request.args.get('level')
+    section = flask.request.args.get('section')
+    date = flask.request.args.get('date')
+    department = flask.request.args.get('department')
+    time_in = flask.request.args.get('time_in')
 
     add_this = Log(
             school_id=school_id,
@@ -261,10 +265,10 @@ def add_log():
     school = School.query.filter_by(api_key=api_key).first()
 
     if department == 'highschool':   
-        morning_start = school.high_morning_start
-        morning_end = school.high_morning_end
-        afternoon_start = school.high_afternoon_start
-        afternoon_end = school.high_afternoon_end
+        morning_start = parse_date(school.high_morning_start)
+        morning_end = parse_date(school.high_morning_end)
+        afternoon_start = parse_date(school.high_afternoon_start)
+        afternoon_end = parse_date(school.high_afternoon_end)
 
         if (time_now >= morning_start and time_now < morning_end) or \
            (time_now > afternoon_start and time_now < afternoon_end):
@@ -274,10 +278,10 @@ def add_log():
             db.session.commit()
 
     else:
-        morning_start = school.elem_morning_start
-        morning_end = school.elem_morning_end
-        afternoon_start = school.elem_afternoon_start
-        afternoon_end = school.elem_afternoon_end
+        morning_start = parse_date(school.elem_morning_start)
+        morning_end = parse_date(school.elem_morning_end)
+        afternoon_start = parse_date(school.elem_afternoon_start)
+        afternoon_end = parse_date(school.elem_afternoon_end)
         
         if (time_now >= morning_start and time_now < morning_end) or \
            (time_now > afternoon_start and time_now < afternoon_end):
@@ -328,6 +332,14 @@ def rebuild_database():
         city="Lucena City",
         email="sgb.edu@gmail.com",
         tel="555-8898",
+        elem_morning_start = now.replace(hour=8, minute=0, second=0),
+        elem_morning_end = now.replace(hour=12, minute=0, second=0),
+        elem_afternoon_start = now.replace(hour=13, minute=0, second=0),
+        elem_afternoon_end = now.replace(hour=16, minute=0, second=0),
+        high_morning_start = now.replace(hour=7, minute=0, second=0),
+        high_morning_end = now.replace(hour=12, minute=0, second=0),
+        high_afternoon_start = now.replace(hour=13, minute=0, second=0),
+        high_afternoon_end = now.replace(hour=16, minute=0, second=0)
         )
 
     db.session.add(school)
