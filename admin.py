@@ -237,13 +237,13 @@ def add_log():
     # if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
     #     return SWJsonify({'Error': 'Unauthorized'}), 400
 
-    id_no = flask.request.args.get('id_no')
-    name = flask.request.args.get('name')
-    level = flask.request.args.get('level')
-    section = flask.request.args.get('section')
-    date = flask.request.args.get('date')
-    department = flask.request.args.get('department')
-    time_in = flask.request.args.get('time_in')
+    id_no = flask.request.form.get('id_no')
+    name = flask.request.form.get('name')
+    level = flask.request.form.get('level')
+    section = flask.request.form.get('section')
+    date = flask.request.form.get('date')
+    department = flask.request.form.get('department')
+    time_in = flask.request.form.get('time_in')
 
     add_this = Log(
             school_id=school_id,
