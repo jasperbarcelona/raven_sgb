@@ -232,7 +232,7 @@ def logout():
 @app.route('/addlog', methods=['GET', 'POST'])
 def add_log():
     school_id = flask.request.form.get('school_id')
-    api_key = flask.request.args.get('api_key')
+    api_key = flask.request.form.get('api_key')
 
     # if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
     #     return SWJsonify({'Error': 'Unauthorized'}), 400
