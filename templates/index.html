@@ -5,55 +5,32 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1.0, user-scalable=no">
 	<link rel="stylesheet" href="../static/css/bootstrap.min.css">
 	<link rel="stylesheet" href="../static/css/style.css">
+	<title>Dashboard | Scuola Gesu Bambino</title>
 </head>
-<body>
+<body onload="load_data()">
 	<div class="container">
-		<h1>Dashboard</h1>
+		<h3>Dashboard | Scuola Gesu Bambino</h3>
 		<div id="tabs">
-
-		<ul class="nav nav-tabs">
-		  <li role="presentation" class="active"><a href="#">Gate Logs</a></li>
-		  <li role="presentation"><a href="#">Attendance</a></li>
-		  <li role="presentation"><a href="#">Absents</a></li>
-		  <li role="presentation"><a href="#">Lates</a></li>
-		  <input type="text" class="form-control searchbox" placeholder="Search">
-		</ul>
-
-		<br />
+			<ul class="nav nav-tabs">
+			  <li class="active"><a href="#logs" data-toggle="tab">Logs</a></li>
+			  <li><a href="#attendance" data-toggle="tab">Attendance</a></li>
+			  <li><a href="#absent" data-toggle="tab">Absent</a></li>
+			  <li><a href="#late" data-toggle="tab">Late</a></li>
+			  <button class="search-btn btn"><span class="glyphicon glyphicon-search"></span></button>
+			  <input type="text" class="form-control searchbox" placeholder="Search">
+			</ul>
 		</div>
-		<div class="page">
-			<center>
-				<table class="table">
-					<thead>
-						<th class="short" class="small">Log ID</th>
-						<th class="long">Name</th>
-						<th class="short">ID Number</th>
-						<th class="short">Grade/Year</th>
-						<th class="short">Section</th>
-						<th class="short">Date</th>			
-						<th class="short">In</th>
-						<th class="short">Out</th>
-					</thead>
-					<tbody>
-						{% for i in log %}
-						<tr>
-							<td class="short">{{i.id}}</td>
-							<td class="long">{{i.name}}</td>
-							<td class="short">{{i.id_no}}</td>						
-							<td class="short">{{i.level}}</td>
-							<td class="short">{{i.section}}</td>
-							<td class="short">{{i.date}}</td>						
-							<td class="short">{{i.time_in}}</td>
-							<td class="short">{{i.time_out}}</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-			</center>
+
+		<div id="main-content">
+			<div id="preloader-container">
+				<span class="preloader"><img src="../static/images/282.GIF"></span>
+			</div>
 		</div>
+
 	</div>
 
 	<script src="../static/js/jquery-1.11.0.min.js"></script>
+	<script src="../static/js/bootstrap.min.js"></script>
 	<script src="../static/js/animations.js"></script>
 	<script src="../static/js/functions.js"></script>
 </body>

@@ -83,6 +83,7 @@ class Log(db.Model, Serializer):
     name = db.Column(db.String(60))
     level = db.Column(db.String(10))
     section = db.Column(db.String(30))
+    department = db.Column(db.String(30))
     time_in = db.Column(db.String(10))
     time_out = db.Column(db.String(10))
     timestamp = db.Column(db.String(50))
@@ -188,12 +189,14 @@ def authenticate_user(school_id, password):
 def index():
     if not session:
         return redirect('/loginpage')
+    return flask.render_template('index.html')
 
+
+@app.route('/data', methods=['GET', 'POST'])
+def load_data():
     a = Log.query.filter_by(school_id=session['school_id']).order_by(Log.timestamp).all()
-    return flask.render_template(
-        'index.html',
-        log=a,
-        )
+    return flask.render_template('tables.html',log=a)
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -235,6 +238,7 @@ def add_log():
     level = flask.request.form.get('level')
     section = flask.request.form.get('section')
     date = flask.request.form.get('date')
+    department = flask.request.form.get('department')
     time_in = flask.request.form.get('time_in')
 
     add_this = Log(
@@ -244,6 +248,7 @@ def add_log():
             name=name,
             level=level,
             section=section,
+            department=department,
             time_in=time_in,
             time_out='None',
             timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
@@ -253,13 +258,33 @@ def add_log():
     db.session.commit()
 
     time_now = now.replace(hour=get_hour(time_in), minute=int(time_in[3:5]))
+    school = School.query.filter_by(api_key=api_key).first()
 
-    if (time_now >= MORNING_START and time_now < MORNING_END) or \
-       (time_now > AFTERNOON_START and time_now < AFTERNOON_END):
+    if department == 'highschool':   
+        morning_start = school.high_morning_start
+        morning_end = school.high_morning_end
+        afternoon_start = school.high_afternoon_start
+        afternoon_end = school.high_afternoon_end
 
-        late = Late(date=date,id_no=id_no,time_in=time_in)
-        db.session.add(late)
-        db.session.commit()
+        if (time_now >= morning_start and time_now < morning_end) or \
+           (time_now > afternoon_start and time_now < afternoon_end):
+
+            late = Late(date=date,id_no=id_no,time_in=time_in)
+            db.session.add(late)
+            db.session.commit()
+
+    else:
+        morning_start = school.elem_morning_start
+        morning_end = school.elem_morning_end
+        afternoon_start = school.elem_afternoon_start
+        afternoon_end = school.elem_afternoon_end
+        
+        if (time_now >= morning_start and time_now < morning_end) or \
+           (time_now > afternoon_start and time_now < afternoon_end):
+
+            late = Late(date=date,id_no=id_no,time_in=time_in)
+            db.session.add(late)
+            db.session.commit()
 
     return SWJsonify({
         'Status': 'Logged In',

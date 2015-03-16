@@ -8,16 +8,17 @@ body{
 }
 
 .container{
+	width: 98%;
 	min-width: 700px;
 }
 
 .searchbox{
 	float: right;
-	width: 250px;
+	width: 280px;
 	height: 32px;
 	margin-top: 1px;
-	margin-right: 10px;
-	border-radius: 5px;
+	border-bottom-right-radius: 0px;
+	border-top-right-radius: 0px;
 	background-color: #ffffff;
 }
 
@@ -41,4 +42,49 @@ body{
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
+}
+
+.search-btn{
+	float: right;
+	background-color: #4485F5;
+	color: #F5F5F5;
+	width: 60px;
+	margin-top: 1px;
+	height: 32px;
+	border-bottom-left-radius: 0px;
+	border-top-left-radius: 0px;
+}
+
+.search-btn:hover{
+	color: #F5F5F5;
+}
+
+#main-content{
+	border: 1px solid #F1F1F1;
+	overflow: scroll;
+	overflow-x: hidden; 
+	height: 530px;
+}
+
+.preloader-container{
+	height: 100%;
+	width: 100%;
+	display:box;
+	box-pack:center;
+	box-align:center;
+	display:-webkit-box;
+	-webkit-box-pack:center;
+	-webkit-box-align:center;
+	display:-moz-box;
+	-moz-box-pack:center;
+	-moz-box-align:center;
+	display:-ms-flexbox;
+	-ms-flex-pack:center;
+	-ms-flex-align:center;
+}
+
+#copyright{
+	position: absolute;
+	right: 2%;
+	bottom: 5px;
 }
