@@ -280,8 +280,8 @@ def add_log():
            (time_now > afternoon_start and time_now < afternoon_end):
 
             late = Late(
-                date=date,id_no=id_no,name=name,level=level,
-                section=section,time_in=time_in,department=department,
+                school_id=session['school_id'],date=date,id_no=id_no,name=name,
+                level=level,section=section,time_in=time_in,department=department,
                 timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
                 )
 
