@@ -103,6 +103,7 @@ class Late(db.Model):
     name = db.Column(db.String(60))
     level = db.Column(db.String(10))
     section = db.Column(db.String(30))
+    department = db.Column(db.String(30))
     time_in = db.Column(db.String(10))
     timestamp = db.Column(db.String(50))
 
