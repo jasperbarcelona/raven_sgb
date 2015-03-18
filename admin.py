@@ -94,13 +94,17 @@ class Log(db.Model, Serializer):
 
 
 class Late(db.Model):
-    __public__ = ['id','school_id','date','id_no','time_in']
+    
 
     id = db.Column(db.Integer, primary_key=True)
     school_id = db.Column(db.Integer)
     date = db.Column(db.String(20))
     id_no = db.Column(db.String(20))
+    name = db.Column(db.String(60))
+    level = db.Column(db.String(10))
+    section = db.Column(db.String(30))
     time_in = db.Column(db.String(10))
+    timestamp = db.Column(db.String(50))
 
 
 class Student(db.Model):
@@ -198,8 +202,9 @@ def index():
 
 @app.route('/data', methods=['GET', 'POST'])
 def load_data():
-    a = Log.query.filter_by(school_id=session['school_id']).order_by(Log.timestamp).all()
-    return flask.render_template('tables.html',log=a)
+    logs = Log.query.filter_by(school_id=session['school_id']).order_by(Log.timestamp.desc()).all()
+    l = Late.query.filter_by(school_id=session['school_id']).order_by(Late.timestamp.desc()).all()
+    return flask.render_template('tables.html',log=logs,late=l)
 
 
 
@@ -273,7 +278,12 @@ def add_log():
         if (time_now >= morning_start and time_now < morning_end) or \
            (time_now > afternoon_start and time_now < afternoon_end):
 
-            late = Late(date=date,id_no=id_no,time_in=time_in)
+            late = Late(
+                date=date,id_no=id_no,name=name,level=level,
+                section=section,time_in=time_in,
+                timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+                )
+
             db.session.add(late)
             db.session.commit()
 
@@ -286,7 +296,11 @@ def add_log():
         if (time_now >= morning_start and time_now < morning_end) or \
            (time_now > afternoon_start and time_now < afternoon_end):
 
-            late = Late(date=date,id_no=id_no,time_in=time_in)
+            late = Late(
+                date=date,id_no=id_no,name=name,level=level,
+                section=section,time_in=time_in,
+                timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+                )
             db.session.add(late)
             db.session.commit()
 

@@ -4,24 +4,22 @@
 		<div class="tab-pane fade in active" id="logs">
 			<table class="table">
 				<thead>
-					<th class="short" class="small">Log ID</th>
+					<th class="short">Date</th>		
 					<th class="long">Name</th>
 					<th class="short">ID Number</th>
 					<th class="short">Grade/Year</th>
-					<th class="short">Section</th>
-					<th class="short">Date</th>			
+					<th class="short">Section</th>	
 					<th class="short">In</th>
 					<th class="short">Out</th>
 				</thead>
 				<tbody>
 					{% for i in log %}
 					<tr>
-						<td class="short">{{i.id}}</td>
+						<td class="short">{{i.date}}</td>	
 						<td class="long">{{i.name}}</td>
 						<td class="short">{{i.id_no}}</td>						
 						<td class="short">{{i.level}}</td>
-						<td class="short">{{i.section}}</td>
-						<td class="short">{{i.date}}</td>						
+						<td class="short">{{i.section}}</td>				
 						<td class="short">{{i.time_in}}</td>
 						<td class="short">{{i.time_out}}</td>
 					</tr>
@@ -30,8 +28,32 @@
 			</table>
 		</div>
 
-		<div class="tab-pane slide" id="attendance">
+		<div class="tab-pane fade" id="attendance">
 			<p>attendance</p>
+		</div>
+
+		<div class="tab-pane fade" id="late">
+			<table class="table">
+				<thead>
+					<th class="short">Date</th>	
+					<th class="long">Name</th>
+					<th class="short">Grade/Year</th>
+					<th class="short">Section</th>			
+					<th class="short">In</th>
+
+				</thead>
+				<tbody>
+					{% for a in late %}
+					<tr>
+						<td class="short">{{a.date}}</td>	
+						<td class="long">{{a.name}}</td>					
+						<td class="short">{{a.level}}</td>
+						<td class="short">{{a.section}}</td>				
+						<td class="short">{{a.time_in}}</td>	
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
 		</div>
 	</div>
 </html>
