@@ -11,20 +11,41 @@
 </head>
 <body onload="load_data()">
 	<div class="container">
+		<br />
 		<h3>Dashboard | Scuola Gesu Bambino</h3>
+		<div id="select-view">
+			<div class="radio" onclick="change_view('student')">
+				{% if view=='student' %}
+				<label><input type="radio" checked="true" name="optradio">Students</label>
+				{% else %}
+				<label><input type="radio" name="optradio">Students</label>
+				{% endif %}
+			</div>
+			&nbsp;&nbsp;
+			<div class="radio" onclick="change_view('faculty')">
+			  {% if view=='faculty' %}
+				<label><input type="radio" checked="true" name="optradio">Faculty</label>
+				{% else %}
+				<label><input type="radio" name="optradio">Faculty</label>
+				{% endif %}
+			</div>
+		</div>
+		<br /><br />
 		<div id="tabs">
 			<ul class="nav nav-tabs">
-			  <li class="active"><a href="#logs" data-toggle="tab">Logs</a></li>
-			  <li><a href="#attendance" data-toggle="tab">Attendance</a></li>
-			  <li><a href="#absent" data-toggle="tab">Absent</a></li>
-			  <li><a href="#late" data-toggle="tab">Late</a></li>
+			  <li class="active"><a href="#logs" data-toggle="tab" onclick="change_tab('logs')">Logs</a></li>
+			  <li><a href="#attendance" data-toggle="tab" onclick="change_tab('attendance')">Attendance</a></li>
+			  <li><a href="#absent" data-toggle="tab" onclick="change_tab('absent')">Absent</a></li>
+			  <li><a href="#late" data-toggle="tab" onclick="change_tab('late')">Late</a></li>
 			  <button class="search-btn btn"><span class="glyphicon glyphicon-search"></span></button>
 			  <input type="text" class="form-control searchbox" placeholder="Search">
 			</ul>
 		</div>
 		<div id="main-content">
-			<div id="preloader-container">
-				<span class="preloader"><img src="../static/images/282.GIF"></span>
+			<div id="table-container">
+				<div id="preloader-container">
+					<span class="preloader"><img src="../static/images/282.GIF"></span>
+				</div>
 			</div>
 		</div>
 	</div>	

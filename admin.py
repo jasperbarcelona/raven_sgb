@@ -8,7 +8,6 @@ from flask.ext.admin.contrib.sqla import ModelView
 from flask.ext.admin import Admin, BaseView, expose
 from flask import render_template, request
 from flask import session, redirect
-from flask_oauth import OAuth
 from functools import wraps
 from dateutil.parser import parse as parse_date
 import json
@@ -66,19 +65,19 @@ class School(db.Model, Serializer):
     city = db.Column(db.String(30))
     email = db.Column(db.String(60))
     tel = db.Column(db.String(15))
-    high_morning_start = db.Column(db.String(30))
-    high_morning_end = db.Column(db.String(30))
-    high_afternoon_start = db.Column(db.String(30))
-    high_afternoon_end = db.Column(db.String(30))
-    elem_morning_start = db.Column(db.String(30))
-    elem_morning_end = db.Column(db.String(30))
-    elem_afternoon_start = db.Column(db.String(30))
-    elem_afternoon_end = db.Column(db.String(30))
+    faculty_morning_start = db.Column(db.String(30))
+    faculty_morning_end = db.Column(db.String(30))
+    faculty_afternoon_start = db.Column(db.String(30))
+    faculty_afternoon_end = db.Column(db.String(30))
+    student_morning_start = db.Column(db.String(30))
+    student_morning_end = db.Column(db.String(30))
+    student_afternoon_start = db.Column(db.String(30))
+    student_afternoon_end = db.Column(db.String(30))
 
 
 class Log(db.Model, Serializer):
     __public__ = ['id','school_id','date','id_no','name','level',
-                  'section','time_in','time_out','timestamp']
+                  'department','section','time_in','time_out','timestamp']
 
     id = db.Column(db.Integer, primary_key=True)
     school_id = db.Column(db.Integer)
@@ -89,22 +88,8 @@ class Log(db.Model, Serializer):
     section = db.Column(db.String(30))
     department = db.Column(db.String(30))
     time_in = db.Column(db.String(10))
+    military_time = db.Column(db.DateTime)
     time_out = db.Column(db.String(10))
-    timestamp = db.Column(db.String(50))
-
-
-class Late(db.Model):
-    
-
-    id = db.Column(db.Integer, primary_key=True)
-    school_id = db.Column(db.Integer)
-    date = db.Column(db.String(20))
-    id_no = db.Column(db.String(20))
-    name = db.Column(db.String(60))
-    level = db.Column(db.String(10))
-    section = db.Column(db.String(30))
-    department = db.Column(db.String(30))
-    time_in = db.Column(db.String(10))
     timestamp = db.Column(db.String(50))
 
 
@@ -118,9 +103,11 @@ class Student(db.Model):
     first_name = db.Column(db.String(30))
     last_name = db.Column(db.String(30))
     middle_name = db.Column(db.String(30))
-    level = db.Column(db.Integer)
+    level = db.Column(db.String(30))
     department = db.Column(db.String(30))
     section = db.Column(db.String(30))
+    absences = db.Column(db.String(3))
+    lates = db.Column(db.String(3))
     parent_contact = db.Column(db.String(12))
 
 
@@ -130,7 +117,6 @@ admin = Admin(app)
 admin.add_view(IngAdmin(School, db.session))
 admin.add_view(IngAdmin(Log, db.session))
 admin.add_view(IngAdmin(Student, db.session))
-admin.add_view(IngAdmin(Late, db.session))
 
 
 def crossdomain(origin=None, methods=None, headers=None,
@@ -193,19 +179,30 @@ def authenticate_user(school_id, password):
     return True
 
 
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if not session:
         return redirect('/loginpage')
-    return flask.render_template('index.html')
+    return flask.render_template('inde.html', view=session['department'])
 
 
 @app.route('/data', methods=['GET', 'POST'])
 def load_data():
-    logs = Log.query.filter_by(school_id=session['school_id']).order_by(Log.timestamp.desc()).all()
-    l = Late.query.filter_by(school_id=session['school_id']).order_by(Late.timestamp.desc()).all()
-    return flask.render_template('tables.html',log=logs,late=l)
+    school = School.query.filter_by(api_key=session['api_key']).first()
+    print 'xxxxxxxx'
+    print school.name
+    logs = Log.query.filter_by(school_id=session['school_id'],department=session['department']).order_by(Log.timestamp.desc()).all()
+    l = Log.query.filter(Log.military_time>=parse_date(school.student_morning_start),Log.military_time>=parse_date(school.student_morning_end)).order_by(Log.timestamp.desc()).all()
+
+    attendance = Student.query.filter_by(department=session['department']).order_by(Student.last_name).all()
+    return flask.render_template('tables.html',log=logs,late=l,attendance=attendance)
+
+
+@app.route('/view', methods=['GET', 'POST'])
+def change_view():
+    view = flask.request.form.get('view')
+    session['department'] = view
+    return redirect('/data')
 
 
 
@@ -221,6 +218,8 @@ def login():
         return redirect('/loginpage')
 
     session['school_id'] = school_id
+    session['api_key'] = School.query.filter_by(id=school_id).first().api_key
+    session['department'] = 'student'
     return redirect('/')
 
 
@@ -250,6 +249,7 @@ def add_log():
     date = flask.request.form.get('date')
     department = flask.request.form.get('department')
     time_in = flask.request.form.get('time_in')
+    military_time = parse_date(flask.request.form.get('military_time'))
 
     add_this = Log(
             school_id=school_id,
@@ -261,49 +261,12 @@ def add_log():
             department=department,
             time_in=time_in,
             time_out='None',
+            military_time=military_time,
             timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
             )
     
     db.session.add(add_this)
     db.session.commit()
-
-    time_now = now.replace(hour=get_hour(time_in), minute=int(time_in[3:5]))
-    school = School.query.filter_by(api_key=api_key).first()
-
-    if department == 'highschool':   
-        morning_start = parse_date(school.high_morning_start)
-        morning_end = parse_date(school.high_morning_end)
-        afternoon_start = parse_date(school.high_afternoon_start)
-        afternoon_end = parse_date(school.high_afternoon_end)
-
-        if (time_now >= morning_start and time_now < morning_end) or \
-           (time_now > afternoon_start and time_now < afternoon_end):
-
-            late = Late(
-                school_id=school_id,date=date,id_no=id_no,name=name,
-                level=level,section=section,time_in=time_in,department=department,
-                timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
-                )
-
-            db.session.add(late)
-            db.session.commit()
-
-    else:
-        morning_start = parse_date(school.elem_morning_start)
-        morning_end = parse_date(school.elem_morning_end)
-        afternoon_start = parse_date(school.elem_afternoon_start)
-        afternoon_end = parse_date(school.elem_afternoon_end)
-        
-        if (time_now >= morning_start and time_now < morning_end) or \
-           (time_now > afternoon_start and time_now < afternoon_end):
-
-            late = Late(
-                school_id=school_id,date=date,id_no=id_no,name=name,
-                level=level,section=section,time_in=time_in,department=department,
-                timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
-                )
-            db.session.add(late)
-            db.session.commit()
 
     return SWJsonify({
         'Status': 'Logged In',
@@ -347,17 +310,45 @@ def rebuild_database():
         city="Lucena City",
         email="sgb.edu@gmail.com",
         tel="555-8898",
-        elem_morning_start = now.replace(hour=8, minute=0, second=0),
-        elem_morning_end = now.replace(hour=12, minute=0, second=0),
-        elem_afternoon_start = now.replace(hour=13, minute=0, second=0),
-        elem_afternoon_end = now.replace(hour=16, minute=0, second=0),
-        high_morning_start = now.replace(hour=7, minute=0, second=0),
-        high_morning_end = now.replace(hour=12, minute=0, second=0),
-        high_afternoon_start = now.replace(hour=13, minute=0, second=0),
-        high_afternoon_end = now.replace(hour=16, minute=0, second=0)
+        student_morning_start = now.replace(hour=8, minute=0, second=0),
+        student_morning_end = now.replace(hour=12, minute=0, second=0),
+        student_afternoon_start = now.replace(hour=13, minute=0, second=0),
+        student_afternoon_end = now.replace(hour=16, minute=0, second=0),
+        faculty_morning_start = now.replace(hour=7, minute=0, second=0),
+        faculty_morning_end = now.replace(hour=12, minute=0, second=0),
+        faculty_afternoon_start = now.replace(hour=13, minute=0, second=0),
+        faculty_afternoon_end = now.replace(hour=16, minute=0, second=0)
+        )
+
+    a = Student(
+        school_id=1234,
+        id_no='2011334281',
+        first_name='Jasper',
+        last_name='Barcelona',
+        middle_name='Estrada',
+        level='2nd Grade',
+        department='students',
+        section='Fidelity',
+        absences='0',
+        lates='0',
+        parent_contact='09183339068'
+        )
+
+    b = Student(
+        school_id=1234,
+        id_no='2011334282',
+        first_name='Prof',
+        last_name='Barcelona',
+        middle_name='Estrada',
+        department='faculty',
+        absences='0',
+        lates='0',
+        parent_contact='09183339068'
         )
 
     db.session.add(school)
+    db.session.add(a)
+    db.session.add(b)
     db.session.commit()
 
     return SWJsonify({'Status': 'Database Rebuild Success'})
