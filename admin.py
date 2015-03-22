@@ -183,7 +183,7 @@ def authenticate_user(school_id, password):
 def index():
     if not session:
         return redirect('/loginpage')
-    return flask.render_template('inde.html', view=session['department'])
+    return flask.render_template('index.html', view=session['department'])
 
 
 @app.route('/data', methods=['GET', 'POST'])
