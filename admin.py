@@ -191,8 +191,17 @@ def load_data():
     school = School.query.filter_by(api_key=session['api_key']).first()
     print 'xxxxxxxx'
     print school.name
-    logs = Log.query.filter_by(school_id=session['school_id'],department=session['department']).order_by(Log.timestamp.desc()).all()
-    l = Log.query.filter(Log.military_time>=parse_date(school.student_morning_start),Log.military_time>=parse_date(school.student_morning_end)).order_by(Log.timestamp.desc()).all()
+    logs = Log.query.filter_by(
+        school_id=session['school_id'],
+        department=session['department']
+        ).order_by(Log.timestamp.desc()).all()
+
+    l = Log.query.filter(
+        Log.military_time>=parse_date(school.student_morning_start),
+        Log.military_time>=parse_date(school.student_morning_end),
+        Log.school_id==session['school_id'],
+        Log.department==session['department']
+        ).order_by(Log.timestamp.desc()).all()
 
     attendance = Student.query.filter_by(department=session['department']).order_by(Student.last_name).all()
     return flask.render_template('tables.html',log=logs,late=l,attendance=attendance)

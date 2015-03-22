@@ -34,9 +34,11 @@
 		<div id="tabs">
 			<ul class="nav nav-tabs">
 			  <li class="active"><a href="#logs" data-toggle="tab" onclick="change_tab('logs')">Logs</a></li>
+			  {% if view=='student' %}
 			  <li><a href="#attendance" data-toggle="tab" onclick="change_tab('attendance')">Attendance</a></li>
 			  <li><a href="#absent" data-toggle="tab" onclick="change_tab('absent')">Absent</a></li>
 			  <li><a href="#late" data-toggle="tab" onclick="change_tab('late')">Late</a></li>
+			  {% endif %}
 			  <button class="search-btn btn"><span class="glyphicon glyphicon-search"></span></button>
 			  <input type="text" class="form-control searchbox" placeholder="Search">
 			</ul>
