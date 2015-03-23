@@ -7,10 +7,12 @@ function load_data(){
 $.post('/data',
 function(data){
 $('#table-container').html(data);
+$("#big-preloader-container").hide();
 });
 }
 
 function change_view(view){
+$("#big-preloader-container").show();
 var view = view;
 $.post('/view',{view:view},
 function(data){

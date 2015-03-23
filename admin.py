@@ -21,7 +21,7 @@ from functools import update_wrapper
 app = flask.Flask(__name__)
 db = SQLAlchemy(app)
 app.secret_key = '234234rfascasascqweqscasefsdvqwefe2323234dvsv'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] =  os.environ['DATABASE_URL']
 API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
 # os.environ['DATABASE_URL']
 
@@ -204,7 +204,7 @@ def load_data():
         ).order_by(Log.timestamp.desc()).all()
 
     attendance = Student.query.filter_by(department=session['department']).order_by(Student.last_name).all()
-    return flask.render_template('tables.html',log=logs,late=l,attendance=attendance)
+    return flask.render_template('tables.html',log=logs,late=l,attendance=attendance, view=session['department'])
 
 
 @app.route('/view', methods=['GET', 'POST'])
@@ -259,6 +259,8 @@ def add_log():
     department = flask.request.form.get('department')
     time_in = flask.request.form.get('time_in')
     military_time = parse_date(flask.request.form.get('military_time'))
+
+
 
     add_this = Log(
             school_id=school_id,
