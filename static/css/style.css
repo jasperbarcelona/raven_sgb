@@ -1,3 +1,10 @@
+@font-face
+	{
+		font-family: OpenSans;
+		src:url('../fonts/OpenSans-Regular.ttf');
+	}
+
+
 html{
 	height: 100%;
 }
@@ -5,11 +12,70 @@ html{
 body{
 	height: 100%;
 	width: 100%;
+	color: #494949 !important;
+	font-family: OpenSans, sans-serif;
+}
+
+.dashboard{
+	float: left;
+	margin-top: 5px;
 }
 
 .container{
 	width: 98%;
-	min-width: 700px;
+	min-width: 800px;
+}
+
+.header{
+	background-color: gray;
+	color: #ffffff;
+}
+
+.button-container{
+	float: right;
+}
+
+.buttons{	
+	height: 30px;
+	width: 70px;	
+	font-size: 16px;
+	margin-top: 2px;
+}
+
+#refresh-btn{
+	background-color: #F4F4F4;
+	color: #6D6D6D;
+	border: 1px solid #B6B6B6;
+}
+
+.dropdown-menu:after {
+	left: auto;
+	right: 13px;
+}
+
+.dropdown-menu {
+	left: auto;
+	right: 0;
+}
+
+.dropdown-menu label{
+	margin-left: 20px;
+}
+
+.active-view{
+	float: right;
+}
+
+#compose-btn{
+	background-color: #CD3D2D;
+	color: #FFFFFF;
+	
+}
+
+#settings-btn{
+	background-color: #F4F4F4;
+	color: #6D6D6D;
+	border: 1px solid #B6B6B6;
 }
 
 #big-preloader-container{
@@ -35,10 +101,8 @@ body{
 }
 
 .searchbox{
-	float: right;
 	width: 280px;
 	height: 32px;
-	margin-top: 1px;
 	border-bottom-right-radius: 0px;
 	border-top-right-radius: 0px;
 	background-color: #ffffff;
@@ -48,8 +112,12 @@ body{
 	width: 100px;
 }
 
+#tabs{
+	margin-top: 30px;
+}
+
 .long{
-	width: 180px;
+	width: 150px;
 	max-width: 180px;
 	min-width: 150px;
 	overflow: hidden;
@@ -58,7 +126,7 @@ body{
 }
 
 .short{
-	width: 100px;
+	width: 120px;
 	max-width: 100px;
 	min-width: 70px;
 	overflow: hidden;
@@ -71,7 +139,6 @@ body{
 	background-color: #4485F5;
 	color: #F5F5F5;
 	width: 60px;
-	margin-top: 1px;
 	height: 32px;
 	border-bottom-left-radius: 0px;
 	border-top-left-radius: 0px;
@@ -86,7 +153,9 @@ body{
 	overflow: scroll;
 	overflow-x: hidden; 
 	height: 530px;
-	padding: 20px;
+	padding-left: 20px;
+	padding-right: 20px;
+	padding-bottom: 20px;
 }
 
 #preloader-container{
@@ -112,7 +181,7 @@ body{
 	bottom: 5px;
 }
 
-#select-view{
+#search-container{
 	padding-top: 3px;
 	display: inline;
 	float: right;

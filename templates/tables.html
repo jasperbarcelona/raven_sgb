@@ -36,24 +36,24 @@
 		<div class="tab-pane fade" id="attendance">
 			<table class="table">
 				<thead>	
-					<th class="long">Last Name</th>
-					<th class="long">First Name</th>
-					<th class="long">Middle Name</th>
-					<th class="long">Grade/Year</th>
-					<th class="long">Section</th>	
-					<th class="long">Absences</th>
-					<th class="long">Lates</th>
+					<th class="short">Last Name</th>
+					<th class="short">First Name</th>
+					<th class="short">Middle Name</th>
+					<th class="short">Grade/Year</th>
+					<th class="short">Section</th>	
+					<th class="short">Absences</th>
+					<th class="short">Lates</th>
 				</thead>
 				<tbody>
 					{% for index in attendance %}
 					<tr>
-						<td class="long">{{index.last_name}}</td>	
-						<td class="long">{{index.first_name}}</td>	
-						<td class="long">{{index.middle_name}}</td>				
-						<td class="long">{{index.level}}</td>
-						<td class="long">{{index.section}}</td>				
-						<td class="long">0</td>
-						<td class="long">{{index.lates}}</td>
+						<td class="short">{{index.last_name}}</td>	
+						<td class="short">{{index.first_name}}</td>	
+						<td class="short">{{index.middle_name}}</td>				
+						<td class="short">{{index.level}}</td>
+						<td class="short">{{index.section}}</td>				
+						<td class="short">0</td>
+						<td class="short">{{index.lates}}</td>
 					</tr>
 					{% endfor %}
 				</tbody>

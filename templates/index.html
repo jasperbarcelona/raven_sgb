@@ -16,25 +16,27 @@
 	</div>
 	<div class="container">
 		<br />
-		<h3>Dashboard | Scuola Gesu Bambino</h3>
-		<div id="select-view">
-			<div class="radio" onclick="change_view('student')">
+		<h3 class="dashboard">Dashboard | Scuola Gesu Bambino</h3>
+		<div id="search-container">
+			<!-- <div class="radio" onclick="change_view('student')">
 				{% if view=='student' %}
-				<label><input type="radio" checked="true" name="optradio">Students</label>
+				<label class="lighter-text"><input type="radio" checked="true" name="optradio">Students</label>
 				{% else %}
-				<label><input type="radio" name="optradio">Students</label>
+				<label class="lighter-text"><input type="radio" name="optradio">Students</label>
 				{% endif %}
 			</div>
 			&nbsp;&nbsp;
 			<div class="radio" onclick="change_view('faculty')">
 			  {% if view=='faculty' %}
-				<label><input type="radio" checked="true" name="optradio">Faculty</label>
+				<label class="lighter-text"	><input type="radio" checked="true" name="optradio">Faculty</label>
 				{% else %}
-				<label><input type="radio" name="optradio">Faculty</label>
+				<label class="lighter-text"><input type="radio" name="optradio">Faculty</label>
 				{% endif %}
-			</div>
+			</div> -->
+			<button class="search-btn btn"><span class="glyphicon glyphicon-search"></span></button>
+			  <input type="text" class="form-control searchbox" placeholder="[WIP]Search">
 		</div>
-		<br /><br />
+		<br />
 		<div id="tabs">
 			<ul class="nav nav-tabs">
 			  <li class="active"><a href="#logs" data-toggle="tab" onclick="change_tab('logs')">Logs</a></li>
@@ -43,8 +45,23 @@
 			  <li><a href="#absent" data-toggle="tab" onclick="change_tab('absent')">Absent</a></li>
 			  <li><a href="#late" data-toggle="tab" onclick="change_tab('late')">Late</a></li>
 			  {% endif %}
-			  <button class="search-btn btn"><span class="glyphicon glyphicon-search"></span></button>
-			  <input type="text" class="form-control searchbox" placeholder="[WIP]Search">
+			  <div class="button-container">
+			  	<button id="compose-btn" class="buttons btn"><span class="glyphicon glyphicon-pencil"></span></button>
+				<a href="/"><button id="refresh-btn" class="buttons btn"><span class="glyphicon glyphicon-repeat"></span></button></a>
+				
+				<div class="btn-group">
+					<button id="settings-btn" type="button" class="btn buttons dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+					<span class="glyphicon glyphicon-cog"></span>
+					</button>
+					<ul class="dropdown-menu" role="menu">
+						<label>View:</label>
+						<li><a href="#">Students<span class="glyphicon glyphicon-ok active-view"></span></a></li>
+						<li><a href="#">Faculty</a></li>
+						<li class="divider"></li>
+						<li><a href="/logout">Logout</a></li>
+					</ul>
+				</div>
+			</div>			
 			</ul>
 		</div>
 		<div id="main-content">
