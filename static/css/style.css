@@ -42,6 +42,10 @@ body{
 	margin-top: 2px;
 }
 
+#compose-btn:focus{
+	outline: none;
+}
+
 #refresh-btn{
 	background-color: #F4F4F4;
 	color: #6D6D6D;
@@ -142,6 +146,11 @@ body{
 	height: 32px;
 	border-bottom-left-radius: 0px;
 	border-top-left-radius: 0px;
+}
+
+.search-btn:focus{
+	outline: none;
+	color: #F5F5F5;
 }
 
 .search-btn:hover{

@@ -46,7 +46,7 @@
 			  <li><a href="#late" data-toggle="tab" onclick="change_tab('late')">Late</a></li>
 			  {% endif %}
 			  <div class="button-container">
-			  	<button id="compose-btn" class="buttons btn"><span class="glyphicon glyphicon-pencil"></span></button>
+			  	<button id="compose-btn" class="buttons btn" data-toggle="modal" data-target=".test-modal"><span class="glyphicon glyphicon-pencil"></span></button>
 				<a href="/"><button id="refresh-btn" class="buttons btn"><span class="glyphicon glyphicon-repeat"></span></button></a>
 				
 				<div class="btn-group">
@@ -70,6 +70,24 @@
 					<span class="preloader"><img src="../static/images/282.GIF"></span>
 				</div> -->
 			</div>
+		</div>
+
+		<div class="modal fade test-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						<h4 class="modal-title" id="gridSystemModalLabel">Modal title</h4>
+					</div>
+					<div class="modal-body">
+						cascdsdvsfd
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+						<button type="button" class="btn btn-primary">Send</button>
+					</div>
+					</div><!-- /.modal-content -->
+				</div><!-- /.modal-dialog -->
 		</div>
 	</div>	
 	<script src="../static/js/bootstrap.min.js"></script>	
