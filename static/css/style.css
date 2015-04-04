@@ -92,7 +92,7 @@ body{
 	font-size: 13px;
 	display: -webkit-flex;
 	display: flex;
-	-webkit-flex-direction: row
+	-webkit-flex-direction: column;
 	flex-direction: row;
 	-webkit-align-items: center;
 	align-items: center;
