@@ -90,15 +90,14 @@ body{
 	width: 100%;
 	text-align: center;
 	font-size: 13px;
-	text-align: center;
-	display: -ms-flexbox;
 	display: -webkit-flex;
 	display: flex;
-
-	-ms-flex-align: center;
+	-webkit-flex-direction: row
+	flex-direction: row;
 	-webkit-align-items: center;
-	-webkit-box-align: center;
 	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
 }
 
 .searchbox{
