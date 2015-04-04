@@ -16,6 +16,10 @@ body{
 	font-family: OpenSans, sans-serif;
 }
 
+.brand::first-letter {
+    color: #0089A8;
+} 
+
 .dashboard{
 	float: left;
 	margin-top: 5px;
@@ -89,7 +93,7 @@ body{
 	height: 100%;
 	width: 100%;
 	text-align: center;
-	font-size: 13px;
+	font-size: 26px;
 	display: -webkit-flex;
 	display: flex;
 	-webkit-flex-direction: column;
