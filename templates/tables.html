@@ -4,15 +4,15 @@
 		<div class="tab-pane fade in active" id="logs">
 			<table class="table">
 				<thead>
-					<th class="short">Date</th>		
-					<th class="long">Name</th>
-					<th class="short">ID Number</th>
+					<th class="short"><span id="date-head">Date</span></th>		
+					<th class="long"><span id="name-head">Name</span></th>
+					<th class="short"><span id="id_no-head">ID Number</span></th>
 					{% if view=='student' %}
-					<th class="short">Grade/Year</th>
-					<th class="short">Section</th>
+					<th class="short"><span id="level-head">Grade/Year</span></th>
+					<th class="short"><span id="section-head">Section</span></th>
 					{% endif %}
-					<th class="short">In</th>
-					<th class="short">Out</th>
+					<th class="short"><span id="in-head">In</span></th>
+					<th class="short"><span id="out-head">Out</span></th>
 				</thead>
 				<tbody>
 					{% for i in log %}

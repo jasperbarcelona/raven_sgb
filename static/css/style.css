@@ -16,6 +16,14 @@ body{
 	font-family: OpenSans, sans-serif;
 }
 
+span:hover{
+	cursor: pointer;
+}
+
+th span:hover{
+	cursor: pointer;
+}
+
 .brand::first-letter {
     color: #0089A8;
 } 
