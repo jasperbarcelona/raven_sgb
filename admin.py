@@ -23,7 +23,7 @@ import os
 app = flask.Flask(__name__)
 db = SQLAlchemy(app)
 app.secret_key = '234234rfascasascqweqscasefsdvqwefe2323234dvsv'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'
 API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
 # os.environ['DATABASE_URL']
 
@@ -110,6 +110,17 @@ class Student(db.Model):
     absences = db.Column(db.String(3))
     lates = db.Column(db.String(3))
     parent_contact = db.Column(db.String(12))
+
+
+class Late(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    school_id = db.Column(db.Integer)
+    date = db.Column(db.String(20))
+    id_no = db.Column(db.String(20))
+    name = db.Column(db.String(60))
+    time_in = db.Column(db.String(10))
+    department = db.Column(db.String(30))
+    timestamp = db.Column(db.String(50))
 
 
 class Absent(db.Model):
@@ -227,12 +238,10 @@ def load_data():
         department=session['department']
         ).order_by(Log.timestamp.desc()).all()
 
-    l = Log.query.filter(
-        str(Log.military_time)[11:]>=str(parse_date(school.student_afternoon_start))[11:],
-        str(Log.military_time)[11:]<=str(parse_date(school.student_afternoon_end))[11:],
-        Log.school_id==session['school_id'],
-        Log.department==session['department']
-        ).order_by(Log.timestamp.desc()).all()
+    l = Late.query.filter_by(
+        school_id=session['school_id'],
+        department=session['department']
+        ).order_by(Late.timestamp.desc()).all()
 
     attendance = Student.query.filter_by(
         department=session['department'])\
@@ -312,10 +321,44 @@ def add_log():
             military_time=military_time,
             timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
             )
-    
+
     db.session.add(add_this)
     db.session.commit()
 
+    time_now = now.replace(hour=get_hour(time_in), minute=int(time_in[3:5]))
+    school = School.query.filter_by(api_key=api_key).first()
+
+    if department == 'faculty':   
+        morning_start = parse_date(school.faculty_morning_start)
+        morning_end = parse_date(school.faculty_morning_end)
+        afternoon_start = parse_date(school.faculty_afternoon_start)
+        afternoon_end = parse_date(school.faculty_afternoon_end)
+
+    else:
+        morning_start = parse_date(school.student_morning_start)
+        morning_end = parse_date(school.student_morning_end)
+        afternoon_start = parse_date(school.student_afternoon_start)
+        afternoon_end = parse_date(school.student_afternoon_end)
+
+        
+    if (time_now >= morning_start and time_now < morning_end) or \
+       (time_now >= afternoon_start and time_now < afternoon_end):
+
+       late = Late(
+            school_id=school_id,
+            date=date,
+            id_no=id_no,
+            name=name,
+            time_in=time_in,
+            department=department,
+            timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+            )
+
+       db.session.add(late)
+       lates=Student.query.filter_by(id_no=id_no).first().lates
+       lates=Late.query.filter_by(id_no=id_no).count()
+       db.session.commit()
+            
     return SWJsonify({
         'Status': 'Logged In',
         'Log': Log.query.all()
@@ -418,6 +461,6 @@ def rebuild_database():
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(port=int(os.environ['PORT']), host='0.0.0.0')
+    app.run()
 
     # port=int(os.environ['PORT']), host='0.0.0.0'
