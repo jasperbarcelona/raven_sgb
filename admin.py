@@ -228,8 +228,8 @@ def load_data():
         ).order_by(Log.timestamp.desc()).all()
 
     l = Log.query.filter(
-        Log.military_time>=str(parse_date(school.student_afternoon_start))[11:],
-        Log.military_time<=str(parse_date(school.student_afternoon_end))[11:],
+        str(Log.military_time)[11:]>=str(parse_date(school.student_afternoon_start))[11:],
+        str(Log.military_time)[11:]<=str(parse_date(school.student_afternoon_end))[11:],
         Log.school_id==session['school_id'],
         Log.department==session['department']
         ).order_by(Log.timestamp.desc()).all()
@@ -297,7 +297,7 @@ def add_log():
     date = flask.request.form.get('date')
     department = flask.request.form.get('department')
     time_in = flask.request.form.get('time_in')
-    military_time = str(parse_date(flask.request.form.get('military_time')))[11:]
+    military_time = parse_date(flask.request.form.get('military_time'))
 
     add_this = Log(
             school_id=school_id,
