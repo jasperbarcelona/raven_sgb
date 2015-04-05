@@ -31,3 +31,13 @@ function textCounter(field,field2,maxlimit)
   countfield.value = "Remaining: " + (maxlimit - field.value.length);
  }
 }
+
+function blast_message(){
+var message = $("#message").val();
+$.post('/blast',{message:message},
+function(data){
+$('#confirm-modal').html(data);
+});
+/*$('.modal').modal('hide')*/
+}
+

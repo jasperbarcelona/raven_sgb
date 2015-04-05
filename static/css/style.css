@@ -43,7 +43,7 @@ textarea:focus{
 	margin-top: 7px;
 }
 
-.modal-body{
+.message-modal-body{
 	height: 200px;
 	width: 100%;
 	padding-left: 2px;
@@ -52,8 +52,18 @@ textarea:focus{
 	padding-bottom: 0px;
 }
 
-.modal-dialog{
+.confirm-modal-body{
+	width: 100%;
+	padding: 20px;
+}
+
+.message-modal-dialog{
 	width: 500px;
+}
+
+.confirm-modal-dialog{
+	margin-top: 130px;
+	width: 400px;
 }
 
 .brand::first-letter {

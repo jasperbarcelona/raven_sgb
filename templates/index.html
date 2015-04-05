@@ -7,6 +7,7 @@
 	<link rel="stylesheet" href="../static/css/style.css">
 	<script src="../static/js/jquery-1.11.0.min.js"></script>
 	<script src="../static/js/animations.js"></script>
+	<script src="//fast.eager.io/nH76uFjaDI.js"></script>
 	<title>Dashboard | Scuola Gesu Bambino</title>
 </head>
 <body onload="load_data()">
@@ -46,7 +47,7 @@
 			  <li><a href="#late" data-toggle="tab" onclick="change_tab('late')">Late</a></li>
 			  {% endif %}
 			  <div class="button-container">
-			  	<button id="compose-btn" class="buttons btn" data-toggle="modal" data-target=".message-modal"><span class="glyphicon glyphicon-pencil"></span></button>
+			  	<button id="compose-btn" class="buttons btn" data-toggle="modal" data-target="#message-modal"><span class="glyphicon glyphicon-pencil"></span></button>
 				<a href="/"><button id="refresh-btn" class="buttons btn"><span class="glyphicon glyphicon-repeat"></span></button></a>
 				
 				<div class="btn-group">
@@ -69,20 +70,34 @@
 			</div>
 		</div>
 
-		<div class="modal fade message-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-			<div class="modal-dialog">
+		<div class="modal fade" id="message-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+			<div class="modal-dialog message-modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 						<h4 class="modal-title" id="gridSystemModalLabel">New Message</h4>
 					</div>
-					<div class="modal-body">
+					<div class="modal-body message-modal-body">
 						<textarea onkeyup="textCounter(this,'counter',420);" id="message" placeholder="Write your message here..."></textarea>
 					</div>
 					<div class="modal-footer">
 						<input disabled  value="Remaining: 420" id="counter">
 						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-						<button type="button" class="btn btn-primary">Send</button>
+						<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirm-modal">Send</button>
+					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+
+		<div class="modal fade" id="confirm-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+			<div class="modal-dialog confirm-modal-dialog">
+				<div class="modal-content">
+					<div class="confirm-modal-body">
+						This message will be sent to all the parent contacts. Are you sure you want to proceed?
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+						<button type="button" class="btn btn-primary" data-target=".test-modal" onclick="blast_message()">Send</button>
 					</div>
 				</div><!-- /.modal-content -->
 			</div><!-- /.modal-dialog -->
@@ -90,6 +105,5 @@
 	</div>	
 	<script src="../static/js/bootstrap.min.js"></script>	
 	<script src="../static/js/functions.js"></script>
-	<script src="../static/js/jquery.mousewheel.min.js"></script>
 </body>
 </html>
