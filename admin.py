@@ -228,8 +228,8 @@ def load_data():
         ).order_by(Log.timestamp.desc()).all()
 
     l = Log.query.filter(
-        Log.military_time>=parse_date(school.student_morning_start),
-        Log.military_time<=parse_date(school.student_morning_end),
+        Log.military_time>=parse_date(school.student_afternoon_start),
+        Log.military_time<=parse_date(school.student_afternoon_end),
         Log.school_id==session['school_id'],
         Log.department==session['department']
         ).order_by(Log.timestamp.desc()).all()
