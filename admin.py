@@ -344,6 +344,20 @@ def time_out():
         }), 201
 
 
+@app.route('/blast',methods=['GET','POST'])
+def blast_message():
+    for user in db.session.query(Student.parent_contact).distinct():
+        print user.parent_contact   
+    return flask.render_template('sending.html')
+
+
+@app.route('/favicon.ico',methods=['GET','POST'])
+def est():
+
+    return('',204)
+
+
+
 @app.route('/db/rebuild', methods=['GET', 'POST'])
 def rebuild_database():
     db.drop_all()
@@ -379,7 +393,7 @@ def rebuild_database():
         section='Fidelity',
         absences='0',
         lates='0',
-        parent_contact='09183339068'
+        parent_contact='639183339068'
         )
 
     b = Student(
@@ -391,7 +405,7 @@ def rebuild_database():
         department='faculty',
         absences='0',
         lates='0',
-        parent_contact='09183339068'
+        parent_contact='639183339068'
         )
 
     db.session.add(school)
