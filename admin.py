@@ -6,27 +6,28 @@ from flask.ext import admin
 from flask.ext.admin.contrib import sqla
 from flask.ext.admin.contrib.sqla import ModelView
 from flask.ext.admin import Admin, BaseView, expose
-from flask import render_template, request
-from flask import session, redirect
-from functools import wraps
 from dateutil.parser import parse as parse_date
-import json
-import datetime
-from datetime import timedelta
-import time
-import os
+from flask import render_template, request
 from functools import update_wrapper
+from flask import session, redirect
+from datetime import timedelta
+from datetime import datetime
+from functools import wraps
+from threading import Timer
+import datetime
+import time
+import json
+import os
 
 
 app = flask.Flask(__name__)
 db = SQLAlchemy(app)
 app.secret_key = '234234rfascasascqweqscasefsdvqwefe2323234dvsv'
-app.config['SQLALCHEMY_DATABASE_URI'] =  os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
 # os.environ['DATABASE_URL']
 
 now = datetime.datetime.now()
-
 
 class Serializer(object):
   __public__ = None
@@ -111,6 +112,19 @@ class Student(db.Model):
     parent_contact = db.Column(db.String(12))
 
 
+class Absent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    school_id = db.Column(db.Integer)
+    id_no = db.Column(db.String(20))
+    first_name = db.Column(db.String(30))
+    last_name = db.Column(db.String(30))
+    middle_name = db.Column(db.String(30))
+    level = db.Column(db.String(30))
+    department = db.Column(db.String(30))
+    section = db.Column(db.String(30))
+    date = db.Column(db.String(20))
+
+
 class IngAdmin(sqla.ModelView):
     column_display_pk = True
 admin = Admin(app)
@@ -179,10 +193,27 @@ def authenticate_user(school_id, password):
     return True
 
 
+def mark_absent():
+    print 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+    print 'its working'
+    start_timer()
+
+
+def start_timer():
+    x=datetime.datetime.now()
+    y=x.replace( hour=1, minute=4, second=0, microsecond=0)
+    delta_t=y-x
+    secs=delta_t.seconds+1
+    t = Timer(secs, mark_absent)
+    t.start()
+    print 'time until mark_absent: ' + str(secs/60) + 'mins'
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if not session:
         return redirect('/loginpage')
+    start_timer()
     return flask.render_template('index.html', view=session['department'])
 
 
@@ -203,8 +234,17 @@ def load_data():
         Log.department==session['department']
         ).order_by(Log.timestamp.desc()).all()
 
-    attendance = Student.query.filter_by(department=session['department']).order_by(Student.last_name).all()
-    return flask.render_template('tables.html',log=logs,late=l,attendance=attendance, view=session['department'])
+    attendance = Student.query.filter_by(
+        department=session['department'])\
+        .order_by(Student.last_name).all()
+
+    return flask.render_template(
+        'tables.html',
+        log=logs,
+        late=l,
+        attendance=attendance, 
+        view=session['department']
+        )
 
 
 @app.route('/view', methods=['GET', 'POST'])
@@ -212,7 +252,6 @@ def change_view():
     view = flask.request.form.get('view')
     session['department'] = view
     return redirect('/data')
-
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -259,8 +298,6 @@ def add_log():
     department = flask.request.form.get('department')
     time_in = flask.request.form.get('time_in')
     military_time = parse_date(flask.request.form.get('military_time'))
-
-
 
     add_this = Log(
             school_id=school_id,
@@ -338,7 +375,7 @@ def rebuild_database():
         last_name='Barcelona',
         middle_name='Estrada',
         level='2nd Grade',
-        department='students',
+        department='student',
         section='Fidelity',
         absences='0',
         lates='0',

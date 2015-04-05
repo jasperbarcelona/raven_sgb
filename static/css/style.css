@@ -24,6 +24,38 @@ th span:hover{
 	cursor: pointer;
 }
 
+textarea{
+	width: 100%;
+	height: 100%;
+	padding: 11px;
+	resize: none;
+	border: 1px solid #4485F5;
+}
+
+textarea:focus{
+	outline: none;
+}
+
+#counter{
+	float: left;
+	background-color: transparent;
+	border: none;
+	margin-top: 7px;
+}
+
+.modal-body{
+	height: 200px;
+	width: 100%;
+	padding-left: 2px;
+	padding-right: 2px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
+.modal-dialog{
+	width: 500px;
+}
+
 .brand::first-letter {
     color: #0089A8;
 } 
@@ -52,6 +84,7 @@ th span:hover{
 	width: 70px;	
 	font-size: 16px;
 	margin-top: 2px;
+	padding:4px;
 }
 
 #compose-btn:focus{
@@ -62,6 +95,10 @@ th span:hover{
 	background-color: #F4F4F4;
 	color: #6D6D6D;
 	border: 1px solid #B6B6B6;
+}
+
+#refresh-btn:focus{
+	outline: none;
 }
 
 .dropdown-menu:after {
@@ -79,7 +116,7 @@ th span:hover{
 }
 
 .active-view{
-	float: right;
+	margin-left: 40px;
 }
 
 #compose-btn{
