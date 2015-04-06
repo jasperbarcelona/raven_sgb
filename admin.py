@@ -347,8 +347,17 @@ def add_log():
         morning_end = parse_date(school.student_morning_end)
         afternoon_start = parse_date(school.student_afternoon_start)
         afternoon_end = parse_date(school.student_afternoon_end)
+    print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
+    print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
+    print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
+    print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
+    print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
 
-        
+    print 'morning_start = ' + morning_start
+    print 'morning_end = ' + morning_end
+    
+    print 'afternoon_start = ' + afternoon_start
+    print 'afternoon_end = ' + afternoon_end
     if (time_now >= morning_start and time_now < morning_end) or \
        (time_now >= afternoon_start and time_now < afternoon_end):
 
