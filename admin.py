@@ -118,6 +118,8 @@ class Late(db.Model):
     date = db.Column(db.String(20))
     id_no = db.Column(db.String(20))
     name = db.Column(db.String(60))
+    level = db.Column(db.String(30))
+    section = db.Column(db.String(30))
     time_in = db.Column(db.String(10))
     department = db.Column(db.String(30))
     timestamp = db.Column(db.String(50))
@@ -366,6 +368,8 @@ def add_log():
             date=date,
             id_no=id_no,
             name=name,
+            level=level,
+            section=section,
             time_in=time_in,
             department=department,
             timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
