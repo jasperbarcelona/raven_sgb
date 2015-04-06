@@ -326,7 +326,7 @@ def add_log():
     db.session.add(add_this)
     db.session.commit()
 
-    time_now = now.replace(hour=get_hour(time_in), minute=int(time_in[3:5]))
+    time_now = str(now.replace(hour=get_hour(time_in), minute=int(time_in[3:5])))[11:]
     school = School.query.filter_by(api_key=api_key).first()
     print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
     print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
@@ -337,16 +337,16 @@ def add_log():
     print time_now
 
     if department == 'faculty':   
-        morning_start = parse_date(school.faculty_morning_start)
-        morning_end = parse_date(school.faculty_morning_end)
-        afternoon_start = parse_date(school.faculty_afternoon_start)
-        afternoon_end = parse_date(school.faculty_afternoon_end)
+        morning_start = str(parse_date(school.faculty_morning_start))[11:]
+        morning_end = str(parse_date(school.faculty_morning_end))[11:]
+        afternoon_start = str(parse_date(school.faculty_afternoon_start))[11:]
+        afternoon_end = str(parse_date(school.faculty_afternoon_end))[11:]
 
     else:
-        morning_start = parse_date(school.student_morning_start)
-        morning_end = parse_date(school.student_morning_end)
-        afternoon_start = parse_date(school.student_afternoon_start)
-        afternoon_end = parse_date(school.student_afternoon_end)
+        morning_start = str(parse_date(school.student_morning_start))[11:]
+        morning_end = str(parse_date(school.student_morning_end))[11:]
+        afternoon_start = str(parse_date(school.student_afternoon_start))[11:]
+        afternoon_end = str(parse_date(school.student_afternoon_end))[11:]
     print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
     print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
     print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
