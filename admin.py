@@ -356,6 +356,7 @@ def add_log():
             )
 
        db.session.add(late)
+       db.session.commit()
        lates=Student.query.filter_by(id_no=id_no).first().lates
        lates=Late.query.filter_by(id_no=id_no).count()
        db.session.commit()
