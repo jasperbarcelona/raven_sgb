@@ -442,13 +442,8 @@ def blast_message():
 @app.route('/sync',methods=['GET','POST'])
 def sync_database():
     school_id = flask.request.args.get('school_id')
-    print 'xxxxxxxxxxxxxxxxxxxxx'
-    print 'xxxxxxxxxxxxxxxxxxxxx'
-    print 'xxxxxxxxxxxxxxxxxxxxx'
-    print 'xxxxxxxxxxxxxxxxxxxxx'
-    print school_id
     return SWJsonify({
-        'Records': Student.query.filter_by(school_id=school_id)
+        'Records': Student.query.filter_by(school_id=school_id).all()
         }), 201
 
 
