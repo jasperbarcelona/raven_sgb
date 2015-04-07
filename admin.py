@@ -112,9 +112,9 @@ class Student(db.Model, Serializer):
     first_name = db.Column(db.String(30))
     last_name = db.Column(db.String(30))
     middle_name = db.Column(db.String(30))
-    level = db.Column(db.String(30))
+    level = db.Column(db.String(30), default='None')
     department = db.Column(db.String(30))
-    section = db.Column(db.String(30))
+    section = db.Column(db.String(30), default='None')
     absences = db.Column(db.String(3))
     lates = db.Column(db.String(3))
     parent_contact = db.Column(db.String(12))
@@ -442,7 +442,7 @@ def blast_message():
 @app.route('/sync',methods=['GET','POST'])
 def sync_database():
     return SWJsonify({
-        'Records': Student.query.all()
+        'Records': Student.query.filter_by(school_id=session['school_id'])
         }), 201
 
 
