@@ -442,8 +442,9 @@ def blast_message():
 @app.route('/sync',methods=['GET','POST'])
 def sync_database():
     return SWJsonify({
-        'Status': 'Sent',
-        'Records': Student.query.all()
+        'Status': 'Logged Out',
+        'Log': Log.query.filter_by(id_no=id_no)\
+        .order_by(Log.timestamp.desc()).first()
         }), 201
 
 
