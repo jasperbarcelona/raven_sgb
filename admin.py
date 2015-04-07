@@ -442,7 +442,7 @@ def blast_message():
 @app.route('/sync',methods=['GET','POST'])
 def sync_database():
     all_records = Student.query.all()
-    return all_records
+    return jsonify(records=all_records)
 
 
 @app.route('/favicon.ico',methods=['GET','POST'])
