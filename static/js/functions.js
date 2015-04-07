@@ -36,8 +36,9 @@ function blast_message(){
 var message = $("#message").val();
 $.post('/blast',{message:message},
 function(data){
-$('#confirm-modal').html(data);
+$('#status-modal-body').html(data);
 });
-/*$('.modal').modal('hide')*/
+$('.modal').modal('hide')
+$('#message-status-modal').modal('show')
 }
 

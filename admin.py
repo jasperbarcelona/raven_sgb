@@ -14,17 +14,25 @@ from datetime import timedelta
 from datetime import datetime
 from functools import wraps
 from threading import Timer
+import requests
 import datetime
 import time
 import json
+import uuid
 import os
 
 
 app = flask.Flask(__name__)
 db = SQLAlchemy(app)
 app.secret_key = '234234rfascasascqweqscasefsdvqwefe2323234dvsv'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'
 API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
+
+SMS_URL = 'https://post.chikka.com/smsapi/request'
+CLIENT_ID = 'ef8cf56d44f93b6ee6165a0caa3fe0d1ebeee9b20546998931907edbb266eb72'
+SECRET_KEY = 'c4c461cc5aa5f9f89b701bc016a73e9981713be1bf7bb057c875dbfacff86e1d'
+SHORT_CODE = '29290420420'
+CONNECT_TIMEOUT = 5.0
 # os.environ['DATABASE_URL']
 
 now = datetime.datetime.now()
@@ -222,6 +230,37 @@ def start_timer():
     t.start()
     print 'time until mark_absent: ' + str(secs/60) + 'mins'
 
+def text_blast(message, contact):
+    sendThis = message
+
+    message_options = {
+            'message_type': 'SEND',
+            'message': sendThis,
+            'client_id': CLIENT_ID,
+            'mobile_number': contact,
+            'secret_key': SECRET_KEY,
+            'shortcode': SHORT_CODE,
+            'message_id': uuid.uuid4().hex
+        }
+
+    sent = False
+    while not sent:
+        try:
+            r = requests.post(
+                SMS_URL,
+                message_options
+                # timeout=(int(CONNECT_TIMEOUT))           
+            )
+            sent =True
+            print r.text
+
+        except requests.exceptions.ConnectionError as e:
+            sleep(5)
+            print "Too slow Mojo!"
+            pass
+    
+    return True
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -330,13 +369,6 @@ def add_log():
 
     time_now = str(now.replace(hour=get_hour(time_in), minute=int(time_in[3:5])))[11:]
     school = School.query.filter_by(api_key=api_key).first()
-    print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
-    print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
-    print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
-    print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
-    print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
-
-    print time_now
 
     if department == 'faculty':   
         morning_start = str(parse_date(school.faculty_morning_start))[11:]
@@ -349,17 +381,7 @@ def add_log():
         morning_end = str(parse_date(school.student_morning_end))[11:]
         afternoon_start = str(parse_date(school.student_afternoon_start))[11:]
         afternoon_end = str(parse_date(school.student_afternoon_end))[11:]
-    print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
-    print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
-    print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
-    print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
-    print 'xxxxxxxxxxxxxxxxxxxxxxxxxx'
-
-    print 'morning_start = ' + str(morning_start)
-    print 'morning_end = ' + str(morning_end)
-
-    print 'afternoon_start = ' + str(afternoon_start)
-    print 'afternoon_end = ' + str(afternoon_end)
+    
     if (time_now >= morning_start and time_now < morning_end) or \
        (time_now >= afternoon_start and time_now < afternoon_end):
 
@@ -411,14 +433,20 @@ def time_out():
 
 @app.route('/blast',methods=['GET','POST'])
 def blast_message():
+    message = flask.request.form.get('message')
     for user in db.session.query(Student.parent_contact).distinct():
-        print user.parent_contact   
-    return flask.render_template('sending.html')
+        text_blast(message, user.parent_contact) 
+    return flask.render_template('status.html')
+
+
+@app.route('/sync',methods=['GET','POST'])
+def sync_database():
+    all_records = Student.query.all()
+    return all_records
 
 
 @app.route('/favicon.ico',methods=['GET','POST'])
 def est():
-
     return('',204)
 
 
@@ -483,6 +511,6 @@ def rebuild_database():
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(port=int(os.environ['PORT']), host='0.0.0.0')
+    app.run()
 
     # port=int(os.environ['PORT']), host='0.0.0.0'
