@@ -104,7 +104,7 @@ class Log(db.Model, Serializer):
 
 class Student(db.Model):
     __public__ = ['id','school_id','id_no','first_name','last_name','middle_name',
-                  'level','department','section','parent_contact']
+                  'level','department','section','absences','lates','parent_contact']
 
     id = db.Column(db.Integer, primary_key=True)
     school_id = db.Column(db.Integer)
@@ -442,9 +442,7 @@ def blast_message():
 @app.route('/sync',methods=['GET','POST'])
 def sync_database():
     return SWJsonify({
-        'Status': 'Logged Out',
-        'Log': Log.query.filter_by(id_no=id_no)\
-        .order_by(Log.timestamp.desc()).first()
+        'Records': Sudent.query.all()
         }), 201
 
 
