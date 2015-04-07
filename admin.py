@@ -442,7 +442,7 @@ def blast_message():
 @app.route('/sync',methods=['GET','POST'])
 def sync_database():
     return SWJsonify({
-        'Records': Sudent.query.all()
+        'Records': Student.query.all()
         }), 201
 
 
