@@ -102,7 +102,7 @@ class Log(db.Model, Serializer):
     timestamp = db.Column(db.String(50))
 
 
-class Student(db.Model):
+class Student(db.Model, Serializer):
     __public__ = ['id','school_id','id_no','first_name','last_name','middle_name',
                   'level','department','section','absences','lates','parent_contact']
 
@@ -442,7 +442,7 @@ def blast_message():
 @app.route('/sync',methods=['GET','POST'])
 def sync_database():
     return SWJsonify({
-        'Records': Log.query.all()
+        'Records': Student.query.all()
         }), 201
 
 
