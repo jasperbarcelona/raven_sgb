@@ -441,8 +441,10 @@ def blast_message():
 
 @app.route('/sync',methods=['GET','POST'])
 def sync_database():
-    all_records = Student.query.all()
-    return SWJsonify({'records': all_records}), 201
+    return SWJsonify({
+        'Status': 'Sent',
+        'Records': Student.query.all()
+        }), 201
 
 
 @app.route('/favicon.ico',methods=['GET','POST'])
