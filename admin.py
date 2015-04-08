@@ -370,7 +370,7 @@ def time_in(school_id,api_key,id_no,name,level,section,date,department,time,mili
         }), 201
 
 
-def time_ou(id_no, time):
+def time_out(id_no, time):
     a = Log.query.filter_by(id_no=id_no).order_by(Log.timestamp.desc()).first()
     a.time_out=time  
     db.session.commit()
