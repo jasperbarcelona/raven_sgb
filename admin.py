@@ -214,10 +214,10 @@ def get_student_data(id_no):
     return Student.query.filter_by(id_no=id_no).first()
 
 
-def send_message(id_no, time):
+def send_message(id_no, time, action):
     student = get_student_data(id_no)
     sendThis = 'Good day! We would like to inform you that '+student.first_name+' '+\
-                student.last_name+' has entered the school gate at '+\
+                student.last_name+' has ' + action +' the school gate at '+\
                 time+'.'
 
     message_options = {
@@ -390,7 +390,7 @@ def add_log():
     time = flask.request.form.get('time')
     military_time = parse_date(flask.request.form.get('military_time'))
 
-    if not Log.query.filter_by(date=date, id_no=id_no).first() or Log.query.filter_by(date=date, id_no=id_no).order_by(Log.timestamp.desc()).first().time_out != 'None':
+    if not Log.query.filter_by(date=date, id_no=id_no).first() or Lateog.query.filter_by(date=date, id_no=id_no).order_by(Log.timestamp.desc()).first().time_out != 'None':
         add_this = Log(
                 school_id=school_id,
                 date=date,
@@ -408,9 +408,8 @@ def add_log():
         db.session.add(add_this)
         db.session.commit()
 
-        message_thread = threading.Thread(target=send_message,args=[id_no, time])    
+        message_thread = threading.Thread(target=send_message,args=[id_no, time, 'entered']])    
         message_thread.start()
-
 
         time_now = str(now.replace(hour=get_hour(time), minute=int(time[3:5])))[11:]
         school = School.query.filter_by(api_key=api_key).first()
@@ -456,6 +455,9 @@ def add_log():
     a = Log.query.filter_by(id_no=id_no).order_by(Log.timestamp.desc()).first()
     a.time_out=time  
     db.session.commit()
+
+    message_thread = threading.Thread(target=send_message,args=[id_no, time, 'exited'])    
+    message_thread.start()
 
     return SWJsonify({
         'Status': 'Logged Out',
