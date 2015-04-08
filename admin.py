@@ -209,6 +209,45 @@ def get_hour(time):
     return hour
 
 
+def get_student_data(id_no):
+    return Student.query.filter_by(id_no=id_no).first()
+
+
+def send_message(id_no, time):
+    student = get_student_data(id_no)
+    sendThis = 'Good day! We would like to inform you that '+student.first_name+' '+\
+                student.last_name+' has entered the school gate at '+\
+                time+'.'
+
+    message_options = {
+            'message_type': 'SEND',
+            'message': sendThis,
+            'client_id': CLIENT_ID,
+            'mobile_number': get_student_data(id_no).parent_contact,
+            'secret_key': SECRET_KEY,
+            'shortcode': SHORT_CODE,
+            'message_id': uuid.uuid4().hex
+        }
+
+    sent = False
+    while not sent:
+        try:
+            r = requests.post(
+                SMS_URL,
+                message_options
+                # timeout=(int(CONNECT_TIMEOUT))           
+            )
+            sent =True
+            print r.text
+
+        except requests.exceptions.ConnectionError as e:
+            sleep(5)
+            print "Too slow Mojo!"
+            pass
+    
+    return None
+
+
 def authenticate_user(school_id, password):
     if not School.query.filter_by(id=school_id, password=password).first():
         return False
@@ -347,65 +386,81 @@ def add_log():
     section = flask.request.form.get('section')
     date = flask.request.form.get('date')
     department = flask.request.form.get('department')
-    time_in = flask.request.form.get('time_in')
+    time = flask.request.form.get('time')
     military_time = parse_date(flask.request.form.get('military_time'))
 
-    add_this = Log(
-            school_id=school_id,
-            date=date,
-            id_no=id_no,
-            name=name,
-            level=level,
-            section=section,
-            department=department,
-            time_in=time_in,
-            time_out='None',
-            military_time=military_time,
-            timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
-            )
+    if not Log.query.filter_by(date=date, id_no=id_no).first().log_in
 
-    db.session.add(add_this)
+        add_this = Log(
+                school_id=school_id,
+                date=date,
+                id_no=id_no,
+                name=name,
+                level=level,
+                section=section,
+                department=department,
+                time_in=time,
+                time_out='None',
+                military_time=military_time,
+                timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+                )
+
+        db.session.add(add_this)
+        db.session.commit()
+
+        message_thread = threading.Thread(target=send_message,args=[id_no, time])    
+        message_thread.start()
+
+
+        time_now = str(now.replace(hour=get_hour(time_in), minute=int(time_in[3:5])))[11:]
+        school = School.query.filter_by(api_key=api_key).first()
+
+        if department == 'faculty':   
+            morning_start = str(parse_date(school.faculty_morning_start))[11:]
+            morning_end = str(parse_date(school.faculty_morning_end))[11:]
+            afternoon_start = str(parse_date(school.faculty_afternoon_start))[11:]
+            afternoon_end = str(parse_date(school.faculty_afternoon_end))[11:]
+
+        else:
+            morning_start = str(parse_date(school.student_morning_start))[11:]
+            morning_end = str(parse_date(school.student_morning_end))[11:]
+            afternoon_start = str(parse_date(school.student_afternoon_start))[11:]
+            afternoon_end = str(parse_date(school.student_afternoon_end))[11:]
+        
+        if (time_now >= morning_start and time_now < morning_end) or \
+           (time_now >= afternoon_start and time_now < afternoon_end):
+
+           late = Late(
+                school_id=school_id,
+                date=date,
+                id_no=id_no,
+                name=name,
+                level=level,
+                section=section,
+                time_in=time_in,
+                department=department,
+                timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+                )
+
+           db.session.add(late)
+           db.session.commit()
+           lates=Student.query.filter_by(id_no=id_no).first().lates
+           lates=Late.query.filter_by(id_no=id_no).count()
+           db.session.commit()
+                
+        return SWJsonify({
+            'Status': 'Logged In',
+            'Log': Log.query.all()
+            }), 201
+
+    a = Log.query.filter_by(id_no=id_no).order_by(Log.timestamp.desc()).first()
+    a.time_out=time  
     db.session.commit()
 
-    time_now = str(now.replace(hour=get_hour(time_in), minute=int(time_in[3:5])))[11:]
-    school = School.query.filter_by(api_key=api_key).first()
-
-    if department == 'faculty':   
-        morning_start = str(parse_date(school.faculty_morning_start))[11:]
-        morning_end = str(parse_date(school.faculty_morning_end))[11:]
-        afternoon_start = str(parse_date(school.faculty_afternoon_start))[11:]
-        afternoon_end = str(parse_date(school.faculty_afternoon_end))[11:]
-
-    else:
-        morning_start = str(parse_date(school.student_morning_start))[11:]
-        morning_end = str(parse_date(school.student_morning_end))[11:]
-        afternoon_start = str(parse_date(school.student_afternoon_start))[11:]
-        afternoon_end = str(parse_date(school.student_afternoon_end))[11:]
-    
-    if (time_now >= morning_start and time_now < morning_end) or \
-       (time_now >= afternoon_start and time_now < afternoon_end):
-
-       late = Late(
-            school_id=school_id,
-            date=date,
-            id_no=id_no,
-            name=name,
-            level=level,
-            section=section,
-            time_in=time_in,
-            department=department,
-            timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
-            )
-
-       db.session.add(late)
-       db.session.commit()
-       lates=Student.query.filter_by(id_no=id_no).first().lates
-       lates=Late.query.filter_by(id_no=id_no).count()
-       db.session.commit()
-            
     return SWJsonify({
-        'Status': 'Logged In',
-        'Log': Log.query.all()
+        'Status': 'Logged Out',
+        'Log': Log.query.filter_by(id_no=id_no)\
+        .order_by(Log.timestamp.desc()).first()
         }), 201
 
 
