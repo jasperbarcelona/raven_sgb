@@ -390,7 +390,7 @@ def add_log():
     time = flask.request.form.get('time')
     military_time = parse_date(flask.request.form.get('military_time'))
 
-    if not Log.query.filter_by(date=date, id_no=id_no).first() or Log.query.filter_by(date=date, id_no=id_no).first().time_out:
+    if not Log.query.filter_by(date=date, id_no=id_no).first():
         add_this = Log(
                 school_id=school_id,
                 date=date,
@@ -412,7 +412,7 @@ def add_log():
         message_thread.start()
 
 
-        time_now = str(now.replace(hour=get_hour(time_in), minute=int(time_in[3:5])))[11:]
+        time_now = str(now.replace(hour=get_hour(time), minute=int(time_in[3:5])))[11:]
         school = School.query.filter_by(api_key=api_key).first()
 
         if department == 'faculty':   
