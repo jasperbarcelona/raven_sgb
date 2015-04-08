@@ -390,7 +390,7 @@ def add_log():
     time = flask.request.form.get('time')
     military_time = parse_date(flask.request.form.get('military_time'))
 
-    if not Log.query.filter_by(date=date, id_no=id_no).first() or Log.query.filter_by(date=date, id_no=id_no).first().time_out != 'None':
+    if not Log.query.filter_by(date=date, id_no=id_no).first() or Log.query.filter_by(date=date, id_no=id_no).order_by(Log.timestamp.desc()).first().time_out != 'None':
         add_this = Log(
                 school_id=school_id,
                 date=date,
