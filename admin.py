@@ -408,7 +408,7 @@ def add_log():
         db.session.add(add_this)
         db.session.commit()
 
-        message_thread = threading.Thread(target=send_message,args=[id_no, time, 'entered']])    
+        message_thread = threading.Thread(target=send_message,args=[id_no, time, 'entered'])    
         message_thread.start()
 
         time_now = str(now.replace(hour=get_hour(time), minute=int(time[3:5])))[11:]
