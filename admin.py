@@ -336,8 +336,8 @@ def check_if_late(school_id,api_key,id_no,name,level,section,date,department,tim
 
        db.session.add(late)
        db.session.commit()
-       lates=Student.query.filter_by(id_no=id_no).first().lates
-       lates=Late.query.filter_by(id_no=id_no).count()
+       lates=Student.query.filter_by(id_no=id_no).first()
+       lates.lates=Late.query.filter_by(id_no=id_no).count()
        db.session.commit()
 
 
@@ -521,7 +521,7 @@ def rebuild_database():
         student_morning_start = now.replace(hour=8, minute=0, second=0),
         student_morning_end = now.replace(hour=12, minute=0, second=0),
         student_afternoon_start = now.replace(hour=13, minute=0, second=0),
-        student_afternoon_end = now.replace(hour=17, minute=0, second=0),
+        student_afternoon_end = now.replace(hour=18, minute=0, second=0),
         faculty_morning_start = now.replace(hour=7, minute=0, second=0),
         faculty_morning_end = now.replace(hour=12, minute=0, second=0),
         faculty_afternoon_start = now.replace(hour=13, minute=0, second=0),
