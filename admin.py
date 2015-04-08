@@ -412,7 +412,7 @@ def add_log():
         message_thread.start()
 
 
-        time_now = str(now.replace(hour=get_hour(time), minute=int(time_in[3:5])))[11:]
+        time_now = str(now.replace(hour=get_hour(time), minute=int(time[3:5])))[11:]
         school = School.query.filter_by(api_key=api_key).first()
 
         if department == 'faculty':   
