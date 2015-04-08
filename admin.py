@@ -270,6 +270,7 @@ def start_timer():
     t.start()
     print 'time until mark_absent: ' + str(secs/60) + 'mins'
 
+
 def text_blast(message, contact):
     sendThis = message
 
@@ -369,6 +370,21 @@ def time_in(school_id,api_key,id_no,name,level,section,date,department,time,mili
         }), 201
 
 
+def time_ou(id_no, time):
+    a = Log.query.filter_by(id_no=id_no).order_by(Log.timestamp.desc()).first()
+    a.time_out=time  
+    db.session.commit()
+
+    message_thread = threading.Thread(target=send_message,args=[id_no, time, 'exited'])    
+    message_thread.start()
+
+    return SWJsonify({
+        'Status': 'Logged Out',
+        'Log': Log.query.filter_by(id_no=id_no)\
+        .order_by(Log.timestamp.desc()).first()
+        }), 201
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if not session:
@@ -445,8 +461,8 @@ def add_log():
     school_id = flask.request.form.get('school_id')
     api_key = flask.request.form.get('api_key')
 
-    # if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
-    #     return SWJsonify({'Error': 'Unauthorized'}), 400
+    if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
+        return SWJsonify({'Error': 'Unauthorized'}), 400
 
     id_no = flask.request.form.get('id_no')
     name = flask.request.form.get('name')
@@ -457,43 +473,12 @@ def add_log():
     time = flask.request.form.get('time')
     military_time = parse_date(flask.request.form.get('military_time'))
 
-    if not Log.query.filter_by(date=date, id_no=id_no).first() or Log.query.filter_by(date=date, id_no=id_no).order_by(Log.timestamp.desc()).first().time_out != 'None':
-        return time_in(school_id,api_key,id_no,name,level,section,date,department,time,military_time)
-
-    a = Log.query.filter_by(id_no=id_no).order_by(Log.timestamp.desc()).first()
-    a.time_out=time  
-    db.session.commit()
-
-    message_thread = threading.Thread(target=send_message,args=[id_no, time, 'exited'])    
-    message_thread.start()
-
-    return SWJsonify({
-        'Status': 'Logged Out',
-        'Log': Log.query.filter_by(id_no=id_no)\
-        .order_by(Log.timestamp.desc()).first()
-        }), 201
-
-
-@app.route('/timeout', methods=['GET', 'POST'])
-def time_out():
-    school_id = flask.request.form.get('school_id')
-    api_key = flask.request.form.get('api_key')
-
-    if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
-        return SWJsonify({'Error': 'Unauthorized'}), 400
-
-    id_no = flask.request.form.get('id_no')
-    time_out = flask.request.form.get('time_out')
-
-    a = Log.query.filter_by(id_no=id_no).order_by(Log.timestamp.desc()).first()
-    a.time_out=time_out  
-    db.session.commit()
-
-    return SWJsonify({
-        'Status': 'Logged Out',
-        'Log': Log.query.filter_by(id_no=id_no)\
-        .order_by(Log.timestamp.desc()).first()
-        }), 201
+    if not Log.query.filter_by(date=date, id_no=id_no).first() or Log.query.filter_by\
+    (date=date, id_no=id_no).order_by(Log.timestamp.desc()).first().time_out != 'None':
+        time_in_thread = threading.Thread(target=time_in,args=[school_id,api_key,id_no,name,level,section,date,department,time,military_time])    
+     
+        return time_in_thread.start()
+    return time_out(id_no, time)
 
 
 @app.route('/blast',methods=['GET','POST'])
