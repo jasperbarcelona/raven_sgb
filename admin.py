@@ -372,13 +372,7 @@ def time_out(id_no, time):
 
     message_thread = threading.Thread(target=send_message,args=[id_no, time, 'exited'])    
     message_thread.start()
-
-    return SWJsonify({
-        'Status': 'Logged Out',
-        'Log': Log.query.filter_by(id_no=id_no)\
-        .order_by(Log.timestamp.desc()).first()
-        }), 201
-
+    
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -478,8 +472,15 @@ def add_log():
         'Status': 'Logged In',
         'Log': Log.query.all()
         }), 201
+
+    time_out_thread = threading.Thread(target=time_out,args=[id_no, time])    
+    time_out_thread.start()
         
-    return time_out(id_no, time)
+    return SWJsonify({
+        'Status': 'Logged Out',
+        'Log': Log.query.filter_by(id_no=id_no)\
+        .order_by(Log.timestamp.desc()).first()
+        }), 201
 
 
 @app.route('/blast',methods=['GET','POST'])
