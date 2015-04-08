@@ -363,11 +363,6 @@ def time_in(school_id,api_key,id_no,name,level,section,date,department,time,mili
     message_thread.start()
 
     check_if_late(school_id,api_key,id_no,name,level,section,date,department,time,military_time)
-            
-    return SWJsonify({
-        'Status': 'Logged In',
-        'Log': Log.query.all()
-        }), 201
 
 
 def time_out(id_no, time):
@@ -475,9 +470,15 @@ def add_log():
 
     if not Log.query.filter_by(date=date, id_no=id_no).first() or Log.query.filter_by\
     (date=date, id_no=id_no).order_by(Log.timestamp.desc()).first().time_out != 'None':
+
         time_in_thread = threading.Thread(target=time_in,args=[school_id,api_key,id_no,name,level,section,date,department,time,military_time])    
-     
-        return time_in_thread.start()
+        time_in_thread.start()
+
+        return SWJsonify({
+        'Status': 'Logged In',
+        'Log': Log.query.all()
+        }), 201
+        
     return time_out(id_no, time)
 
 
