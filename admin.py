@@ -302,27 +302,7 @@ def text_blast(message, contact):
     return True
 
 
-def time_in(school_id,api_key,id_no,name,level,section,date,department,time,military_time):
-    add_this = Log(
-                    school_id=school_id,
-                    date=date,
-                    id_no=id_no,
-                    name=name,
-                    level=level,
-                    section=section,
-                    department=department,
-                    time_in=time,
-                    time_out='None',
-                    military_time=military_time,
-                    timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
-                    )
-
-    db.session.add(add_this)
-    db.session.commit()
-
-    message_thread = threading.Thread(target=send_message,args=[id_no, time, 'entered'])    
-    message_thread.start()
-
+def check_if_late(school_id,api_key,id_no,name,level,section,date,department,time,military_time):
     time_now = str(now.replace(hour=get_hour(time), minute=int(time[3:5])))[11:]
     school = School.query.filter_by(api_key=api_key).first()
 
@@ -358,6 +338,30 @@ def time_in(school_id,api_key,id_no,name,level,section,date,department,time,mili
        lates=Student.query.filter_by(id_no=id_no).first().lates
        lates=Late.query.filter_by(id_no=id_no).count()
        db.session.commit()
+
+
+def time_in(school_id,api_key,id_no,name,level,section,date,department,time,military_time):
+    add_this = Log(
+                    school_id=school_id,
+                    date=date,
+                    id_no=id_no,
+                    name=name,
+                    level=level,
+                    section=section,
+                    department=department,
+                    time_in=time,
+                    time_out='None',
+                    military_time=military_time,
+                    timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+                    )
+
+    db.session.add(add_this)
+    db.session.commit()
+
+    message_thread = threading.Thread(target=send_message,args=[id_no, time, 'entered'])    
+    message_thread.start()
+
+    check_if_late(school_id,api_key,id_no,name,level,section,date,department,time,military_time)
             
     return SWJsonify({
         'Status': 'Logged In',
@@ -531,7 +535,7 @@ def rebuild_database():
         student_morning_start = now.replace(hour=8, minute=0, second=0),
         student_morning_end = now.replace(hour=12, minute=0, second=0),
         student_afternoon_start = now.replace(hour=13, minute=0, second=0),
-        student_afternoon_end = now.replace(hour=16, minute=0, second=0),
+        student_afternoon_end = now.replace(hour=17, minute=0, second=0),
         faculty_morning_start = now.replace(hour=7, minute=0, second=0),
         faculty_morning_end = now.replace(hour=12, minute=0, second=0),
         faculty_afternoon_start = now.replace(hour=13, minute=0, second=0),
