@@ -437,7 +437,7 @@ def add_log():
                 name=name,
                 level=level,
                 section=section,
-                time_in=time_in,
+                time_in=time,
                 department=department,
                 timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
                 )
