@@ -530,7 +530,7 @@ def rebuild_database():
         )
     db.session.add(school)
 
-    for i in range(100):
+    for i in range(1000):
         a = Student(
             school_id=1234,
             id_no='2011334281',
