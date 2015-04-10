@@ -27,7 +27,7 @@ import os
 app = flask.Flask(__name__)
 db = SQLAlchemy(app)
 app.secret_key = '234234rfascasascqweqscasefsdvqwefe2323234dvsv'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'
 API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
 
 SMS_URL = 'https://post.chikka.com/smsapi/request'
@@ -529,7 +529,7 @@ def rebuild_database():
         )
     db.session.add(school)
 
-    for i in range(1000):
+    for i in range(100):
         a = Student(
             school_id=1234,
             id_no='2011334281',
@@ -581,6 +581,6 @@ def rebuild_database():
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(port=int(os.environ['PORT']), host='0.0.0.0')
+    app.run()
 
     # port=int(os.environ['PORT']), host='0.0.0.0'
