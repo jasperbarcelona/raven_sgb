@@ -34,11 +34,16 @@ function textCounter(field,field2,maxlimit)
 
 function blast_message(){
 var message = $("#message").val();
-$.post('/blast',{message:message},
-function(data){
-$('#status-modal-body').html(data);
-});
-$('.modal').modal('hide')
-$('#message-status-modal').modal('show')
+if(navigator.onLine==true){
+    $.post('/blast',{message:message},
+    function(data){
+    $('#status-modal-body').html(data);
+    });
+    $('.modal').modal('hide');
+    $('#message-status-modal').modal('show');
+}
+else{
+    alert('You are offline');
+}
 }
 

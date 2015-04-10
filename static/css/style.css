@@ -14,13 +14,15 @@ body{
 	width: 100%;
 	color: #494949 !important;
 	font-family: OpenSans, sans-serif;
+	background-image: url('../images/white_tiles.png');
+	background-repeat: repeat;
 }
 
 span:hover{
 	cursor: pointer;
 }
 
-th span:hover{
+th:hover{
 	cursor: pointer;
 }
 
@@ -29,11 +31,18 @@ textarea{
 	height: 100%;
 	padding: 11px;
 	resize: none;
-	border: 1px solid #4485F5;
+	border: 1px solid #494949;
 }
 
 textarea:focus{
 	outline: none;
+}
+
+.xs{
+	width: 30px !important;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 #counter{
@@ -51,10 +60,23 @@ textarea:focus{
 .message-modal-body{
 	height: 200px;
 	width: 100%;
-	padding-left: 2px;
-	padding-right: 2px;
+	padding-left: 0px;
+	padding-right: 0px;
 	padding-top: 0px;
 	padding-bottom: 0px;
+}
+
+.modal-header{
+	background-color: #4485F5;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 0px;
+	border-bottom-left-radius: 0px;
+	color: #FFFFFF;
+}
+
+.close{
+	margin-top: 5px !important;
 }
 
 .confirm-modal-body{
@@ -173,10 +195,6 @@ textarea:focus{
 	float: right;
 }
 
-.table th{
-	width: 100px;
-}
-
 #tabs{
 	margin-top: 30px;
 }
@@ -226,6 +244,7 @@ textarea:focus{
 	padding-left: 20px;
 	padding-right: 20px;
 	padding-bottom: 20px;
+	background-color: rgba(255,255,255,0.7);
 }
 
 #copyright{
@@ -246,4 +265,33 @@ textarea:focus{
 
 h3{
 	display: inline;
+}
+
+thead{
+	border: 1px solid #DDDDDD;
+}
+
+td{
+	border: 1px solid #DDDDDD;
+}
+
+
+table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+	background-color: #FFFFFF;
+	/*color: #FFFFFF;*/
+	border: 2px solid #DDDDDD;
+	color: #494949;
+}
+
+table.tablesorter thead tr .headerSortUp {
+	background-image: url('../images/asc.gif');
+	background-repeat: no-repeat;
+	background-position: right;
+	background-size: 25px;
+}
+table.tablesorter thead tr .headerSortDown {
+	background-image: url('../images/desc.gif');
+	background-repeat: no-repeat;
+	background-position: right;
+	background-size: 25px;
 }

@@ -15,6 +15,7 @@ from datetime import datetime
 from functools import wraps
 import threading
 from threading import Timer
+from time import sleep
 import requests
 import datetime
 import time
@@ -271,18 +272,16 @@ def start_timer():
     print 'time until mark_absent: ' + str(secs/60) + 'mins'
 
 
-def text_blast(message, contact):
-    sendThis = message
-
+def send_blast(message, parent_contact):
     message_options = {
-            'message_type': 'SEND',
-            'message': sendThis,
-            'client_id': CLIENT_ID,
-            'mobile_number': contact,
-            'secret_key': SECRET_KEY,
-            'shortcode': SHORT_CODE,
-            'message_id': uuid.uuid4().hex
-        }
+                'message_type': 'SEND',
+                'message': message,
+                'client_id': CLIENT_ID,
+                'mobile_number': parent_contact,
+                'secret_key': SECRET_KEY,
+                'shortcode': SHORT_CODE,
+                'message_id': uuid.uuid4().hex
+            }
 
     sent = False
     while not sent:
@@ -297,10 +296,8 @@ def text_blast(message, contact):
 
         except requests.exceptions.ConnectionError as e:
             sleep(5)
-            print "Too slow Mojo!"
+            print "Too slow Blast!"
             pass
-    
-    return True
 
 
 def check_if_late(school_id,api_key,id_no,name,level,section,date,department,time,military_time):
@@ -486,8 +483,10 @@ def add_log():
 @app.route('/blast',methods=['GET','POST'])
 def blast_message():
     message = flask.request.form.get('message')
-    for user in db.session.query(Student.parent_contact).distinct():
-        text_blast(message, user.parent_contact) 
+    for user in db.session.query(Student.parent_contact).filter(Student.school_id==session['school_id']).distinct(): 
+        blast_thread = threading.Thread(target=send_blast,args=[message, user.parent_contact])    
+        blast_thread.start()
+    
     return flask.render_template('status.html')
 
 
@@ -545,6 +544,20 @@ def rebuild_database():
             parent_contact='639183339068'
             )
 
+        c = Student(
+            school_id=1234,
+            id_no='2011334281',
+            first_name='Janno',
+            last_name='Armamento',
+            middle_name='Estrada',
+            level='2nd Grade',
+            department='student',
+            section='Fidelity',
+            absences='0',
+            lates='0',
+            parent_contact='639183339068'
+            )
+
         b = Student(
             school_id=1234,
             id_no='2011334282',
@@ -560,6 +573,7 @@ def rebuild_database():
         
         db.session.add(a)
         db.session.add(b)
+        db.session.add(c)
     db.session.commit()
 
     return SWJsonify({'Status': 'Database Rebuild Success'})
