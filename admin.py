@@ -569,9 +569,9 @@ def rebuild_database():
             section='test',
             department='student',
             time_in='1234',
-            military_time='1234',
+            military_time='2015-04-15 06:30:13',
             time_out='1234',
-            timestamp='12-15-04 12:01:2345'
+            timestamp='1234'
             )
         db.session.add(c)
     db.session.commit()
