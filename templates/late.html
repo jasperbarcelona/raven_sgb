@@ -1,0 +1,25 @@
+<table class="table tablesorter">
+                <thead>
+                    <th class="xs"></th>
+                    <th class="short">Date</th> 
+                    <th class="long">Name</th>
+                    <th class="short">Grade/Year</th>
+                    <th class="short">Section</th>          
+                    <th class="short">In</th>
+
+                </thead>
+                <tbody>
+                    {% set num = 1 %}
+                    {% for a in late %}
+                    <tr>
+                        <td class="xs">{{num}}</td>
+                        <td class="short">{{a.date}}</td>   
+                        <td class="long">{{a.name}}</td>                    
+                        <td class="short">{{a.level}}</td>
+                        <td class="short">{{a.section}}</td>                
+                        <td class="short">{{a.time_in}}</td>    
+                    </tr>
+                    {% set num = num+1 %}
+                    {% endfor %}
+                </tbody>
+            </table>

@@ -15,6 +15,8 @@ from datetime import datetime
 from functools import wraps
 import threading
 from threading import Timer
+from multiprocessing.pool import ThreadPool
+
 from time import sleep
 import requests
 import datetime
@@ -28,8 +30,8 @@ app = flask.Flask(__name__)
 db = SQLAlchemy(app)
 app.secret_key = '234234rfascasascqweqscasefsdvqwefe2323234dvsv'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
 
+API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
 SMS_URL = 'https://post.chikka.com/smsapi/request'
 CLIENT_ID = 'ef8cf56d44f93b6ee6165a0caa3fe0d1ebeee9b20546998931907edbb266eb72'
 SECRET_KEY = 'c4c461cc5aa5f9f89b701bc016a73e9981713be1bf7bb057c875dbfacff86e1d'
@@ -38,6 +40,7 @@ CONNECT_TIMEOUT = 5.0
 # os.environ['DATABASE_URL']
 
 now = datetime.datetime.now()
+pool = ThreadPool(processes=1)
 
 class Serializer(object):
   __public__ = None
@@ -369,6 +372,29 @@ def time_out(id_no, time):
 
     message_thread = threading.Thread(target=send_message,args=[id_no, time, 'exited'])    
     message_thread.start()
+
+
+def prepare_next(log_limit, late_limit, attendance_limit, school_id, department):
+     log_limit += 100
+     late_limit += 100
+     attendance_limit += 100
+
+     logs = Log.query.filter_by(
+        school_id=school_id,
+        department=department
+        ).order_by(Log.timestamp.desc()).limit(log_limit)
+
+     late = Late.query.filter_by(
+        school_id=school_id,
+        department=department
+        ).order_by(Log.timestamp.desc()).limit(late_limit)
+
+     attendance = Student.query.filter_by(
+        school_id=school_id,
+        department=department)\
+        .order_by(Student.last_name).limit(attendance_limit)
+
+     return {'logs':logs, 'Late':late ,'attendance':attendance}
     
 
 @app.route('/', methods=['GET', 'POST'])
@@ -384,6 +410,7 @@ def index():
 
 @app.route('/data', methods=['GET', 'POST'])
 def load_data():
+    global variable
     school = School.query.filter_by(api_key=session['api_key']).first()
    
     logs = Log.query.filter_by(
@@ -397,8 +424,15 @@ def load_data():
         ).order_by(Late.timestamp.desc()).limit(session['late_limit'])
 
     attendance = Student.query.filter_by(
+        school_id=session['school_id'],
         department=session['department'])\
         .order_by(Student.last_name).limit(session['attendance_limit'])
+
+    # lazy_thread = threading.Thread(target=prepare_next,args=[session['log_limit'],session['late_limit'],session['attendance_limit'],session['school_id'],session['department']])    
+    # lazy_thread.start()
+
+    async_result = pool.apply_async(prepare_next, (session['log_limit'],session['late_limit'],session['attendance_limit'],session['school_id'],session['department']))
+    variable = async_result.get()
 
     return flask.render_template(
         'tables.html',
@@ -408,6 +442,26 @@ def load_data():
         view=session['department']
         )
 
+@app.route('/test', methods=['GET', 'POST'])
+def test():
+    data = flask.request.form.get('data')
+    if data == 'logs':
+        return flask.render_template(
+            'logs.html',
+            log=variable['logs']
+            )
+
+    elif data == 'attendance':
+        return flask.render_template(
+            'attendance.html',
+            attendance=variable['attendance']
+            )
+
+    elif data == 'late':
+        return flask.render_template(
+            'late.html',
+            late=variable['late']
+            )
 
 @app.route('/view', methods=['GET', 'POST'])
 def change_view():
@@ -569,9 +623,9 @@ def rebuild_database():
             section='test',
             department='student',
             time_in='1234',
-            military_time='2015-04-15 06:30:13',
+            military_time=now,
             time_out='1234',
-            timestamp='1234'
+            timestamp=now
             )
         db.session.add(c)
     db.session.commit()

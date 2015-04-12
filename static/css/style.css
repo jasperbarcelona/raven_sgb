@@ -199,6 +199,17 @@ textarea:focus{
 	margin-top: 30px;
 }
 
+.tab-pane{
+	height: 100%;
+	width: 100%;
+	overflow: scroll;
+	overflow-x: hidden;
+}
+
+.tab-content{
+	height: 100%;
+}
+
 .long{
 	width: 150px;
 	max-width: 180px;
@@ -238,12 +249,8 @@ textarea:focus{
 
 #main-content{
 	border: 1px solid #F1F1F1;
-	overflow: scroll;
+	overflow: hidden;
 	overflow-x: hidden; 
-	height: 530px;
-	padding-left: 20px;
-	padding-right: 20px;
-	padding-bottom: 20px;
 	background-color: rgba(255,255,255,0.7);
 }
 
@@ -257,6 +264,10 @@ textarea:focus{
 	padding-top: 3px;
 	display: inline;
 	float: right;
+}
+
+#table-container{
+	height: 100%;
 }
 
 .radio{

@@ -1,0 +1,33 @@
+
+            <table class="table tablesorter">
+                <thead>
+                    <th class="xs"></th>
+                    <th class="short"><span>Date</span></th>        
+                    <th class="long">Name</th>
+                    <th class="short">ID Number</th>
+                    {% if view=='student' %}
+                    <th class="short">Grade/Year</th>
+                    <th class="short">Section</th>
+                    {% endif %}
+                    <th class="short">In</th>
+                    <th class="short">Out</th>
+                </thead>
+                <tbody>
+                    {% set num = 1 %}
+                    {% for i in log %}
+                    <tr>
+                        <td class="xs">{{num}}</td> 
+                        <td class="short">{{i.date}}</td>   
+                        <td class="long">{{i.name}}</td>
+                        <td class="short">{{i.id_no}}</td>
+                        {% if view=='student' %}                    
+                        <td class="short">{{i.level}}</td>
+                        <td class="short">{{i.section}}</td>
+                        {% endif %}             
+                        <td class="short">{{i.time_in}}</td>
+                        <td class="short">{{i.time_out}}</td>
+                    </tr>
+                    {% set num = num+1 %}
+                    {% endfor %}
+                </tbody>
+            </table>
