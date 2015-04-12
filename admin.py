@@ -376,9 +376,9 @@ def index():
     if not session:
         return redirect('/loginpage')
     start_timer()
-    session['log_limit'] = 500
-    session['late_limit'] = 500
-    session['attendance_limit'] = 500
+    session['log_limit'] = 100
+    session['late_limit'] = 100
+    session['attendance_limit'] = 100
     return flask.render_template('index.html', view=session['department'])
 
 
