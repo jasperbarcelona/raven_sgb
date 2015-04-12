@@ -559,6 +559,21 @@ def rebuild_database():
         db.session.add(a)
         db.session.add(b)
     
+    for i in range(5000):
+        c = Log(
+            school_id=1234,
+            date='1234',
+            id_no='1234',
+            name='test',
+            level='test',
+            section='test',
+            department='student',
+            time_in='1234',
+            military_time='1234',
+            time_out='1234',
+            timestamp='12-15-04 12:01:2345'
+            )
+        db.session.add(c)
     db.session.commit()
 
     return SWJsonify({'Status': 'Database Rebuild Success'})
