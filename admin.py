@@ -376,32 +376,34 @@ def index():
     if not session:
         return redirect('/loginpage')
     start_timer()
+    session['log_limit'] = 500
+    session['late_limit'] = 500
+    session['attendance_limit'] = 500
     return flask.render_template('index.html', view=session['department'])
 
 
 @app.route('/data', methods=['GET', 'POST'])
 def load_data():
     school = School.query.filter_by(api_key=session['api_key']).first()
-    print 'xxxxxxxx'
-    print school.name
+   
     logs = Log.query.filter_by(
         school_id=session['school_id'],
         department=session['department']
-        ).order_by(Log.timestamp.desc()).all()
+        ).order_by(Log.timestamp.desc()).limit(session['log_limit'])
 
-    l = Late.query.filter_by(
+    late = Late.query.filter_by(
         school_id=session['school_id'],
         department=session['department']
-        ).order_by(Late.timestamp.desc()).all()
+        ).order_by(Late.timestamp.desc()).limit(session['late_limit'])
 
     attendance = Student.query.filter_by(
         department=session['department'])\
-        .order_by(Student.last_name).all()
+        .order_by(Student.last_name).limit(session['attendance_limit'])
 
     return flask.render_template(
         'tables.html',
         log=logs,
-        late=l,
+        late=late,
         attendance=attendance, 
         view=session['department']
         )
@@ -528,6 +530,35 @@ def rebuild_database():
         faculty_afternoon_end = now.replace(hour=16, minute=0, second=0)
         )
     db.session.add(school)
+
+    for i in range(1000):
+        a = Student(
+            school_id=1234,
+            id_no='2011334281',
+            first_name='Jasper',
+            last_name='Barcelona',
+            middle_name='Estrada',
+            department='student',
+            section='Charity',
+            absences='0',
+            lates='0',
+            parent_contact='639183339068'
+            )
+        b = Student(
+            school_id=1234,
+            id_no='2011334282',
+            first_name='Janno',
+            last_name='Armamento',
+            middle_name='Estrada',
+            department='student',
+            section='Fidelity',
+            absences='0',
+            lates='0',
+            parent_contact='639183339068'
+            )
+        db.session.add(a)
+        db.session.add(b)
+    
     db.session.commit()
 
     return SWJsonify({'Status': 'Database Rebuild Success'})
