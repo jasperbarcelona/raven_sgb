@@ -18,7 +18,7 @@ function load_next(tab){
     var data = tab
     $.post('/loadmore',{data:data},
     function(data){
-        $('#'+tab).html(data);
+        $('#'+tab).append(data);
         isPreviousEventComplete = true;
     });
 }

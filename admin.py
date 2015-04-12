@@ -388,17 +388,17 @@ def prepare_next(log_limit, late_limit, attendance_limit, school_id, department)
      logs = Log.query.filter_by(
         school_id=school_id,
         department=department
-        ).order_by(Log.timestamp.desc()).limit(log_limit)
+        ).order_by(Log.timestamp.desc()).slice((log_limit-100),log_limit)
 
      late = Late.query.filter_by(
         school_id=school_id,
         department=department
-        ).order_by(Log.timestamp.desc()).limit(late_limit)
+        ).order_by(Log.timestamp.desc()).slice((late_limit-100),late_limit)
 
      attendance = Student.query.filter_by(
         school_id=school_id,
         department=department)\
-        .order_by(Student.last_name).limit(attendance_limit)
+        .order_by(Student.last_name).slice((attendance_limit-100),attendance_limit)
 
      return {'logs':logs, 'Late':late ,'attendance':attendance}
     
@@ -411,6 +411,9 @@ def index():
     session['log_limit'] = 100
     session['late_limit'] = 100
     session['attendance_limit'] = 100
+    session['log_start'] = 0
+    session['late_start'] = 0
+    session['attendance_start'] = 0
     return flask.render_template('index.html', view=session['department'])
 
 
@@ -418,20 +421,20 @@ def index():
 def load_data():
     school = School.query.filter_by(api_key=session['api_key']).first()
    
-    logs = Log.query.filter_by(
-        school_id=session['school_id'],
-        department=session['department']
-        ).order_by(Log.timestamp.desc()).limit(session['log_limit'])
+    logs = Log.query.filter(
+        Log.school_id==session['school_id'],
+        Log.department==session['department']
+        ).order_by(Log.timestamp.desc()).slice(session['log_start'],session['log_limit'])
 
     late = Late.query.filter_by(
         school_id=session['school_id'],
         department=session['department']
-        ).order_by(Late.timestamp.desc()).limit(session['late_limit'])
+        ).order_by(Late.timestamp.desc()).slice(session['late_start'],session['late_limit'])
 
     attendance = Student.query.filter_by(
         school_id=session['school_id'],
         department=session['department'])\
-        .order_by(Student.last_name).limit(session['attendance_limit'])
+        .order_by(Student.last_name).slice(session['attendance_start'],session['attendance_limit'])
 
     prepare()
 
