@@ -219,39 +219,36 @@ def get_student_data(id_no):
     return Student.query.filter_by(id_no=id_no).first()
 
 
-def send_message(id_no, time, action):
-    student = get_student_data(id_no)
-    sendThis = 'Good day! We would like to inform you that '+student.first_name+' '+\
-                student.last_name+' has ' + action +' the school gate at '+\
-                time+'.'
-
+def message_options(message, msisdn):
     message_options = {
             'message_type': 'SEND',
-            'message': sendThis,
+            'message': message,
             'client_id': CLIENT_ID,
-            'mobile_number': get_student_data(id_no).parent_contact,
+            'mobile_number': msisdn,
             'secret_key': SECRET_KEY,
             'shortcode': SHORT_CODE,
             'message_id': uuid.uuid4().hex
         }
 
+    return message_options
+
+
+def send_message(message, msisdn, request_url):
     sent = False
     while not sent:
         try:
             r = requests.post(
-                SMS_URL,
-                message_options
+                request_url,
+                message_options(message, msisdn)
                 # timeout=(int(CONNECT_TIMEOUT))           
             )
             sent =True
-            print r.text
+            print r.text #update log database (put 'sent' to status)
 
         except requests.exceptions.ConnectionError as e:
             sleep(5)
             print "Too slow Mojo!"
             pass
-    
-    return None
 
 
 def authenticate_user(school_id, password):
@@ -276,35 +273,9 @@ def start_timer():
     print 'time until mark_absent: ' + str(secs/60) + 'mins'
 
 
-def send_blast(message, parent_contact):
-    message_options = {
-                'message_type': 'SEND',
-                'message': message,
-                'client_id': CLIENT_ID,
-                'mobile_number': parent_contact,
-                'secret_key': SECRET_KEY,
-                'shortcode': SHORT_CODE,
-                'message_id': uuid.uuid4().hex
-            }
+def check_if_late(school_id,api_key,id_no,name,level,section,
+                             date,department,time,military_time):
 
-    sent = False
-    while not sent:
-        try:
-            r = requests.post(
-                SMS_URL,
-                message_options
-                # timeout=(int(CONNECT_TIMEOUT))           
-            )
-            sent =True
-            print r.text
-
-        except requests.exceptions.ConnectionError as e:
-            sleep(5)
-            print "Too slow Blast!"
-            pass
-
-
-def check_if_late(school_id,api_key,id_no,name,level,section,date,department,time,military_time):
     time_now = str(now.replace(hour=get_hour(time), minute=int(time[3:5])))[11:]
     school = School.query.filter_by(api_key=api_key).first()
 
@@ -323,7 +294,19 @@ def check_if_late(school_id,api_key,id_no,name,level,section,date,department,tim
     if (time_now >= morning_start and time_now < morning_end) or \
        (time_now >= afternoon_start and time_now < afternoon_end):
 
-       late = Late(
+       return record_as_late(school_id, id_no, name, level, section, 
+                                          date, department, time, military_time)
+
+    return SWJsonify({
+        'Status': '201',
+        'message': 'Logged In',
+        'Remarks': 'On Time'
+        }), 201
+
+
+def record_as_late(school_id, id_no, name, level, section, 
+                               date, department, time, military_time):
+    late = Late(
             school_id=school_id,
             date=date,
             id_no=id_no,
@@ -335,14 +318,22 @@ def check_if_late(school_id,api_key,id_no,name,level,section,date,department,tim
             timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
             )
 
-       db.session.add(late)
-       db.session.commit()
-       lates=Student.query.filter_by(id_no=id_no).first()
-       lates.lates=Late.query.filter_by(id_no=id_no).count()
-       db.session.commit()
+    db.session.add(late)
+    db.session.commit()
+    attendance=Student.query.filter_by(id_no=id_no, school_id=school_id).one()
+    attendance.lates=Late.query.filter_by(id_no=id_no, school_id=school_id).count()
+    db.session.commit()
+
+    return SWJsonify({
+    'Status': '201',
+    'message': 'Logged In',
+    'Remarks': 'Late'
+    }), 201
 
 
-def time_in(school_id,api_key,id_no,name,level,section,date,department,time,military_time):
+def time_in(school_id,api_key,id_no,name,level,section,
+                    date,department,time,military_time):
+
     add_this = Log(
                     school_id=school_id,
                     date=date,
@@ -360,10 +351,18 @@ def time_in(school_id,api_key,id_no,name,level,section,date,department,time,mili
     db.session.add(add_this)
     db.session.commit()
 
-    message_thread = threading.Thread(target=send_message,args=[id_no, time, 'entered'])    
+    student = get_student_data(id_no)
+    message = 'Good day! We would like to inform you that '+student.first_name+' '+\
+                student.last_name+' has entered the school gate at '+\
+                time+'.'
+
+    message_thread = threading.Thread(target=send_message,args=[
+                                    message, student.parent_contact, SMS_URL])
+
     message_thread.start()
 
-    check_if_late(school_id,api_key,id_no,name,level,section,date,department,time,military_time)
+    return check_if_late(school_id,api_key,id_no,name,level,
+               section,date,department,time,military_time)
 
 
 def time_out(id_no, time):
@@ -371,14 +370,27 @@ def time_out(id_no, time):
     a.time_out=time  
     db.session.commit()
 
-    message_thread = threading.Thread(target=send_message,args=[id_no, time, 'exited'])    
+    student = get_student_data(id_no)
+    message = 'Good day! We would like to inform you that '+student.first_name+' '+\
+                student.last_name+' has exited the school gate at '+\
+                time+'.'
+
+    message_thread = threading.Thread(target=send_message,args=[
+                                    message, student.parent_contact, SMS_URL])
+    
     message_thread.start()
+
+    return SWJsonify({
+        'Status': '201',
+        'message': 'Logged Out'
+        }), 201
 
 
 def prepare():
     global variable
-    async_result = pool.apply_async(prepare_next, (session['log_limit'],session['late_limit'],session['attendance_limit'],session['school_id'],session['department']))
-    variable = async_result.get()
+    variable = pool.apply_async(prepare_next, (session['log_limit'],
+                      session['late_limit'],session['attendance_limit'],
+                      session['school_id'],session['department'])).get()
 
 
 def prepare_next(log_limit, late_limit, attendance_limit, school_id, department):
@@ -515,7 +527,10 @@ def add_log():
     api_key = flask.request.form.get('api_key')
 
     if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
-        return SWJsonify({'Error': 'Unauthorized'}), 400
+        return SWJsonify({
+                        'Status': '500',
+                         'Message': 'Unauthorized'
+                    }), 400
 
     id_no = flask.request.form.get('id_no')
     name = flask.request.form.get('name')
@@ -526,32 +541,30 @@ def add_log():
     time = flask.request.form.get('time')
     military_time = parse_date(flask.request.form.get('military_time'))
 
-    if not Log.query.filter_by(date=date, id_no=id_no).first() or Log.query.filter_by\
-    (date=date, id_no=id_no).order_by(Log.timestamp.desc()).first().time_out != 'None':
+    if not Log.query.filter_by(date=date, id_no=id_no).first() or \
+              Log.query.filter_by(date=date, id_no=id_no).order_by\
+              (Log.timestamp.desc()).first().time_out != 'None':
 
-        time_in_thread = threading.Thread(target=time_in,args=[school_id,api_key,id_no,name,level,section,date,department,time,military_time])    
-        time_in_thread.start()
+        log_thread = pool.apply_async(time_in, (school_id,api_key,
+        id_no,name,level,section,date,department,time,military_time))
 
-        return SWJsonify({
-        'Status': 'Logged In',
-        'Log': Log.query.all()
-        }), 201
+        log_thread = threading.Thread(target=time_in,args=[school_id,api_key,
+                              id_no,name,level,section,date,department,time,military_time])
 
-    time_out_thread = threading.Thread(target=time_out,args=[id_no, time])    
-    time_out_thread.start()
+    else:
+        log_thread = threading.Thread(target=time_out,args=[id_no, time])
         
-    return SWJsonify({
-        'Status': 'Logged Out',
-        'Log': Log.query.filter_by(id_no=id_no)\
-        .order_by(Log.timestamp.desc()).first()
-        }), 201
+    return log_thread.start()
 
 
 @app.route('/blast',methods=['GET','POST'])
 def blast_message():
     message = flask.request.form.get('message')
-    for user in db.session.query(Student.parent_contact).filter(Student.school_id==session['school_id']).distinct(): 
-        blast_thread = threading.Thread(target=send_blast,args=[message, user.parent_contact])    
+    for user in db.session.query(Student.parent_contact).filter\
+              (Student.school_id==session['school_id']).distinct(): 
+
+        blast_thread = threading.Thread(target=send_message,
+                                 args=[message, user.parent_contact, SMS_URL])
         blast_thread.start()
     
     return flask.render_template('status.html')
@@ -595,50 +608,6 @@ def rebuild_database():
         faculty_afternoon_end = now.replace(hour=16, minute=0, second=0)
         )
     db.session.add(school)
-
-    for i in range(1000):
-        a = Student(
-            school_id=1234,
-            id_no='2011334281',
-            first_name='Jasper',
-            last_name='Barcelona',
-            middle_name='Estrada',
-            department='student',
-            section='Charity',
-            absences='0',
-            lates='0',
-            parent_contact='639183339068'
-            )
-        b = Student(
-            school_id=1234,
-            id_no='2011334282',
-            first_name='Janno',
-            last_name='Armamento',
-            middle_name='Estrada',
-            department='student',
-            section='Fidelity',
-            absences='0',
-            lates='0',
-            parent_contact='639183339068'
-            )
-        db.session.add(a)
-        db.session.add(b)
-    
-    for i in range(5000):
-        c = Log(
-            school_id=1234,
-            date='1234',
-            id_no='1234',
-            name='test',
-            level='test',
-            section='test',
-            department='student',
-            time_in='1234',
-            military_time=now,
-            time_out='1234',
-            timestamp=now
-            )
-        db.session.add(c)
     db.session.commit()
 
     return SWJsonify({'Status': 'Database Rebuild Success'})

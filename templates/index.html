@@ -78,12 +78,12 @@
 						<h4 class="modal-title" id="gridSystemModalLabel">New Message</h4>
 					</div>
 					<div class="modal-body message-modal-body">
-						<textarea onkeyup="textCounter(this,'counter',420);" id="message" placeholder="Write your message here..."></textarea>
+						<textarea oninput="textCounter(this,'counter',420);" id="message" placeholder="Write your message here..."></textarea>
 					</div>
 					<div class="modal-footer">
 						<input disabled  value="Remaining: 420" id="counter">
 						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-						<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirm-modal">Send</button>
+						<button id="send" type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirm-modal" disabled>Send</button>
 					</div>
 				</div><!-- /.modal-content -->
 			</div><!-- /.modal-dialog -->
@@ -96,8 +96,9 @@
 						This message will be sent to all the parent contacts. Are you sure you want to proceed?
 					</div>
 					<div class="modal-footer">
+						<input type="password" id="message-confirm-password" class="form-control" placeholder="Re-enter password" />
 						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-						<button type="button" class="btn btn-primary" onclick="blast_message()">Send</button>
+						<button type="button" id="confirm-send" class="btn btn-primary" onclick="blast_message()" disabled>Send</button>
 					</div>
 				</div><!-- /.modal-content -->
 			</div><!-- /.modal-dialog -->

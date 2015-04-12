@@ -34,7 +34,7 @@ function textCounter(field,field2,maxlimit)
 
 function blast_message(){
 var message = $("#message").val();
-if(navigator.onLine==true){
+if ((navigator.onLine==true) && ($.trim($("#message").val()))) {
     $.post('/blast',{message:message},
     function(data){
     $('#status-modal-body').html(data);
@@ -42,8 +42,11 @@ if(navigator.onLine==true){
     $('.modal').modal('hide');
     $('#message-status-modal').modal('show');
 }
+else if (navigator.onLine==false) {
+    alert('You are offline!');
+}
 else{
-    alert('You are offline');
+    alert('Message is empty!');
 }
 }
 
