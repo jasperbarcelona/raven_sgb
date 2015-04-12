@@ -374,6 +374,12 @@ def time_out(id_no, time):
     message_thread.start()
 
 
+def prepare():
+    global variable
+    async_result = pool.apply_async(prepare_next, (session['log_limit'],session['late_limit'],session['attendance_limit'],session['school_id'],session['department']))
+    variable = async_result.get()
+
+
 def prepare_next(log_limit, late_limit, attendance_limit, school_id, department):
      log_limit += 100
      late_limit += 100
@@ -410,7 +416,6 @@ def index():
 
 @app.route('/data', methods=['GET', 'POST'])
 def load_data():
-    global variable
     school = School.query.filter_by(api_key=session['api_key']).first()
    
     logs = Log.query.filter_by(
@@ -431,8 +436,7 @@ def load_data():
     # lazy_thread = threading.Thread(target=prepare_next,args=[session['log_limit'],session['late_limit'],session['attendance_limit'],session['school_id'],session['department']])    
     # lazy_thread.start()
 
-    async_result = pool.apply_async(prepare_next, (session['log_limit'],session['late_limit'],session['attendance_limit'],session['school_id'],session['department']))
-    variable = async_result.get()
+    prepare()
 
     return flask.render_template(
         'tables.html',
@@ -444,24 +448,22 @@ def load_data():
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
-    data = flask.request.form.get('data')
-    if data == 'logs':
-        return flask.render_template(
-            'logs.html',
-            log=variable['logs']
-            )
+    needed = flask.request.form.get('data')
+    data = variable[needed]
 
-    elif data == 'attendance':
-        return flask.render_template(
-            'attendance.html',
-            attendance=variable['attendance']
-            )
+    if needed == 'logs':
+        session['log_limit']+=100
+    elif needed == 'late':
+        session['late_limit']+=100
+    elif needed == 'attendance':
+        session['attendance_limit']+=100
 
-    elif data == 'late':
-        return flask.render_template(
-            'late.html',
-            late=variable['late']
-            )
+    prepare()
+
+    return flask.render_template(
+        needed+'.html',
+        data=data
+        )
 
 @app.route('/view', methods=['GET', 'POST'])
 def change_view():
