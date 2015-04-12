@@ -294,14 +294,8 @@ def check_if_late(school_id,api_key,id_no,name,level,section,
     if (time_now >= morning_start and time_now < morning_end) or \
        (time_now >= afternoon_start and time_now < afternoon_end):
 
-       return record_as_late(school_id, id_no, name, level, section, 
-                                          date, department, time, military_time)
-
-    return SWJsonify({
-        'Status': '201',
-        'message': 'Logged In',
-        'Remarks': 'On Time'
-        }), 201
+        record_as_late(school_id, id_no, name, level, section, 
+                                 date, department, time, military_time)
 
 
 def record_as_late(school_id, id_no, name, level, section, 
@@ -323,12 +317,6 @@ def record_as_late(school_id, id_no, name, level, section,
     attendance=Student.query.filter_by(id_no=id_no, school_id=school_id).one()
     attendance.lates=Late.query.filter_by(id_no=id_no, school_id=school_id).count()
     db.session.commit()
-
-    return SWJsonify({
-    'Status': '201',
-    'message': 'Logged In',
-    'Remarks': 'Late'
-    }), 201
 
 
 def time_in(school_id,api_key,id_no,name,level,section,
@@ -361,8 +349,8 @@ def time_in(school_id,api_key,id_no,name,level,section,
 
     message_thread.start()
 
-    return check_if_late(school_id,api_key,id_no,name,level,
-               section,date,department,time,military_time)
+    return check_if_late(school_id, api_key, id_no,name,level,
+               section, date, department, time, military_time)
 
 
 def time_out(id_no, time):
@@ -545,16 +533,22 @@ def add_log():
               Log.query.filter_by(date=date, id_no=id_no).order_by\
               (Log.timestamp.desc()).first().time_out != 'None':
 
-        log_thread = pool.apply_async(time_in, (school_id,api_key,
-        id_no,name,level,section,date,department,time,military_time))
-
         log_thread = threading.Thread(target=time_in,args=[school_id,api_key,
                               id_no,name,level,section,date,department,time,military_time])
+        log_thread.start()     
 
-    else:
-        log_thread = threading.Thread(target=time_out,args=[id_no, time])
-        
-    return log_thread.start()
+        return SWJsonify({
+                        'Status': '201',
+                         'Message': 'Looged In'
+                    }), 201
+
+    log_thread = threading.Thread(target=time_out,args=[id_no, time])
+    log_thread.start()      
+
+    return SWJsonify({
+                        'Status': '201',
+                         'Message': 'Looged Out'
+                    }), 201
 
 
 @app.route('/blast',methods=['GET','POST'])
