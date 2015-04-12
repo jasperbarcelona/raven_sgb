@@ -1,32 +1,17 @@
-<table class="table tablesorter">
-                <thead> 
-                <tr>
-                    <th class="xs"></th>
-                    <th class="short">Last Name</th>
-                    <th class="short">First Name</th>
-                    <th class="short">Middle Name</th>
-                    <th class="short">ID Number</th>
-                    <th class="short">Grade/Year</th>
-                    <th class="short">Section</th>  
-                    <th class="short">Absences</th>
-                    <th class="short">Lates</th>
-                </tr>
-                </thead>
-                <tbody>
-                    {% set num = 1 %}
-                    {% for index in data %}
-                    <tr>
-                        <td class="xs">{{num}}</td> 
-                        <td class="short">{{index.last_name}}</td>  
-                        <td class="short">{{index.first_name}}</td> 
-                        <td class="short">{{index.middle_name}}</td>
-                        <td class="short">{{index.id_no}}</td>              
-                        <td class="short">{{index.level}}</td>
-                        <td class="short">{{index.section}}</td>                
-                        <td class="short">0</td>
-                        <td class="short">{{index.lates}}</td>
-                    </tr>
-                    {% set num = num+1 %}
-                    {% endfor %}
-                </tbody>
-            </table>
+<table class="table">
+    <tbody>
+        {% for index in data %}
+        <tr>
+            <td class="xs">{{loop.index+limit}}</td> 
+            <td class="short">{{index.last_name}}</td>  
+            <td class="short">{{index.first_name}}</td> 
+            <td class="short">{{index.middle_name}}</td>
+            <td class="short">{{index.id_no}}</td>              
+            <td class="short">{{index.level}}</td>
+            <td class="short">{{index.section}}</td>                
+            <td class="short">0</td>
+            <td class="short">{{index.lates}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

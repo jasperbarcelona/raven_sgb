@@ -1,22 +1,10 @@
 
-            <table class="table tablesorter">
-                <thead>
-                    <th class="xs"></th>
-                    <th class="short"><span>Date</span></th>        
-                    <th class="long">Name</th>
-                    <th class="short">ID Number</th>
-                    {% if view=='student' %}
-                    <th class="short">Grade/Year</th>
-                    <th class="short">Section</th>
-                    {% endif %}
-                    <th class="short">In</th>
-                    <th class="short">Out</th>
-                </thead>
+            <table class="table">
                 <tbody>
                     {% set num = 1 %}
                     {% for i in data %}
                     <tr>
-                        <td class="xs">{{num}}</td> 
+                        <td class="xs">{{loop.index+limit}}</td> 
                         <td class="short">{{i.date}}</td>   
                         <td class="long">{{i.name}}</td>
                         <td class="short">{{i.id_no}}</td>

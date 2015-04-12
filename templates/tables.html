@@ -15,10 +15,9 @@
 					<th class="short">Out</th>
 				</thead>
 				<tbody>
-					{% set num = 1 %}
 					{% for i in log %}
 					<tr>
-						<td class="xs">{{num}}</td>	
+						<td class="xs">{{loop.index}}</td>	
 						<td class="short">{{i.date}}</td>	
 						<td class="long">{{i.name}}</td>
 						<td class="short">{{i.id_no}}</td>
@@ -29,7 +28,6 @@
 						<td class="short">{{i.time_in}}</td>
 						<td class="short">{{i.time_out}}</td>
 					</tr>
-					{% set num = num+1 %}
 					{% endfor %}
 				</tbody>
 			</table>
@@ -53,10 +51,9 @@
 				</tr>
 				</thead>
 				<tbody>
-					{% set num = 1 %}
 					{% for index in attendance %}
 					<tr>
-						<td class="xs">{{num}}</td>	
+						<td class="xs">{{loop.index}}</td>	
 						<td class="short">{{index.last_name}}</td>	
 						<td class="short">{{index.first_name}}</td>	
 						<td class="short">{{index.middle_name}}</td>
@@ -66,7 +63,6 @@
 						<td class="short">0</td>
 						<td class="short">{{index.lates}}</td>
 					</tr>
-					{% set num = num+1 %}
 					{% endfor %}
 				</tbody>
 			</table>
@@ -88,17 +84,15 @@
 
 				</thead>
 				<tbody>
-					{% set num = 1 %}
 					{% for a in late %}
 					<tr>
-						<td class="xs">{{num}}</td>
+						<td class="xs">{{loop.index}}</td>
 						<td class="short">{{a.date}}</td>	
 						<td class="long">{{a.name}}</td>					
 						<td class="short">{{a.level}}</td>
 						<td class="short">{{a.section}}</td>				
 						<td class="short">{{a.time_in}}</td>	
 					</tr>
-					{% set num = num+1 %}
 					{% endfor %}
 				</tbody>
 			</table>

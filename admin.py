@@ -2,6 +2,7 @@ import flask, flask.views
 from flask import url_for, request, session, redirect, jsonify, Response, make_response, current_app
 from jinja2 import environment, FileSystemLoader
 from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.orderinglist import ordering_list
 from flask.ext import admin
 from flask.ext.admin.contrib import sqla
 from flask.ext.admin.contrib.sqla import ModelView
@@ -419,7 +420,7 @@ def index():
 
 @app.route('/data', methods=['GET', 'POST'])
 def load_data():
-    school = School.query.filter_by(api_key=session['api_key']).first()
+    school = School.query.filter_by(api_key=session['api_key']).one()
    
     logs = Log.query.filter(
         Log.school_id==session['school_id'],
@@ -452,17 +453,25 @@ def load_more():
     data = variable[needed]
 
     if needed == 'logs':
+        limit = session['log_limit']
         session['log_limit']+=100
+        
     elif needed == 'late':
+        limit = session['late_limit']
         session['late_limit']+=100
+        
     elif needed == 'attendance':
+        limit = session['attendance_limit']
         session['attendance_limit']+=100
+        
 
     prepare()
 
     return flask.render_template(
         needed+'.html',
-        data=data
+        data=data,
+        view=session['department'],
+        limit=limit
         )
 
 @app.route('/view', methods=['GET', 'POST'])

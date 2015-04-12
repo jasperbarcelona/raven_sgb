@@ -275,6 +275,11 @@ textarea:focus{
 	display: inline;
 }
 
+.table{
+	margin-bottom: 0 !important;
+}
+
+
 h3{
 	display: inline;
 }
@@ -284,9 +289,9 @@ thead{
 }
 
 td{
-	border: 1px solid #DDDDDD;
+	border-left: 1px solid #DDDDDD;
+	border-right: 1px solid #DDDDDD;
 }
-
 
 table.tablesorter thead tr th, table.tablesorter tfoot tr th {
 	background-color: #FFFFFF;
