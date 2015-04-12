@@ -433,9 +433,6 @@ def load_data():
         department=session['department'])\
         .order_by(Student.last_name).limit(session['attendance_limit'])
 
-    # lazy_thread = threading.Thread(target=prepare_next,args=[session['log_limit'],session['late_limit'],session['attendance_limit'],session['school_id'],session['department']])    
-    # lazy_thread.start()
-
     prepare()
 
     return flask.render_template(
@@ -446,8 +443,8 @@ def load_data():
         view=session['department']
         )
 
-@app.route('/test', methods=['GET', 'POST'])
-def test():
+@app.route('/loadmore', methods=['GET', 'POST'])
+def load_more():
     needed = flask.request.form.get('data')
     data = variable[needed]
 

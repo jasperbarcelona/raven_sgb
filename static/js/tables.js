@@ -2,52 +2,25 @@ $(document).ready(function(){
 
 $('.table').tablesorter();
 
-jQuery(function($) {
-    $('#logs').bind('scroll', function() {
-        if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight) {  
-            var data = 'logs'
-            $.post('/test',{data:data},
-            function(data){
-            $('#logs').html(data);
-            });
+var isPreviousEventComplete = true;
+
+$('.tab-pane').scroll(function () {
+    if($(this).scrollTop() + $(this).height() > (this.scrollHeight * .7))  {
+        var that = this;
+        if (isPreviousEventComplete) {
+            load_next(String(that.getAttribute('id')));
         }
-    })
+    }
 });
 
-jQuery(function($) {
-    $('#attendance').bind('scroll', function() {
-        if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight) {  
-            var data = 'attendance'
-            $.post('/test',{data:data},
-            function(data){
-            $('#attendance').html(data);
-            });
-        }
-    })
-});
-
-jQuery(function($) {
-    $('#absent').bind('scroll', function() {
-        if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight) {  
-            var data = 'absent'
-            $.post('/test',{data:data},
-            function(data){
-            $('#absent').html(data);
-            });
-        }
-    })
-});
-
-jQuery(function($) {
-    $('#late').bind('scroll', function() {
-        if($(this).scrollTop() + $(this).innerHeight() >= this.scrollHeight) {  
-            var data = 'late'
-            $.post('/test',{data:data},
-            function(data){
-            $('#late').html(data);
-            });
-        }
-    })
-});
+function load_next(tab){
+    isPreviousEventComplete = false;
+    var data = tab
+    $.post('/loadmore',{data:data},
+    function(data){
+        $('#'+tab).html(data);
+        isPreviousEventComplete = true;
+    });
+}
 
 });
