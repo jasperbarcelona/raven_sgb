@@ -585,51 +585,6 @@ def rebuild_database():
         faculty_afternoon_end = now.replace(hour=16, minute=0, second=0)
         )
     db.session.add(school)
-    for i in range(1000):
-        a = Student(
-            school_id=1234,
-            id_no='2011334281',
-            first_name='Jasper',
-            last_name='Barcelona',
-            middle_name='Estrada',
-            level='4th Grade',
-            department='student',
-            section='Charity',
-            absences='0',
-            lates='0',
-            parent_contact='639183339068'
-            )
-        b = Student(
-            school_id=1234,
-            id_no='2011334282',
-            first_name='Janno',
-            last_name='Armamento',
-            middle_name='Estrada',
-            level='4th Grade',
-            department='student',
-            section='Fidelity',
-            absences='0',
-            lates='0',
-            parent_contact='639183339068'
-            )
-        db.session.add(a)
-        db.session.add(b)
-    
-    for i in range(5000):
-        c = Log(
-            school_id=1234,
-            date='1234',
-            id_no='1234',
-            name='test',
-            level='test',
-            section='test',
-            department='student',
-            time_in='1234',
-            military_time=now,
-            time_out='1234',
-            timestamp=now
-            )
-        db.session.add(c)
     db.session.commit()
 
     return SWJsonify({'Status': 'Database Rebuild Success'})
