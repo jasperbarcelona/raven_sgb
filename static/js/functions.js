@@ -3,13 +3,13 @@ function change_tab(page){
 tab = page;
 }
 
-function load_data(){
+/*function load_data(){
 $.post('/data',
 function(data){
 $('#table-container').html(data);
 $("#big-preloader-container").hide();
 });
-}
+}*/
 
 function change_view(view){
 $("#big-preloader-container").show();

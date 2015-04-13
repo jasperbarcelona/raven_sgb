@@ -1,14 +1,14 @@
 <table class="table">
-    <tbody>
-    {% for a in data %}
-    <tr>
-        <td class="xs">{{loop.index+limit}}</td>
-        <td class="short">{{a.date}}</td>   
-        <td class="long">{{a.name}}</td>                    
-        <td class="short">{{a.level}}</td>
-        <td class="short">{{a.section}}</td>                
-        <td class="short">{{a.time_in}}</td>    
-    </tr>
-    {% endfor %}
-    </tbody>
+	<tbody>
+		{% for a in data %}
+		<tr>
+			<td class="xs">{{loop.index+limit}}</td>
+			<td class="short">{{a.date}}</td>
+			<td class="long">{{a.name}}</td>
+			<td class="short">{{a.level}}</td>
+			<td class="short">{{a.section}}</td>
+			<td class="short">{{a.time_in}}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
 </table>

@@ -376,12 +376,12 @@ def time_out(id_no, time):
 
 def prepare():
     global variable
-    variable = pool.apply_async(prepare_next, (session['log_limit'],
+    variable = pool.apply_async(fetch_next, (session['log_limit'],
                       session['late_limit'],session['attendance_limit'],
                       session['school_id'],session['department'])).get()
 
 
-def prepare_next(log_limit, late_limit, attendance_limit, school_id, department):
+def fetch_next(log_limit, late_limit, attendance_limit, school_id, department):
      log_limit += 100
      late_limit += 100
      attendance_limit += 100
@@ -394,14 +394,14 @@ def prepare_next(log_limit, late_limit, attendance_limit, school_id, department)
      late = Late.query.filter_by(
         school_id=school_id,
         department=department
-        ).order_by(Log.timestamp.desc()).slice((late_limit-100),late_limit)
+        ).order_by(Late.timestamp.desc()).slice((late_limit-100),late_limit)
 
      attendance = Student.query.filter_by(
         school_id=school_id,
         department=department)\
         .order_by(Student.last_name).slice((attendance_limit-100),attendance_limit)
 
-     return {'logs':logs, 'Late':late ,'attendance':attendance}
+     return {'logs':logs, 'late':late ,'attendance':attendance}
     
 
 @app.route('/', methods=['GET', 'POST'])
@@ -409,43 +409,25 @@ def index():
     if not session:
         return redirect('/loginpage')
     start_timer()
-    session['log_limit'] = 100
-    session['late_limit'] = 100
-    session['attendance_limit'] = 100
+    session['log_limit'] = 0
+    session['late_limit'] = 0
+    session['attendance_limit'] = 0
     session['log_start'] = 0
     session['late_start'] = 0
     session['attendance_start'] = 0
-    return flask.render_template('index.html', view=session['department'])
 
-
-@app.route('/data', methods=['GET', 'POST'])
-def load_data():
     school = School.query.filter_by(api_key=session['api_key']).one()
    
-    logs = Log.query.filter(
-        Log.school_id==session['school_id'],
-        Log.department==session['department']
-        ).order_by(Log.timestamp.desc()).slice(session['log_start'],session['log_limit'])
-
-    late = Late.query.filter_by(
-        school_id=session['school_id'],
-        department=session['department']
-        ).order_by(Late.timestamp.desc()).slice(session['late_start'],session['late_limit'])
-
-    attendance = Student.query.filter_by(
-        school_id=session['school_id'],
-        department=session['department'])\
-        .order_by(Student.last_name).slice(session['attendance_start'],session['attendance_limit'])
-
     prepare()
 
     return flask.render_template(
-        'tables.html',
-        log=logs,
-        late=late,
-        attendance=attendance, 
+        'index.html',
+        log=variable['logs'],
+        late=variable['late'],
+        attendance=variable['attendance'], 
         view=session['department']
         )
+
 
 @app.route('/loadmore', methods=['GET', 'POST'])
 def load_more():
@@ -602,6 +584,51 @@ def rebuild_database():
         faculty_afternoon_end = now.replace(hour=16, minute=0, second=0)
         )
     db.session.add(school)
+    for i in range(1000):
+        a = Student(
+            school_id=1234,
+            id_no='2011334281',
+            first_name='Jasper',
+            last_name='Barcelona',
+            middle_name='Estrada',
+            level='4th Grade',
+            department='student',
+            section='Charity',
+            absences='0',
+            lates='0',
+            parent_contact='639183339068'
+            )
+        b = Student(
+            school_id=1234,
+            id_no='2011334282',
+            first_name='Janno',
+            last_name='Armamento',
+            middle_name='Estrada',
+            level='4th Grade',
+            department='student',
+            section='Fidelity',
+            absences='0',
+            lates='0',
+            parent_contact='639183339068'
+            )
+        db.session.add(a)
+        db.session.add(b)
+    
+    for i in range(5000):
+        c = Log(
+            school_id=1234,
+            date='1234',
+            id_no='1234',
+            name='test',
+            level='test',
+            section='test',
+            department='student',
+            time_in='1234',
+            military_time=now,
+            time_out='1234',
+            timestamp=now
+            )
+        db.session.add(c)
     db.session.commit()
 
     return SWJsonify({'Status': 'Database Rebuild Success'})

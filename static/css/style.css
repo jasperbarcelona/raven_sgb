@@ -190,6 +190,7 @@ textarea:focus{
 	align-items: center;
 	-webkit-justify-content: center;
 	justify-content: center;
+	display: none;
 }
 
 .searchbox{

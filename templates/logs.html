@@ -1,21 +1,19 @@
+<table class="table">
+	<tbody>
+		{% for i in data %}
+		<tr>
+			<td class="xs">{{loop.index+limit}}</td>
+			<td class="short">{{i.date}}</td>
+			<td class="long">{{i.name}}</td>
+			<td class="short">{{i.id_no}}</td>
+			{% if view=='student' %}
+			<td class="short">{{i.level}}</td>
+			<td class="short">{{i.section}}</td>
+			{% endif %}
+			<td class="short">{{i.time_in}}</td>
+			<td class="short">{{i.time_out}}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
 
-            <table class="table">
-                <tbody>
-                    {% set num = 1 %}
-                    {% for i in data %}
-                    <tr>
-                        <td class="xs">{{loop.index+limit}}</td> 
-                        <td class="short">{{i.date}}</td>   
-                        <td class="long">{{i.name}}</td>
-                        <td class="short">{{i.id_no}}</td>
-                        {% if view=='student' %}                    
-                        <td class="short">{{i.level}}</td>
-                        <td class="short">{{i.section}}</td>
-                        {% endif %}             
-                        <td class="short">{{i.time_in}}</td>
-                        <td class="short">{{i.time_out}}</td>
-                    </tr>
-                    {% set num = num+1 %}
-                    {% endfor %}
-                </tbody>
-            </table>
