@@ -386,6 +386,7 @@ def fetch_next(log_limit, late_limit, attendance_limit, school_id, department):
      late_limit += 100
      attendance_limit += 100
 
+
      logs = Log.query.filter_by(
         school_id=school_id,
         department=department
@@ -402,7 +403,7 @@ def fetch_next(log_limit, late_limit, attendance_limit, school_id, department):
         .order_by(Student.last_name).slice((attendance_limit-100),attendance_limit)
 
      return {'logs':logs, 'late':late ,'attendance':attendance}
-    
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():

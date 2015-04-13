@@ -299,22 +299,21 @@ td{
 	border-right: 1px solid #DDDDDD;
 }
 
-table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+table.table thead tr th, table.table tfoot tr th {
 	background-color: #FFFFFF;
-	/*color: #FFFFFF;*/
 	border: 2px solid #DDDDDD;
 	color: #494949;
 }
 
-table.tablesorter thead tr .headerSortUp {
+/*table.table thead tr .headerSortUp {
 	background-image: url('../images/asc.gif');
 	background-repeat: no-repeat;
 	background-position: right;
 	background-size: 25px;
 }
-table.tablesorter thead tr .headerSortDown {
+table.table thead tr .headerSortDown {
 	background-image: url('../images/desc.gif');
 	background-repeat: no-repeat;
 	background-position: right;
 	background-size: 25px;
-}
+}*/
