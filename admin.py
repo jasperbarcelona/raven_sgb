@@ -298,11 +298,11 @@ def check_if_late(school_id,api_key,id_no,name,level,section,
         afternoon_end = str(parse_date(school.faculty_afternoon_end))[11:]
 
     else:
-        if school.level in PRIMARY:
+        if level in PRIMARY:
             educ = 'primary'
-        elif school.level in JUNIOR_HIGH:
+        elif level in JUNIOR_HIGH:
             educ = 'junior'
-        elif school.level in SENIOR_HIGH:
+        elif level in SENIOR_HIGH:
             educ = 'senior'
 
         query = 'school.%s' % educ
@@ -647,9 +647,9 @@ def rebuild_database():
 
     c = Student(
         school_id=1234,
-        id_no='2011334282',
-        first_name='Janno',
-        last_name='Armamento',
+        id_no='2011334283',
+        first_name='Bear',
+        last_name='Delos Reyes',
         middle_name='Estrada',
         level='12th Grade',
         department='student',
