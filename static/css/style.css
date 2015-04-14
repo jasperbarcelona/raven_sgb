@@ -14,8 +14,9 @@ body{
 	width: 100%;
 	color: #494949 !important;
 	font-family: OpenSans, sans-serif;
-	background-image: url('../images/white_tiles.png');
+	background-image: url('../images/footer_lodyas.png');
 	background-repeat: repeat;
+
 }
 
 span:hover{
@@ -40,7 +41,7 @@ textarea:focus{
 }
 
 .xs{
-	width: 30px !important;
+	width: 45px !important;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -53,9 +54,39 @@ textarea:focus{
 	margin-top: 7px;
 }
 
+.status-modal-dialog{
+	margin-top: 130px;
+	width: 300px;
+}
+
+#message-status-modal .modal-body{
+	height: 80px;
+	padding-left: 30px;
+	box-shadow:inset 0px 0px 10px 0px rgba(0,0,0,0.3);
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	-webkit-align-items: center;
+	align-items: center;
+}
+
 .status-success{
 	color: #80D580;
-	margin-right: 30px;
+	margin-right: 10px;
+	font-size: 32px;
+	float: left;
+}
+
+.status-error{
+	color: #CD3D2D;
+	margin-right: 10px;
+	font-size: 32px;
+	float: left;
+}
+
+.status-message{
+	font-size: 16px;
 }
 
 .message-modal-body{
@@ -113,11 +144,6 @@ textarea:focus{
 	min-width: 800px;
 }
 
-.header{
-	background-color: gray;
-	color: #ffffff;
-}
-
 .button-container{
 	float: right;
 }
@@ -163,7 +189,7 @@ textarea:focus{
 }
 
 #compose-btn{
-	background-color: #CD3D2D;
+	background-color: #4485F5;
 	color: #FFFFFF;
 	
 }
@@ -227,9 +253,9 @@ textarea:focus{
 }
 
 .short{
-	width: 120px;
-	max-width: 100px;
-	min-width: 70px;
+	width: 80px;
+	max-width: 80px;
+	min-width: 50px;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -255,10 +281,10 @@ textarea:focus{
 }
 
 #main-content{
-	border: 1px solid #F1F1F1;
+	
 	overflow: hidden;
 	overflow-x: hidden; 
-	background-color: rgba(255,255,255,0.7);
+	background-color: rgba(255,255,255,1);
 }
 
 #copyright{
@@ -283,15 +309,11 @@ textarea:focus{
 
 .table{
 	margin-bottom: 0 !important;
+	border-bottom: none !important;
 }
-
 
 h3{
 	display: inline;
-}
-
-thead{
-	border: 1px solid #DDDDDD;
 }
 
 td{
@@ -299,11 +321,29 @@ td{
 	border-right: 1px solid #DDDDDD;
 }
 
-table.table thead tr th, table.table tfoot tr th {
-	background-color: #FFFFFF;
-	border: 2px solid #DDDDDD;
-	color: #494949;
+tr:hover{
+	background-color: #E5E5E5;
 }
+
+table.table thead tr th, table.table tfoot tr th {
+	background-color: #494949;
+	color: #ffffff;
+}
+
+.nav-tabs li .tab-item{
+	color: #FFFFFF;
+	font-weight: bold;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus{
+          color: #FFFFFF;
+          cursor: default;
+          background-color: #494949;
+          border: 1px solid #dddddd;
+          border-bottom-color: transparent;
+} 
 
 /*table.table thead tr .headerSortUp {
 	background-image: url('../images/asc.gif');

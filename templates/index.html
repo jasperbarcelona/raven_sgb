@@ -1,20 +1,22 @@
 {% extends "base.html" %}
 {% block content %} 
 <div id="table-container">
-	<div class="tab-content">
-		<div class="tab-pane fade in active" id="logs">		
-			<table class="table tablesorter">
-				<thead>
-					<th class="xs"></th>
-					<th class="short"><span>Date</span></th>		
-					<th class="long">Name</th>
-					<th class="short">ID Number</th>
-					{% if view=='student' %}
-					<th class="short">Grade/Year</th>
-					<th class="short">Section</th>
-					{% endif %}
-					<th class="short">In</th>
-					<th class="short">Out</th>
+	<div class="tab-content">	
+		<div class="tab-pane fade in active" id="logs">
+			<table class="table">
+				<thead >
+					<tr>
+						<th class="xs"></th>
+						<th class="short">Date</th>		
+						<th class="long">Name</th>
+						<th class="short">ID Number</th>
+						{% if view=='student' %}
+						<th class="short">Grade/Year</th>
+						<th class="short">Section</th>
+						{% endif %}
+						<th class="short">In</th>
+						<th class="short">Out</th>
+					</tr>
 				</thead>
 				<tbody>
 					{% for i in log %}
@@ -37,7 +39,7 @@
 
 		{% if view=='student' %}
 		<div class="tab-pane fade" id="attendance">
-			<table class="table tablesorter">
+			<table class="table">
 				<thead>	
 				<tr>
 					<th class="xs"></th>
@@ -74,7 +76,7 @@
 		</div>
 
 		<div class="tab-pane fade" id="late">
-			<table class="table tablesorter">
+			<table class="table">
 				<thead>
 					<th class="xs"></th>
 					<th class="short">Date</th>	

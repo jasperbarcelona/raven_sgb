@@ -1,7 +1,5 @@
 $(document).ready(function(){
 
-$('.table').tablesorter();
-
 var isPreviousEventComplete = true;
 
 $('.tab-pane').scroll(function () {

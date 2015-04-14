@@ -38,6 +38,10 @@ CLIENT_ID = 'ef8cf56d44f93b6ee6165a0caa3fe0d1ebeee9b20546998931907edbb266eb72'
 SECRET_KEY = 'c4c461cc5aa5f9f89b701bc016a73e9981713be1bf7bb057c875dbfacff86e1d'
 SHORT_CODE = '29290420420'
 CONNECT_TIMEOUT = 5.0
+
+PRIMARY = ['1st Grade', '2nd Grade', '3rd Grade', '4th Grade', '5th Grade', '6th Grade']
+JUNIOR_HIGH = ['7th Grade', '8th Grade', '9th Grade', '10th Grade']
+SENIOR_HIGH = ['11th Grade', '12th Grade']
 # os.environ['DATABASE_URL']
 
 now = datetime.datetime.now()
@@ -84,10 +88,18 @@ class School(db.Model, Serializer):
     faculty_morning_end = db.Column(db.String(30))
     faculty_afternoon_start = db.Column(db.String(30))
     faculty_afternoon_end = db.Column(db.String(30))
-    student_morning_start = db.Column(db.String(30))
-    student_morning_end = db.Column(db.String(30))
-    student_afternoon_start = db.Column(db.String(30))
-    student_afternoon_end = db.Column(db.String(30))
+    primary_morning_start = db.Column(db.String(30))
+    primary_morning_end = db.Column(db.String(30))
+    primary_afternoon_start = db.Column(db.String(30))
+    primary_afternoon_end = db.Column(db.String(30))
+    junior_morning_start = db.Column(db.String(30))
+    junior_morning_end = db.Column(db.String(30))
+    junior_afternoon_start = db.Column(db.String(30))
+    junior_afternoon_end = db.Column(db.String(30))
+    senior_morning_start = db.Column(db.String(30))
+    senior_morning_end = db.Column(db.String(30))
+    senior_afternoon_start = db.Column(db.String(30))
+    senior_afternoon_end = db.Column(db.String(30))
 
 
 class Log(db.Model, Serializer):
@@ -286,10 +298,19 @@ def check_if_late(school_id,api_key,id_no,name,level,section,
         afternoon_end = str(parse_date(school.faculty_afternoon_end))[11:]
 
     else:
-        morning_start = str(parse_date(school.student_morning_start))[11:]
-        morning_end = str(parse_date(school.student_morning_end))[11:]
-        afternoon_start = str(parse_date(school.student_afternoon_start))[11:]
-        afternoon_end = str(parse_date(school.student_afternoon_end))[11:]
+        if school.level in PRIMARY:
+            educ = 'primary'
+        elif school.level in JUNIOR_HIGH:
+            educ = 'junior'
+        elif school.level in SENIOR_HIGH:
+            educ = 'senior'
+
+        query = 'school.%s' % educ
+
+        morning_start = str(parse_date(eval(query+'morning_start')))[11:]
+        morning_end = str(parse_date(eval(query+'morning_end')))[11:]
+        afternoon_start = str(parse_date(eval(query+'afternoon_start')))[11:]
+        afternoon_end = str(parse_date(eval(query+'afternoon_end')))[11:]
     
     if (time_now >= morning_start and time_now < morning_end) or \
        (time_now >= afternoon_start and time_now < afternoon_end):
@@ -376,17 +397,15 @@ def time_out(id_no, time):
 
 def prepare():
     global variable
+    session['log_limit']+=100
+    session['late_limit']+=100
+    session['attendance_limit']+=100
     variable = pool.apply_async(fetch_next, (session['log_limit'],
                       session['late_limit'],session['attendance_limit'],
                       session['school_id'],session['department'])).get()
 
 
 def fetch_next(log_limit, late_limit, attendance_limit, school_id, department):
-     log_limit += 100
-     late_limit += 100
-     attendance_limit += 100
-
-
      logs = Log.query.filter_by(
         school_id=school_id,
         department=department
@@ -410,22 +429,23 @@ def index():
     if not session:
         return redirect('/loginpage')
     start_timer()
-    session['log_limit'] = 0
-    session['late_limit'] = 0
-    session['attendance_limit'] = 0
-    session['log_start'] = 0
-    session['late_start'] = 0
-    session['attendance_start'] = 0
+    session['log_limit'] = 100
+    session['late_limit'] = 100
+    session['attendance_limit'] = 100
 
     school = School.query.filter_by(api_key=session['api_key']).one()
-   
+
+    first_set = fetch_next(session['log_limit'],session['late_limit'],
+        session['attendance_limit'],session['school_id'],
+        session['department'])
+
     prepare()
 
     return flask.render_template(
         'index.html',
-        log=variable['logs'],
-        late=variable['late'],
-        attendance=variable['attendance'], 
+        log=first_set['logs'],
+        late=first_set['late'],
+        attendance=first_set['attendance'], 
         view=session['department']
         )
 
@@ -436,18 +456,14 @@ def load_more():
     data = variable[needed]
 
     if needed == 'logs':
-        limit = session['log_limit']
-        session['log_limit']+=100
+        limit = session['log_limit']-100
         
     elif needed == 'late':
-        limit = session['late_limit']
-        session['late_limit']+=100
+        limit = session['late_limit']-100
         
     elif needed == 'attendance':
-        limit = session['attendance_limit']
-        session['attendance_limit']+=100
+        limit = session['attendance_limit']-100
         
-
     prepare()
 
     return flask.render_template(
@@ -459,9 +475,9 @@ def load_more():
 
 @app.route('/view', methods=['GET', 'POST'])
 def change_view():
-    view = flask.request.form.get('view')
+    view = flask.request.args.get('view')
     session['department'] = view
-    return redirect('/data')
+    return redirect('/')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -536,7 +552,11 @@ def add_log():
 
 @app.route('/blast',methods=['GET','POST'])
 def blast_message():
+    password = flask.request.form.get('password')
     message = flask.request.form.get('message')
+    if not authenticate_user(session['school_id'], password):
+        return flask.render_template('status.html', status='Unauthorized')
+
     for user in db.session.query(Student.parent_contact).filter\
               (Student.school_id==session['school_id']).distinct(): 
 
@@ -544,7 +564,7 @@ def blast_message():
                                  args=[message, user.parent_contact, SMS_URL])
         blast_thread.start()
     
-    return flask.render_template('status.html')
+    return flask.render_template('status.html', status='Success')
 
 
 @app.route('/sync',methods=['GET','POST'])
@@ -575,14 +595,26 @@ def rebuild_database():
         city="Lucena City",
         email="sgb.edu@gmail.com",
         tel="555-8898",
-        student_morning_start = now.replace(hour=8, minute=0, second=0),
-        student_morning_end = now.replace(hour=12, minute=0, second=0),
-        student_afternoon_start = now.replace(hour=13, minute=0, second=0),
-        student_afternoon_end = now.replace(hour=18, minute=0, second=0),
+        
         faculty_morning_start = now.replace(hour=7, minute=0, second=0),
         faculty_morning_end = now.replace(hour=12, minute=0, second=0),
         faculty_afternoon_start = now.replace(hour=13, minute=0, second=0),
-        faculty_afternoon_end = now.replace(hour=16, minute=0, second=0)
+        faculty_afternoon_end = now.replace(hour=16, minute=0, second=0),
+
+        primary_morning_start = now.replace(hour=7, minute=0, second=0),
+        primary_morning_end = now.replace(hour=12, minute=0, second=0),
+        primary_afternoon_start = now.replace(hour=13, minute=0, second=0),
+        primary_afternoon_end = now.replace(hour=18, minute=0, second=0),
+
+        junior_morning_start = now.replace(hour=8, minute=0, second=0),
+        junior_morning_end = now.replace(hour=12, minute=0, second=0),
+        junior_afternoon_start = now.replace(hour=13, minute=0, second=0),
+        junior_afternoon_end = now.replace(hour=16, minute=0, second=0),
+
+        senior_morning_start = now.replace(hour=9, minute=0, second=0),
+        senior_morning_end = now.replace(hour=12, minute=0, second=0),
+        senior_afternoon_start = now.replace(hour=13, minute=0, second=0),
+        senior_afternoon_end = now.replace(hour=16, minute=0, second=0)
         )
     db.session.add(school)
     db.session.commit()

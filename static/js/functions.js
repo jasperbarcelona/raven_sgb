@@ -3,24 +3,6 @@ function change_tab(page){
 tab = page;
 }
 
-/*function load_data(){
-$.post('/data',
-function(data){
-$('#table-container').html(data);
-$("#big-preloader-container").hide();
-});
-}*/
-
-function change_view(view){
-$("#big-preloader-container").show();
-var view = view;
-$.post('/view',{view:view},
-function(data){
-$('#table-container').html(data);
-window.location.assign("/");
-});
-}
-
 function textCounter(field,field2,maxlimit)
 {
  var countfield = document.getElementById(field2);
@@ -34,8 +16,9 @@ function textCounter(field,field2,maxlimit)
 
 function blast_message(){
 var message = $("#message").val();
+var password = $("#message-confirm-password").val();
 if ((navigator.onLine==true) && ($.trim($("#message").val()))) {
-    $.post('/blast',{message:message},
+    $.post('/blast',{message:message,password:password},
     function(data){
     $('#status-modal-body').html(data);
     });
