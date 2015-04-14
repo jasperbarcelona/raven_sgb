@@ -305,12 +305,12 @@ def check_if_late(school_id,api_key,id_no,name,level,section,
         elif level in SENIOR_HIGH:
             educ = 'senior'
 
-        query = 'school.%s' % educ
+        query = 'school.%s' %educ
 
-        morning_start = str(parse_date(eval(query+'morning_start')))[11:]
-        morning_end = str(parse_date(eval(query+'morning_end')))[11:]
-        afternoon_start = str(parse_date(eval(query+'afternoon_start')))[11:]
-        afternoon_end = str(parse_date(eval(query+'afternoon_end')))[11:]
+        morning_start = str(parse_date(eval(query+'_morning_start')))[11:]
+        morning_end = str(parse_date(eval(query+'_morning_end')))[11:]
+        afternoon_start = str(parse_date(eval(query+'_afternoon_start')))[11:]
+        afternoon_end = str(parse_date(eval(query+'_afternoon_end')))[11:]
     
     if (time_now >= morning_start and time_now < morning_end) or \
        (time_now >= afternoon_start and time_now < afternoon_end):
