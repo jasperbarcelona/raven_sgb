@@ -296,10 +296,10 @@ def check_if_late(school_id,api_key,id_no,name,level,section,
 
     query = 'school.%s' %educ
 
-    morning_start = parse_date(eval(query+'_morning_start'))
-    morning_end = parse_date(eval(query+'_morning_end'))
-    afternoon_start = parse_date(eval(query+'_afternoon_start'))
-    afternoon_end = parse_date(eval(query+'_afternoon_end'))
+    morning_start = eval(query+'_morning_start')
+    morning_end = eval(query+'_morning_end')
+    afternoon_start = eval(query+'_afternoon_start')
+    afternoon_end = eval(query+'_afternoon_end')
 
     print 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
     print 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
