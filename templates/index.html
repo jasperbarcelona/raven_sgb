@@ -2,7 +2,7 @@
 {% block content %} 
 <div id="table-container">
 	<div class="tab-content">	
-		<div class="tab-pane fade in active" id="logs">
+		<div class="tab-pane active" id="logs-tab">
 			<table class="table">
 				<thead >
 					<tr>
@@ -18,7 +18,7 @@
 						<th class="short">Out</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody id="logs">
 					{% for i in log %}
 					<tr>
 						<td class="xs">{{loop.index}}</td>	
@@ -38,22 +38,22 @@
 		</div>
 
 		{% if view=='student' %}
-		<div class="tab-pane fade" id="attendance">
+		<div class="tab-pane" id="attendance-tab">
 			<table class="table">
 				<thead>	
-				<tr>
-					<th class="xs"></th>
-					<th class="short" id="last_name">Last Name</th>
-					<th class="short" id="first_name">First Name</th>
-					<th class="short" id="middle_name">Middle Name</th>
-					<th class="short" id="id_no">ID Number</th>
-					<th class="short" id="level">Grade/Year</th>
-					<th class="short" id="section">Section</th>	
-					<th class="short" id="absences">Absences</th>
-					<th class="short" id="lates">Lates</th>
-				</tr>
+					<tr>
+						<th class="xs"></th>
+						<th class="short" id="last_name">Last Name</th>
+						<th class="short" id="first_name">First Name</th>
+						<th class="short" id="middle_name">Middle Name</th>
+						<th class="short" id="id_no">ID Number</th>
+						<th class="short" id="level">Grade/Year</th>
+						<th class="short" id="section">Section</th>	
+						<th class="short" id="absences">Absences</th>
+						<th class="short" id="lates">Lates</th>
+					</tr>
 				</thead>
-				<tbody>
+				<tbody id="attendance">
 					{% for index in attendance %}
 					<tr>
 						<td class="xs">{{loop.index}}</td>	
@@ -71,11 +71,11 @@
 			</table>
 		</div>
 
-		<div class="tab-pane fade" id="absent">
+		<div class="tab-pane" id="absent-tab">
 			<p>attendance</p>
 		</div>
 
-		<div class="tab-pane fade" id="late">
+		<div class="tab-pane" id="late-tab">
 			<table class="table">
 				<thead>
 					<th class="xs"></th>
@@ -86,7 +86,7 @@
 					<th class="short">In</th>
 
 				</thead>
-				<tbody>
+				<tbody id="late">
 					{% for a in late %}
 					<tr>
 						<td class="xs">{{loop.index}}</td>

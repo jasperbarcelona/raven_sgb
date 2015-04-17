@@ -84,10 +84,6 @@ class School(db.Model, Serializer):
     city = db.Column(db.String(30))
     email = db.Column(db.String(60))
     tel = db.Column(db.String(15))
-    faculty_morning_start = db.Column(db.String(30))
-    faculty_morning_end = db.Column(db.String(30))
-    faculty_afternoon_start = db.Column(db.String(30))
-    faculty_afternoon_end = db.Column(db.String(30))
     primary_morning_start = db.Column(db.String(30))
     primary_morning_end = db.Column(db.String(30))
     primary_afternoon_start = db.Column(db.String(30))
@@ -288,29 +284,22 @@ def start_timer():
 def check_if_late(school_id,api_key,id_no,name,level,section,
                              date,department,time,military_time):
 
-    time_now = str(now.replace(hour=get_hour(time), minute=int(time[3:5])))[11:]
+    time_now = str(now.replace(hour=get_hour(time), minute=int(time[3:5])))[11:16]
     school = School.query.filter_by(api_key=api_key).first()
 
-    if department == 'faculty':   
-        morning_start = str(parse_date(school.faculty_morning_start))[11:]
-        morning_end = str(parse_date(school.faculty_morning_end))[11:]
-        afternoon_start = str(parse_date(school.faculty_afternoon_start))[11:]
-        afternoon_end = str(parse_date(school.faculty_afternoon_end))[11:]
+    if level in PRIMARY:
+        educ = 'primary'
+    elif level in JUNIOR_HIGH:
+        educ = 'junior'
+    elif level in SENIOR_HIGH:
+        educ = 'senior'
 
-    else:
-        if level in PRIMARY:
-            educ = 'primary'
-        elif level in JUNIOR_HIGH:
-            educ = 'junior'
-        elif level in SENIOR_HIGH:
-            educ = 'senior'
+    query = 'school.%s' %educ
 
-        query = 'school.%s' %educ
-
-        morning_start = str(parse_date(eval(query+'_morning_start')))[11:]
-        morning_end = str(parse_date(eval(query+'_morning_end')))[11:]
-        afternoon_start = str(parse_date(eval(query+'_afternoon_start')))[11:]
-        afternoon_end = str(parse_date(eval(query+'_afternoon_end')))[11:]
+    morning_start = parse_date(eval(query+'_morning_start'))
+    morning_end = parse_date(eval(query+'_morning_end'))
+    afternoon_start = parse_date(eval(query+'_afternoon_start'))
+    afternoon_end = parse_date(eval(query+'_afternoon_end'))
     
     if (time_now >= morning_start and time_now < morning_end) or \
        (time_now >= afternoon_start and time_now < afternoon_end):
@@ -368,10 +357,14 @@ def time_in(school_id,api_key,id_no,name,level,section,
     message_thread = threading.Thread(target=send_message,args=[
                                     message, student.parent_contact, SMS_URL])
 
-    message_thread.start()
+    if department != 'faculty':
+        message_thread.start()
+        return check_if_late(school_id, api_key, id_no,name,level,
+                  section, date, department, time, military_time)
 
-    return check_if_late(school_id, api_key, id_no,name,level,
-               section, date, department, time, military_time)
+    return '', 201
+
+    
 
 
 def time_out(id_no, time):
@@ -446,7 +439,19 @@ def index():
         log=first_set['logs'],
         late=first_set['late'],
         attendance=first_set['attendance'], 
-        view=session['department']
+        view=session['department'],
+        primary_morning_start=school.primary_morning_start,
+        primary_morning_end=school.primary_morning_end,
+        primary_afternoon_start=school.primary_afternoon_start,
+        primary_afternoon_end=school.primary_afternoon_end,
+        junior_morning_start=school.junior_morning_start,
+        junior_morning_end=school.junior_morning_end,
+        junior_afternoon_start=school.junior_afternoon_start,
+        junior_afternoon_end=school.junior_afternoon_end,
+        senior_morning_start=school.senior_morning_start,
+        senior_morning_end=school.senior_morning_end,
+        senior_afternoon_start=school.senior_afternoon_start,
+        senior_afternoon_end=school.senior_afternoon_end,
         )
 
 
@@ -575,9 +580,44 @@ def sync_database():
         }), 201
 
 
+@app.route('/sched',methods=['GET','POST'])
+def change_sched():
+    primary_morning_start = flask.request.form.get('primary_morning_start')
+    primary_morning_end = flask.request.form.get('primary_morning_end')
+    junior_morning_start = flask.request.form.get('junior_morning_start')
+    junior_morning_end = flask.request.form.get('junior_morning_end')
+    senior_morning_start = flask.request.form.get('senior_morning_start')
+    senior_morning_end = flask.request.form.get('senior_morning_end')
+    primary_afternoon_start = flask.request.form.get('primary_afternoon_start')
+    primary_afternoon_end =flask.request.form.get('primary_afternoon_end')
+    junior_afternoon_start = flask.request.form.get('junior_afternoon_start')
+    junior_afternoon_end = flask.request.form.get('junior_afternoon_end')
+    senior_afternoon_start = flask.request.form.get('senior_afternoon_start')
+    senior_afternoon_end = flask.request.form.get('senior_afternoon_end')
+
+    school = School.query.filter_by(id=session['school_id']).one()
+
+    school.primary_morning_start = primary_morning_start
+    school.primary_morning_end = primary_morning_end
+    school.junior_morning_start = junior_morning_start
+    school.junior_morning_end = junior_morning_end
+    school.senior_morning_start = senior_morning_start
+    school.senior_morning_end = senior_morning_end
+    school.primary_afternoon_start = primary_afternoon_start
+    school.primary_afternoon_end = primary_afternoon_end
+    school.junior_afternoon_start = junior_afternoon_start
+    school.junior_afternoon_end = junior_afternoon_end
+    school.senior_afternoon_start = senior_afternoon_start
+    school.senior_afternoon_end = senior_afternoon_end
+
+    db.session.commit()
+    
+    return redirect('/')
+
+
 @app.route('/favicon.ico',methods=['GET','POST'])
 def est():
-    return('',204)
+    return '',204
 
 
 
@@ -595,26 +635,21 @@ def rebuild_database():
         city="Lucena City",
         email="sgb.edu@gmail.com",
         tel="555-8898",
-        
-        faculty_morning_start = now.replace(hour=7, minute=0, second=0),
-        faculty_morning_end = now.replace(hour=12, minute=0, second=0),
-        faculty_afternoon_start = now.replace(hour=13, minute=0, second=0),
-        faculty_afternoon_end = now.replace(hour=16, minute=0, second=0),
 
-        primary_morning_start = now.replace(hour=7, minute=0, second=0),
-        primary_morning_end = now.replace(hour=12, minute=0, second=0),
-        primary_afternoon_start = now.replace(hour=13, minute=0, second=0),
-        primary_afternoon_end = now.replace(hour=18, minute=0, second=0),
+        primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
+        primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+        primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
 
-        junior_morning_start = now.replace(hour=8, minute=0, second=0),
-        junior_morning_end = now.replace(hour=12, minute=0, second=0),
-        junior_afternoon_start = now.replace(hour=13, minute=0, second=0),
-        junior_afternoon_end = now.replace(hour=16, minute=0, second=0),
+        junior_morning_start = str(now.replace(hour=8, minute=0, second=0))[11:16],
+        junior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+        junior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16],
 
-        senior_morning_start = now.replace(hour=9, minute=0, second=0),
-        senior_morning_end = now.replace(hour=12, minute=0, second=0),
-        senior_afternoon_start = now.replace(hour=13, minute=0, second=0),
-        senior_afternoon_end = now.replace(hour=16, minute=0, second=0)
+        senior_morning_start = str(now.replace(hour=9, minute=0, second=0))[11:16],
+        senior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        senior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+        senior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16]
         )
     db.session.add(school)
 
@@ -661,6 +696,50 @@ def rebuild_database():
     db.session.add(a)
     db.session.add(b)
     db.session.add(c)
+
+    for i in range(1000):
+        d = Student(
+            school_id=1234,
+            id_no='2011334281',
+            first_name='Jasper',
+            last_name='Barcelona',
+            middle_name='Estrada',
+            department='student',
+            section='Charity',
+            absences='0',
+            lates='0',
+            parent_contact='639183339068'
+            )
+        e = Student(
+            school_id=1234,
+            id_no='2011334282',
+            first_name='Janno',
+            last_name='Armamento',
+            middle_name='Estrada',
+            department='student',
+            section='Fidelity',
+            absences='0',
+            lates='0',
+            parent_contact='639183339068'
+            )
+        db.session.add(d)
+        db.session.add(e)
+    
+    for i in range(5000):
+        f = Log(
+            school_id=1234,
+            date='1234',
+            id_no='1234',
+            name='test',
+            level='test',
+            section='test',
+            department='student',
+            time_in='1234',
+            military_time=now,
+            time_out='1234',
+            timestamp=now
+            )
+        db.session.add(f)
     db.session.commit()
 
     return SWJsonify({'Status': 'Database Rebuild Success'})

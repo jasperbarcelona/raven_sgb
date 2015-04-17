@@ -34,6 +34,8 @@ textarea{
 	resize: none;
 	border-top: 1px solid #DDDDDD;
 	border-bottom: 1px solid #DDDDDD;
+	border-left: none;
+	border-right: none;
 }
 
 textarea:focus{
@@ -98,7 +100,8 @@ textarea:focus{
 	padding-bottom: 0px;
 }
 
-.modal-header{
+.message-modal-header{
+	height: 40px;
 	background-color: #4485F5;
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
@@ -107,8 +110,106 @@ textarea:focus{
 	color: #FFFFFF;
 }
 
+.message-modal-title{
+	margin-top: -8px !important;
+}
+
 .close{
-	margin-top: 4px !important;
+	margin-top: -5px !important;
+}
+
+.schedule-modal-dialog,
+.schedule-modal-content {
+    /* 80% of window height */
+	    height: 95%;
+	    width: 500px;
+	    position: fixed;
+	    left: 0;
+	    right: 0;
+	    margin-left: auto;
+	    margin-right: auto;
+}
+
+.schedule-modal-body{
+	height: calc(100% - 60px) !important;
+	overflow: scroll;
+	overflow-x: hidden; 
+}
+
+
+.sched{
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+}
+
+.sched .form-control{
+	background-color: #FFFFFF;
+}
+
+.input-group-addon{
+	background-color: #4485F5;
+	color: #FFFFFF;
+}
+
+.sched-group{
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: column;
+	flex-direction: column;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+	margin-bottom: 15px;
+	padding-bottom: 25px;
+	border-bottom: 2px solid #DDDDDD;
+}
+
+.sched-group:last-of-type{
+	margin-bottom: 0px;
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+}
+
+.time-label{
+	margin-bottom: 5px;
+}
+
+.afternoon{
+	margin-top: 10px;
+}
+
+.sched-label{
+	font-weight: bold;
+	font-size: 16px;
+	color: #3B75D7;
+}
+
+.schedule-text{
+	width: 200px;
+}
+
+.to{
+	margin-left: 20px;
+	margin-right: 20px;
 }
 
 .confirm-modal-body{
@@ -156,7 +257,23 @@ textarea:focus{
 	padding:4px;
 }
 
+#save-sched{
+	width: 120px;
+	height: 35px;
+}
+
+
 #compose-btn:focus{
+	outline: none;
+}
+
+#search-btn{
+	background-color: #F4F4F4;
+	color: #6D6D6D;
+	border: 1px solid #B6B6B6;
+}
+
+#search-btn:focus{
 	outline: none;
 }
 
@@ -232,15 +349,37 @@ textarea:focus{
 	margin-top: 30px;
 }
 
+tbody{
+	display:block;
+	overflow: scroll;
+	overflow-x:hidden;
+}
+
+thead, tbody tr {
+    display:table;
+    width:100%;
+}
+
+thead {
+    width: calc( 100% - 1em )/* scrollbar is average 1em/16px width, remove it from thead width */
+}
+table {
+    width:400px;
+}
+
 .tab-pane{
 	height: 100%;
 	width: 100%;
-	overflow: scroll;
-	overflow-x: hidden;
+	/*overflow: scroll;
+	overflow-x: hidden;*/
 }
 
 .tab-content{
 	height: 100%;
+}
+
+.nav-tabs{
+	border: none;
 }
 
 .long{
@@ -261,24 +400,7 @@ textarea:focus{
 	text-overflow: ellipsis;
 }
 
-.search-btn{
-	float: right;
-	background-color: #4485F5;
-	color: #F5F5F5;
-	width: 60px;
-	height: 32px;
-	border-bottom-left-radius: 0px;
-	border-top-left-radius: 0px;
-}
 
-.search-btn:focus{
-	outline: none;
-	color: #F5F5F5;
-}
-
-.search-btn:hover{
-	color: #F5F5F5;
-}
 
 #main-content{
 	
@@ -330,9 +452,15 @@ table.table thead tr th, table.table tfoot tr th {
 	color: #ffffff;
 }
 
+#options li a:hover{
+	background-color: #4485F5 !important;
+	color: #ffffff;
+}
+
 .nav-tabs li .tab-item{
 	color: #FFFFFF;
 	font-weight: bold;
+	border: none !important;
 }
 
 .nav-tabs > li.active > a,

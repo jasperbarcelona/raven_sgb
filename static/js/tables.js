@@ -2,7 +2,7 @@ $(document).ready(function(){
 
 var isPreviousEventComplete = true;
 
-$('.tab-pane').scroll(function () {
+$('tbody').scroll(function () {
     if($(this).scrollTop() + $(this).height() > (this.scrollHeight * .7))  {
         var that = this;
         if (isPreviousEventComplete) {

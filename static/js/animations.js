@@ -1,7 +1,20 @@
 $(document).ready(function(){
+
+initial_data();
+
+$('.clockpicker').clockpicker({
+    autoclose: true,
+});
+
+$('.clockpicker-top').clockpicker({
+    autoclose: true,
+    placement: 'top'
+});
+
 $('#confirm-send').attr('disabled',true);
 var height = $(window).height()-72;
 $("#main-content").css("height",height);
+$("tbody").css("height",height-40);
 
 $(window).resize(function(){
     var height = $(window).height()-72;
@@ -20,7 +33,8 @@ $('#message').on('keyup', function(){
 $('#confirm-modal').on('hidden.bs.modal', function () {
     $('#message-confirm-password').val('');
     $('#confirm-send').attr('disabled',true);
-})
+});
+
 
 $('#message-confirm-password').on('keyup', function(){
     if (!$.trim($(this).val())) {
@@ -30,5 +44,84 @@ $('#message-confirm-password').on('keyup', function(){
         $('#confirm-send').removeAttr('disabled');
     }
 });
+
+$('.time').on('change', function(){
+    $('#save-sched').removeAttr('disabled');
+});
+
+$('#schedule-modal').on('hidden.bs.modal', function () {
+    reset();
+    $('#save-sched').attr('disabled',true);
+});
+
+$('#sched-cancel').on('click', function () {
+    reset();
+    $('#save-sched').attr('disabled',true);
+});
+
+
+$('#refresh-btn').on('click', function(){
+    $('#refresh-btn span').css({'display':'none'});
+    $('#refresh-btn').css({'background-image':'url(../static/images/preloader_gray.png)','background-repeat': 'no-repeat','background-position': 'center'});
+});
+
+$('#save-sched').on('click', function(){
+    $('#save-sched span').css({'display':'none'});
+    $('#save-sched').css({'background-image':'url(../static/images/preloader_white.png)','background-repeat': 'no-repeat','background-position': 'center'});
+    initial_data()
+    $.post('/sched',{
+        primary_morning_start:primary_morning_start,
+        primary_morning_end:primary_morning_end,
+        junior_morning_start:junior_morning_start,
+        junior_morning_end:junior_morning_end,
+        senior_morning_start:senior_morning_start,
+        senior_morning_end:senior_morning_end,
+        primary_afternoon_start:primary_afternoon_start,
+        primary_afternoon_end:primary_afternoon_end,
+        junior_afternoon_start:junior_afternoon_start,
+        junior_afternoon_end:junior_afternoon_end,
+        senior_afternoon_start:senior_afternoon_start,
+        senior_afternoon_end:senior_afternoon_end,
+    },
+    function(data){
+        initial_data();
+        $('#save-sched').attr('disabled',true);
+        $('#save-sched span').css({'display':'none'});
+        $('#save-sched').css({'background-image':'none'});
+        $('#save-sched span').show();
+    });
+});
+
+function reset(){
+    $('#primary_morning_start').val(primary_morning_start);
+    $('#primary_morning_end').val(primary_morning_end);
+    $('#junior_morning_start').val(junior_morning_start);
+    $('#junior_morning_end').val(junior_morning_end);
+    $('#senior_morning_start').val(senior_morning_start);
+    $('#senior_morning_end').val(senior_morning_end);
+
+    $('#primary_afternoon_start').val(primary_afternoon_start);
+    $('#primary_afternoon_end').val(primary_afternoon_end);
+    $('#junior_afternoon_start').val(junior_afternoon_start);
+    $('#junior_afternoon_end').val(junior_afternoon_end);
+    $('#senior_afternoon_start').val(senior_afternoon_start);
+    $('#senior_afternoon_end').val(senior_afternoon_end);
+}
+
+function initial_data(){
+    primary_morning_start = $('#primary_morning_start').val();
+    primary_morning_end = $('#primary_morning_end').val();
+    junior_morning_start = $('#junior_morning_start').val();
+    junior_morning_end = $('#junior_morning_end').val();
+    senior_morning_start = $('#senior_morning_start').val();
+    senior_morning_end = $('#senior_morning_end').val();
+    primary_afternoon_start = $('#primary_afternoon_start').val();
+    primary_afternoon_end = $('#primary_afternoon_end').val();
+    junior_afternoon_start = $('#junior_afternoon_start').val();
+    junior_afternoon_end = $('#junior_afternoon_end').val();
+    senior_afternoon_start = $('#senior_afternoon_start').val();
+    senior_afternoon_end = $('#senior_afternoon_end').val();
+}
+
 
 });
