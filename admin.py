@@ -697,34 +697,6 @@ def rebuild_database():
     db.session.add(b)
     db.session.add(c)
 
-    for i in range(1000):
-        d = Student(
-            school_id=1234,
-            id_no='2011334281',
-            first_name='Jasper',
-            last_name='Barcelona',
-            middle_name='Estrada',
-            department='student',
-            section='Charity',
-            absences='0',
-            lates='0',
-            parent_contact='639183339068'
-            )
-        e = Student(
-            school_id=1234,
-            id_no='2011334282',
-            first_name='Janno',
-            last_name='Armamento',
-            middle_name='Estrada',
-            department='student',
-            section='Fidelity',
-            absences='0',
-            lates='0',
-            parent_contact='639183339068'
-            )
-        db.session.add(d)
-        db.session.add(e)
-
     db.session.commit()
 
     return SWJsonify({'Status': 'Database Rebuild Success'})
