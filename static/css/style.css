@@ -44,6 +44,8 @@ textarea:focus{
 
 .xs{
 	width: 45px !important;
+	max-width: 45px;
+	min-width: 45px;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -384,7 +386,7 @@ table {
 
 .long{
 	width: 150px;
-	max-width: 180px;
+	max-width: 150px;
 	min-width: 150px;
 	overflow: hidden;
 	white-space: nowrap;
@@ -394,7 +396,7 @@ table {
 .short{
 	width: 80px;
 	max-width: 80px;
-	min-width: 50px;
+	min-width: 80px;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
