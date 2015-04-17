@@ -300,6 +300,13 @@ def check_if_late(school_id,api_key,id_no,name,level,section,
     morning_end = parse_date(eval(query+'_morning_end'))
     afternoon_start = parse_date(eval(query+'_afternoon_start'))
     afternoon_end = parse_date(eval(query+'_afternoon_end'))
+
+    print 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    print 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    print 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    print time_now
+    print 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    print morning_start
     
     if (time_now >= morning_start and time_now < morning_end) or \
        (time_now >= afternoon_start and time_now < afternoon_end):
