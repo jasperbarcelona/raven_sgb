@@ -223,10 +223,8 @@ def crossdomain(origin=None, methods=None, headers=None,
 def get_hour(time):
     if time[6:8] == 'PM' and time[:2] != '12':
         hour = int(time[:2]) + 12
-        print hour
         return hour
     hour = int(time[:2])
-    print hour
     return hour
 
 
@@ -273,8 +271,6 @@ def authenticate_user(school_id, password):
 
 
 def mark_absent():
-    print 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-    print 'its working'
     start_timer()
 
 
@@ -307,13 +303,6 @@ def check_if_late(school_id,api_key,id_no,name,level,section,
     morning_end = eval(query+'_morning_end')
     afternoon_start = eval(query+'_afternoon_start')
     afternoon_end = eval(query+'_afternoon_end')
-
-    print 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-    print 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-    print 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-    print time_now
-    print 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-    print morning_start
     
     if (time_now >= morning_start and time_now < morning_end) or \
        (time_now >= afternoon_start and time_now < afternoon_end):
@@ -396,10 +385,7 @@ def time_out(id_no, time):
     
     message_thread.start()
 
-    return SWJsonify({
-        'Status': '201',
-        'message': 'Logged Out'
-        }), 201
+    return '', 201
 
 
 def prepare():
