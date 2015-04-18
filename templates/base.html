@@ -33,6 +33,7 @@
                                         <li><a href="#late-tab" class="tab-item" data-toggle="tab" onclick="change_tab('late')">Late</a></li>
                                         {% endif %}
                                         <div class="button-container">
+                                                <button class="btn" id="add-user-btn" data-toggle="modal" data-target="#add-user-modal"><span class="glyphicon glyphicon-plus"></span></button>
                                                 <button id="compose-btn" class="buttons btn" data-toggle="modal" data-target="#message-modal"><span class="glyphicon glyphicon-pencil"></span></button>
                                                 <a href="#"><button id="search-btn" class="buttons btn"><span class="glyphicon glyphicon-search"></span></button></a>
                                                 <a href="/"><button id="refresh-btn" class="buttons btn"><span class="glyphicon glyphicon-repeat"></span></button></a>
@@ -100,9 +101,56 @@
                                 </div><!-- /.modal-dialog -->
                         </div>
 
+                        <div class="modal fade" id="add-user-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                                <div class="modal-dialog add-user-modal-dialog">
+                                        <div class="modal-content">
+                                                <div class="modal-header message-modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                        <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">New User</h4>
+                                                </div>
+                                                <div class="modal-body add-user-modal-body">
+                                                        <input type="text" class="form-control" id="add_last_name" placeholder="Last Name" /><br />
+                                                        <input type="text" class="form-control" id="add_first_name" placeholder="First Name" /><br />
+                                                        <input type="text" class="form-control" id="add_middle_name" placeholder="Middle Name" /><br />
+                                                        <select class="form-control select" id="add_level">
+                                                                <option value="" disabled selected>Grade/Level</option>
+                                                                <option>1st Grade</option>
+                                                                <option>2nd Grade</option>
+                                                                <option>3rd Grade</option>
+                                                                <option>4th Grade</option>
+                                                                <option>5th Grade</option>
+                                                                <option>6th Grade</option>
+                                                                <option>7th Grade</option>
+                                                                <option>8th Grade</option>
+                                                                <option>9th Grade</option>
+                                                                <option>10th Grade</option>
+                                                                <option>11th Grade</option>
+                                                                <option>12th Grade</option>
+                                                        </select><br />
+                                                        <select class="form-control select" id="add_section">
+                                                                <option value="" disabled selected>Section</option>
+                                                                {% for section in sections %}
+                                                                <option>{{section.name}}</option>
+                                                                {% endfor %}
+                                                        </select><br />
+                                                        <input type="text" class="form-control" id="add_contact" placeholder="Parent Contact Number" /><br />
+                                                        <input type="text" class="form-control" id="add_id_no" placeholder="ID Number" /><br />
+                                                </div>
+                                                <div class="modal-footer add-user-modal-footer">
+                                                        <button id = "add-user-cancel" type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                                                        <button id="save-user" type="button" class="btn btn-primary" disabled><span>Save</span></button>
+                                                </div>
+                                        </div><!-- /.modal-content -->
+                                </div><!-- /.modal-dialog -->
+                        </div>
+
                         <div class="modal fade" id="schedule-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
                                 <div class="modal-dialog schedule-modal-dialog">
                                         <div class="modal-content schedule-modal-content">
+                                                <div class="modal-header message-modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                        <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">Class Schedules</h4>
+                                                </div>
                                                 <div class="modal-body schedule-modal-body">
 
                                                         <span class="sched-label">Primary School</span>
@@ -227,7 +275,7 @@
                 </div>  
                 <script src="../static/js/bootstrap.min.js"></script>
                 <script src="../static/js/tables.js"></script>
-                <script src="../static/js/bootstrap-clockpicker.min.js"></script>	
-                <script src="../static/js/functions.js"></script>	
+                <script src="../static/js/bootstrap-clockpicker.min.js"></script>   
+                <script src="../static/js/functions.js"></script>   
         </body>
 </html>

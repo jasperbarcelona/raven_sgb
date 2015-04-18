@@ -43,28 +43,28 @@
 				<thead>	
 					<tr>
 						<th class="xs"></th>
-						<th class="short" id="last_name">Last Name</th>
+						<th class="long" id="last_name">Last Name</th>
 						<th class="short" id="first_name">First Name</th>
 						<th class="short" id="middle_name">Middle Name</th>
 						<th class="short" id="id_no">ID Number</th>
 						<th class="short" id="level">Grade/Year</th>
 						<th class="short" id="section">Section</th>	
-						<th class="short" id="absences">Absences</th>
-						<th class="short" id="lates">Lates</th>
+						<th class="attendance-count" id="absences">A</th>
+						<th class="attendance-count" id="lates">L</th>
 					</tr>
 				</thead>
 				<tbody id="attendance">
 					{% for index in attendance %}
 					<tr>
 						<td class="xs">{{loop.index}}</td>	
-						<td class="short">{{index.last_name}}</td>	
+						<td class="long">{{index.last_name}}</td>	
 						<td class="short">{{index.first_name}}</td>	
 						<td class="short">{{index.middle_name}}</td>
 						<td class="short">{{index.id_no}}</td>				
 						<td class="short">{{index.level}}</td>
 						<td class="short">{{index.section}}</td>				
-						<td class="short">0</td>
-						<td class="short">{{index.lates}}</td>
+						<td class="attendance-count">0</td>
+						<td class="attendance-count">{{index.lates}}</td>
 					</tr>
 					{% endfor %}
 				</tbody>

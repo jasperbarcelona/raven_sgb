@@ -42,10 +42,31 @@ textarea:focus{
 	outline: none;
 }
 
+.select{
+	padding-left: 8px !important;
+}
+
+.add-user-modal-dialog{
+	width: 400px;
+}
+
+#add-user-btn{
+	background-color: transparent;
+	color: #FFFFFF;
+	height: 30px;	
+	font-size: 20px;
+	padding-top: 2px;
+	display: none;
+}
+
+#add-user-btn:focus{
+	outline: none;
+}
+
 .xs{
-	width: 45px !important;
-	max-width: 45px;
-	min-width: 45px;
+	width: 40px !important;
+	max-width: 40px;
+	min-width: 40px;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -123,7 +144,7 @@ textarea:focus{
 .schedule-modal-dialog,
 .schedule-modal-content {
     /* 80% of window height */
-	    height: 95%;
+	    height: 90%;
 	    width: 500px;
 	    position: fixed;
 	    left: 0;
@@ -133,7 +154,7 @@ textarea:focus{
 }
 
 .schedule-modal-body{
-	height: calc(100% - 60px) !important;
+	height: calc(100% - 100px) !important;
 	overflow: scroll;
 	overflow-x: hidden; 
 }
@@ -251,17 +272,23 @@ textarea:focus{
 	float: right;
 }
 
+.btn{
+	height: 35px;
+}
+
 .buttons{	
 	height: 30px;
 	width: 70px;	
 	font-size: 16px;
-	margin-top: 2px;
 	padding:4px;
 }
 
 #save-sched{
 	width: 120px;
-	height: 35px;
+}
+
+#save-user{
+	width: 80px;
 }
 
 
@@ -385,18 +412,27 @@ table {
 }
 
 .long{
-	width: 150px;
-	max-width: 150px;
-	min-width: 150px;
+	width: 140px;
+	max-width: 140px;
+	min-width: 140px;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 }
 
 .short{
-	width: 80px;
-	max-width: 80px;
-	min-width: 80px;
+	width: 100px;
+	max-width: 100px;
+	min-width: 100px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.attendance-count{
+	width: 40px;
+	max-width: 40px;
+	min-width: 40px;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -405,7 +441,6 @@ table {
 
 
 #main-content{
-	
 	overflow: hidden;
 	overflow-x: hidden; 
 	background-color: rgba(255,255,255,1);

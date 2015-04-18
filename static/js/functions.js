@@ -1,36 +1,42 @@
-var tab = 'log'
+tab = 'log'
 function change_tab(page){
-tab = page;
+  tab = page;
+  if (tab == 'attendance'){
+    $('#add-user-btn').show();
+  }
+  else{
+    $('#add-user-btn').hide();
+  }
 }
 
-function textCounter(field,field2,maxlimit)
-{
+function textCounter(field,field2,maxlimit){
  var countfield = document.getElementById(field2);
- if ( field.value.length > maxlimit ) {
-  field.value = field.value.substring( 0, maxlimit );
+  if( field.value.length > maxlimit ){
+    field.value = field.value.substring( 0, maxlimit );
   return false;
- } else {
-  countfield.value = "Remaining: " + (maxlimit - field.value.length);
- }
+  }
+  else{
+    countfield.value = "Remaining: " + (maxlimit - field.value.length);
+  }
 }
 
 function blast_message(){
-var message = $("#message").val();
-var password = $("#message-confirm-password").val();
-if ((navigator.onLine==true) && ($.trim($("#message").val()))) {
+  var message = $("#message").val();
+  var password = $("#message-confirm-password").val();
+  if ((navigator.onLine==true) && ($.trim($("#message").val()))) {
     $.post('/blast',{message:message,password:password},
     function(data){
-    $('#status-modal-body').html(data);
+      $('#status-modal-body').html(data);
     });
     $('.modal').modal('hide');
     $('#message-status-modal').modal('show');
-}
-else if (navigator.onLine==false) {
+  }
+  else if (navigator.onLine==false) {
     alert('You are offline!');
-}
-else{
+  }
+  else{
     alert('Message is empty!');
-}
+  }
 }
 
 

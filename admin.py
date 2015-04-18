@@ -98,6 +98,12 @@ class School(db.Model, Serializer):
     senior_afternoon_end = db.Column(db.String(30))
 
 
+class Section(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    school_id = db.Column(db.Integer)
+    name = db.Column(db.String(30))
+
+
 class Log(db.Model, Serializer):
     __public__ = ['id','school_id','date','id_no','name','level',
                   'department','section','time_in','time_out','timestamp']
@@ -164,6 +170,7 @@ class IngAdmin(sqla.ModelView):
     column_display_pk = True
 admin = Admin(app)
 admin.add_view(IngAdmin(School, db.session))
+admin.add_view(IngAdmin(Section, db.session))
 admin.add_view(IngAdmin(Log, db.session))
 admin.add_view(IngAdmin(Student, db.session))
 admin.add_view(IngAdmin(Late, db.session))
@@ -434,6 +441,7 @@ def index():
     session['attendance_limit'] = 100
 
     school = School.query.filter_by(api_key=session['api_key']).one()
+    sections = Section.query.filter_by(school_id=session['school_id']).all()
 
     first_set = fetch_next(session['log_limit'],session['late_limit'],
         session['attendance_limit'],session['school_id'],
@@ -447,6 +455,7 @@ def index():
         late=first_set['late'],
         attendance=first_set['attendance'], 
         view=session['department'],
+        sections=sections,
         primary_morning_start=school.primary_morning_start,
         primary_morning_end=school.primary_morning_end,
         primary_afternoon_start=school.primary_afternoon_start,
@@ -587,6 +596,36 @@ def sync_database():
         }), 201
 
 
+@app.route('/user/add',methods=['GET','POST'])
+def add_user():
+    last_name = flask.request.form.get('last_name')
+    first_name = flask.request.form.get('first_name')
+    middle_name = flask.request.form.get('middle_name')
+    level = flask.request.form.get('level')
+    section = flask.request.form.get('section')
+    contact = flask.request.form.get('contact')
+    id_no = flask.request.form.get('id_no')
+
+    user = Student(
+        school_id = session['school_id'],
+        id_no = id_no,
+        first_name = first_name,
+        last_name = last_name,
+        middle_name = middle_name,
+        level = level,
+        department = session['department'],
+        section = section,
+        absences = 0,
+        lates = 0,
+        parent_contact = '63' + contact[1:]
+        )
+
+    db.session.add(user)
+    db.session.commit()
+
+    return '', 201
+
+
 @app.route('/sched',methods=['GET','POST'])
 def change_sched():
     primary_morning_start = flask.request.form.get('primary_morning_start')
@@ -700,9 +739,30 @@ def rebuild_database():
         lates='0',
         parent_contact='639183339068'
         )
+
+    d = Section(
+        school_id=1234,
+        name='Charity'
+        )
+
+    e = Section(
+        school_id=1234,
+        name='Fidelity'
+        )
+
+    f = Section(
+        school_id=1234,
+        name='Peace'
+        )
+
+
     db.session.add(a)
     db.session.add(b)
     db.session.add(c)
+
+    db.session.add(d)
+    db.session.add(e)
+    db.session.add(f)
 
     db.session.commit()
 
