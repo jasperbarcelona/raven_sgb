@@ -512,7 +512,8 @@ def mark_absent():
     all_students = Student.query.filter_by(school_id=school_id).all()
 
     for student in all_students:
-        if not Log.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no):
+        timed_in = Log.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no).first().time_in
+        if not timed_in:
             absent = Absent(
             school_id=school_id,
             date=time.strftime("%B %d, %Y"),
