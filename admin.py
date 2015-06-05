@@ -530,7 +530,7 @@ def mark_absent():
             db.session.add(absent)
             db.session.commit()
 
-            student.absences=Absent.query.filter_by(id_no=id_no, school_id=school_id).count()
+            student.absences=Absent.query.filter_by(id_no=student.id_no, school_id=school_id).count()
             db.session.commit()
 
 
