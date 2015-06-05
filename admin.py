@@ -17,7 +17,6 @@ from functools import wraps
 import threading
 from threading import Timer
 from multiprocessing.pool import ThreadPool
-
 from time import sleep
 import requests
 import datetime
@@ -43,6 +42,7 @@ PRIMARY = ['1st Grade', '2nd Grade', '3rd Grade', '4th Grade', '5th Grade', '6th
 JUNIOR_HIGH = ['7th Grade', '8th Grade', '9th Grade', '10th Grade']
 SENIOR_HIGH = ['11th Grade', '12th Grade']
 # os.environ['DATABASE_URL']
+# 'sqlite:///local.db'
 
 now = datetime.datetime.now()
 pool = ThreadPool(processes=1)
@@ -156,14 +156,13 @@ class Late(db.Model):
 class Absent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     school_id = db.Column(db.Integer)
-    id_no = db.Column(db.String(20))
-    first_name = db.Column(db.String(30))
-    last_name = db.Column(db.String(30))
-    middle_name = db.Column(db.String(30))
-    level = db.Column(db.String(30))
-    department = db.Column(db.String(30))
-    section = db.Column(db.String(30))
     date = db.Column(db.String(20))
+    id_no = db.Column(db.String(20))
+    name = db.Column(db.String(60))
+    level = db.Column(db.String(30))
+    section = db.Column(db.String(30))
+    department = db.Column(db.String(30))
+    timestamp = db.Column(db.String(50))
 
 
 class IngAdmin(sqla.ModelView):
@@ -174,6 +173,7 @@ admin.add_view(IngAdmin(Section, db.session))
 admin.add_view(IngAdmin(Log, db.session))
 admin.add_view(IngAdmin(Student, db.session))
 admin.add_view(IngAdmin(Late, db.session))
+admin.add_view(IngAdmin(Absent, db.session))
 
 
 def crossdomain(origin=None, methods=None, headers=None,
@@ -417,6 +417,17 @@ def fetch_next(log_limit, late_limit, attendance_limit, school_id, department):
      return {'logs':logs, 'late':late ,'attendance':attendance}
 
 
+def search_attendance(**kwargs):
+    query = 'Student.query.filter('
+    for arg_name in kwargs:
+        if kwargs[arg_name]:
+            query += 'Student.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
+    query += ').all()'
+    return eval(query)
+
+
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if not session:
@@ -487,6 +498,45 @@ def change_view():
     return redirect('/')
 
 
+@app.route('/markabsent', methods=['GET', 'POST'])
+def mark_absent():
+    school_id = flask.request.form.get('school_id')
+    api_key = flask.request.form.get('api_key')
+
+    if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
+        return SWJsonify({
+                        'Status': '500',
+                         'Message': 'Unauthorized'
+                    }), 500
+
+    all_students = Student.query.filter_by(school_id=school_id).all()
+    logs_today = Log.query.filter_by(date=time.strftime("%B %d, %Y")).all()
+
+    for student in all_students:
+        if not student in logs_today:
+            absent = Absent(
+            school_id=school_id,
+            date=time.strftime("%B %d, %Y"),
+            id_no=student.id_no,
+            name=student.last_name+', '+\
+                         student.first_name+' '+\
+                         student.middle_name[:1]+'.',
+            level=student.level,
+            section=student.section,
+            department=student.department,
+            timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+            )
+
+            db.session.add(absent)
+            db.session.commit()
+
+            student.absences=Absent.query.filter_by(id_no=id_no, school_id=school_id).count()
+            db.session.commit()
+
+
+    return '',201
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if session:
@@ -506,6 +556,8 @@ def login():
 
 @app.route('/loginpage', methods=['GET', 'POST'])
 def login_page():
+    if session:
+        return redirect('/')
     return flask.render_template('login.html')
 
 
@@ -524,7 +576,7 @@ def add_log():
         return SWJsonify({
                         'Status': '500',
                          'Message': 'Unauthorized'
-                    }), 400
+                    }), 500
 
     id_no = flask.request.form.get('id_no')
     name = flask.request.form.get('name')
@@ -610,6 +662,30 @@ def add_user():
     db.session.commit()
 
     return '', 201
+
+
+@app.route('/search/attendance',methods=['GET','POST'])
+def search_student_attendance():
+    needed = flask.request.form.get('needed')
+    last_name = flask.request.form.get('last_name')
+    first_name = flask.request.form.get('first_name')
+    middle_name = flask.request.form.get('middle_name')
+    id_no = flask.request.form.get('id_no')
+    level = flask.request.form.get('level')
+    section = flask.request.form.get('section')
+    absences = flask.request.form.get('absences')
+    lates = flask.request.form.get('lates')
+    
+    data = search_attendance(last_name=last_name, first_name=first_name,
+                middle_name=middle_name, id_no=id_no, level=level, section=section,
+                absences=absences, lates=lates)
+
+    return flask.render_template(
+        needed+'.html',
+        data=data,
+        view=session['department'],
+        limit=0
+        )
 
 
 @app.route('/sched',methods=['GET','POST'])

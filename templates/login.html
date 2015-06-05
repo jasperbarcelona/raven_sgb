@@ -1,7 +1,29 @@
 <html>
-	<form action="/login" method="POST">
-		<input type="text" name="school_id" placeholder="School ID">
-		<input type="password" name="password" placeholder="Password">
-		<input type="submit">
-	</form>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" href="../static/css/bootstrap.min.css">
+		<link rel="stylesheet" href="../static/css/bootstrap-clockpicker.min.css">
+		<link rel="stylesheet" href="../static/css/login.css">
+		<script src="../static/js/jquery-1.11.0.min.js"></script>
+		<!-- <script src="//fast.eager.io/nH76uFjaDI.js"></script> -->
+		<title>Login</title>
+	</head>
+	<div class="container">
+
+		<form class="form-signin" action="/login" method="POST">
+			<h2 class="form-signin-heading">Please sign in</h2>
+			<label for="school-id" class="sr-only">Email address</label>
+			<input type="text" name="school_id" class="form-control" placeholder="School ID" required autofocus>
+			<label for="password" class="sr-only">Password</label>
+			<input type="password" name="password" class="form-control" placeholder="Password" required>
+			<div class="checkbox">
+				<label>
+				<input type="checkbox" value="remember-me"> Remember me
+				</label>
+			</div>
+			<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+		</form>
+
+	</div>
 </html>

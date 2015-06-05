@@ -17,10 +17,24 @@
 						<th class="short">In</th>
 						<th class="short">Out</th>
 					</tr>
+					<tr class="search-panel">
+						<td class="xs"></td>	
+						<td class="short"><input type="text" class="form-control search-text"></td>	
+						<td class="long"><input type="text" class="form-control search-text"></td>
+						<td class="short"><input type="text" class="form-control search-text"></td>
+						{% if view=='student' %}					
+						<td class="short"><input type="text" class="form-control search-text"></td>
+						<td class="short"><input type="text" class="form-control search-text"></td>
+						{% endif %}				
+						<td class="short"><input type="text" class="form-control search-text"></td>
+						<td class="short"><input type="text" class="form-control search-text"></td>
+					</tr>
 				</thead>
+				
 				<tbody id="logs">
+					{% if log[0] %}
 					{% for i in log %}
-					<tr>
+					<tr class="rows">
 						<td class="xs">{{loop.index}}</td>	
 						<td class="short">{{i.date}}</td>	
 						<td class="long">{{i.name}}</td>
@@ -33,7 +47,14 @@
 						<td class="short">{{i.time_out}}</td>
 					</tr>
 					{% endfor %}
+
+					{% else %}
+					<tr>
+					<td class="no-records">No Records Yet</td>	
+					</tr>
+					{% endif %}
 				</tbody>
+				
 			</table>
 		</div>
 
@@ -47,15 +68,50 @@
 						<th class="short" id="first_name">First Name</th>
 						<th class="short" id="middle_name">Middle Name</th>
 						<th class="short" id="id_no">ID Number</th>
-						<th class="short" id="level">Grade/Year</th>
+						<th class="short" id="level">Grade/Level</th>
 						<th class="short" id="section">Section</th>	
 						<th class="attendance-count" id="absences">A</th>
 						<th class="attendance-count" id="lates">L</th>
 					</tr>
+					<tr class="search-panel">
+						<td class="xs"></td>	
+						<td class="long"><input id="search_last_name" type="text" class="form-control search-text"></td>	
+						<td class="short"><input id="search_first_name" type="text" class="form-control search-text"></td>	
+						<td class="short"><input id="search_middle_name" type="text" class="form-control search-text"></td>
+						<td class="short"><input id="search_id_no" type="text" class="form-control search-text"></td>
+						<td class="short">
+							<select class="form-control search-text" id="search_level">
+							        <option value="">All</option>
+							        <option>1st Grade</option>
+							        <option>2nd Grade</option>
+							        <option>3rd Grade</option>
+							        <option>4th Grade</option>
+							        <option>5th Grade</option>
+							        <option>6th Grade</option>
+							        <option>7th Grade</option>
+							        <option>8th Grade</option>
+							        <option>9th Grade</option>
+							        <option>10th Grade</option>
+							        <option>11th Grade</option>
+							        <option>12th Grade</option>
+							</select>
+		                                                       </td>
+		                                                       <td class="short">
+							<select class="form-control search-text" id="search_section">
+							        <option value="">All</option>
+							        {% for section in sections %}
+							        <option>{{section.name}}</option>
+							        {% endfor %}
+							</select><br />
+		                                                       </td>
+						<td class="attendance-count"><input id="search_absences" type="text" class="form-control search-text"></td>
+						<td class="attendance-count"><input id="search_lates" type="text" class="form-control search-text">	</td>
+					</tr>
 				</thead>
 				<tbody id="attendance">
+					{% if attendance[0] %}
 					{% for index in attendance %}
-					<tr>
+					<tr class="rows">
 						<td class="xs">{{loop.index}}</td>	
 						<td class="long">{{index.last_name}}</td>	
 						<td class="short">{{index.first_name}}</td>	
@@ -67,6 +123,12 @@
 						<td class="attendance-count">{{index.lates}}</td>
 					</tr>
 					{% endfor %}
+
+					{% else %}
+					<tr>
+					<td class="no-records">No Records Yet</td>	
+					</tr>
+					{% endif %}
 				</tbody>
 			</table>
 		</div>
@@ -87,8 +149,9 @@
 
 				</thead>
 				<tbody id="late">
+					{% if late[0] %}
 					{% for a in late %}
-					<tr>
+					<tr class="rows">
 						<td class="xs">{{loop.index}}</td>
 						<td class="short">{{a.date}}</td>	
 						<td class="long">{{a.name}}</td>					
@@ -97,6 +160,12 @@
 						<td class="short">{{a.time_in}}</td>	
 					</tr>
 					{% endfor %}
+
+					{% else %}
+					<tr>
+					<td class="no-records">No Records Yet</td>	
+					</tr>
+					{% endif %}
 				</tbody>
 			</table>
 		</div>

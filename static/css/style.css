@@ -337,13 +337,21 @@ textarea:focus{
 #compose-btn{
 	background-color: #4485F5;
 	color: #FFFFFF;
-	
+	margin-right: 2px;
 }
 
 #settings-btn{
 	background-color: #F4F4F4;
 	color: #6D6D6D;
 	border: 1px solid #B6B6B6;
+}
+
+.no-records{
+	width: 100%;
+	text-align: center;
+	font-size: 24px;
+	border: none !important;
+	padding-top: 20% !important;
 }
 
 #big-preloader-container{
@@ -429,6 +437,16 @@ table {
 	text-overflow: ellipsis;
 }
 
+td .form-control{
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.search-panel td{
+	padding-left: 2px !important;
+	padding-right: 2px !important;
+}
+
 .attendance-count{
 	width: 40px;
 	max-width: 40px;
@@ -480,7 +498,8 @@ td{
 	border-right: 1px solid #DDDDDD;
 }
 
-tr:hover{
+.rows:hover{
+	cursor: pointer;
 	background-color: #E5E5E5;
 }
 
