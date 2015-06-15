@@ -1,0 +1,14 @@
+<table class="table">
+	<tbody>
+		{% for index in data %}
+		<tr class="rows">
+			<td class="xs">{{loop.index+limit}}</td>	
+			<td class="short">{{index.date}}</td>	
+			<td class="short">{{index.id_no}}</td>	
+			<td class="long">{{index.name}}</td>
+			<td class="short">{{index.level}}</td>
+			<td class="short">{{index.section}}</td>				
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>

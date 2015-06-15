@@ -7,9 +7,9 @@
 				<thead >
 					<tr>
 						<th class="xs"></th>
-						<th class="short">Date</th>		
+						<th class="short">Date</th>
+						<th class="short">ID Number</th>	
 						<th class="long">Name</th>
-						<th class="short">ID Number</th>
 						{% if view=='student' %}
 						<th class="short">Grade/Year</th>
 						<th class="short">Section</th>
@@ -19,15 +19,36 @@
 					</tr>
 					<tr class="search-panel">
 						<td class="xs"></td>	
-						<td class="short"><input type="text" class="form-control search-text"></td>	
-						<td class="long"><input type="text" class="form-control search-text"></td>
-						<td class="short"><input type="text" class="form-control search-text"></td>
+						<td class="short"><input type="text" id="log_search_date" class="form-control search-text search-logs"></td>	
+						<td class="short"><input type="text" id="log_search_id_no" class="form-control search-text search-logs"></td>
+						<td class="long"><input type="text" id="log_search_name" class="form-control search-text search-logs"></td>
 						{% if view=='student' %}					
-						<td class="short"><input type="text" class="form-control search-text"></td>
-						<td class="short"><input type="text" class="form-control search-text"></td>
-						{% endif %}				
-						<td class="short"><input type="text" class="form-control search-text"></td>
-						<td class="short"><input type="text" class="form-control search-text"></td>
+						<td class="short">
+							<select id="log_search_level" class="form-control search-text search-logs">
+							        <option value="">All</option>
+							        <option>1st Grade</option>
+							        <option>2nd Grade</option>
+							        <option>3rd Grade</option>
+							        <option>4th Grade</option>
+							        <option>5th Grade</option>
+							        <option>6th Grade</option>
+							        <option>7th Grade</option>
+							        <option>8th Grade</option>
+							        <option>9th Grade</option>
+							        <option>10th Grade</option>
+							        <option>11th Grade</option>
+							        <option>12th Grade</option>
+							</select>
+						</td>
+						<td class="short">
+							<select id="log_search_section" class="form-control search-text search-logs">
+							        <option value="">All</option>
+							        {% for section in sections %}
+							        <option>{{section.name}}</option>
+							        {% endfor %}
+							</select><br />
+						</td>
+						{% endif %}
 					</tr>
 				</thead>
 				
@@ -37,8 +58,8 @@
 					<tr class="rows">
 						<td class="xs">{{loop.index}}</td>	
 						<td class="short">{{i.date}}</td>	
-						<td class="long">{{i.name}}</td>
 						<td class="short">{{i.id_no}}</td>
+						<td class="long">{{i.name}}</td>
 						{% if view=='student' %}					
 						<td class="short">{{i.level}}</td>
 						<td class="short">{{i.section}}</td>
@@ -64,23 +85,23 @@
 				<thead>	
 					<tr>
 						<th class="xs"></th>
+						<th class="short" id="id_no">ID Number</th>
 						<th class="long" id="last_name">Last Name</th>
 						<th class="short" id="first_name">First Name</th>
 						<th class="short" id="middle_name">Middle Name</th>
-						<th class="short" id="id_no">ID Number</th>
 						<th class="short" id="level">Grade/Level</th>
 						<th class="short" id="section">Section</th>	
 						<th class="attendance-count" id="absences">A</th>
 						<th class="attendance-count" id="lates">L</th>
 					</tr>
 					<tr class="search-panel">
-						<td class="xs"></td>	
-						<td class="long"><input id="search_last_name" type="text" class="form-control search-text"></td>	
-						<td class="short"><input id="search_first_name" type="text" class="form-control search-text"></td>	
-						<td class="short"><input id="search_middle_name" type="text" class="form-control search-text"></td>
-						<td class="short"><input id="search_id_no" type="text" class="form-control search-text"></td>
+						<td class="xs"></td>
+						<td class="short"><input id="attendance_search_id_no" type="text" class="form-control search-text search-attendance"></td>
+						<td class="long"><input id="attendance_search_last_name" type="text" class="form-control search-text search-attendance"></td>
+						<td class="short"><input id="attendance_search_first_name" type="text" class="form-control search-text search-attendance"></td>
+						<td class="short"><input id="attendance_search_middle_name" type="text" class="form-control search-text search-attendance"></td>
 						<td class="short">
-							<select class="form-control search-text" id="search_level">
+							<select class="form-control search-text" id="attendance_search_level">
 							        <option value="">All</option>
 							        <option>1st Grade</option>
 							        <option>2nd Grade</option>
@@ -95,15 +116,15 @@
 							        <option>11th Grade</option>
 							        <option>12th Grade</option>
 							</select>
-		                                                       </td>
-		                                                       <td class="short">
-							<select class="form-control search-text" id="search_section">
+						</td>
+						<td class="short">
+							<select class="form-control search-text" id="attendance_search_section">
 							        <option value="">All</option>
 							        {% for section in sections %}
 							        <option>{{section.name}}</option>
 							        {% endfor %}
 							</select><br />
-		                                                       </td>
+						</td>
 						<td class="attendance-count"><input id="search_absences" type="text" class="form-control search-text"></td>
 						<td class="attendance-count"><input id="search_lates" type="text" class="form-control search-text">	</td>
 					</tr>
@@ -113,10 +134,10 @@
 					{% for index in attendance %}
 					<tr class="rows">
 						<td class="xs">{{loop.index}}</td>	
+						<td class="short">{{index.id_no}}</td>	
 						<td class="long">{{index.last_name}}</td>	
 						<td class="short">{{index.first_name}}</td>	
 						<td class="short">{{index.middle_name}}</td>
-						<td class="short">{{index.id_no}}</td>				
 						<td class="short">{{index.level}}</td>
 						<td class="short">{{index.section}}</td>				
 						<td class="attendance-count">0</td>
@@ -134,19 +155,113 @@
 		</div>
 
 		<div class="tab-pane" id="absent-tab">
-			<p>attendance</p>
+			<table class="table">
+				<thead>	
+					<tr>
+						<th class="xs"></th>
+						<th class="short" id="absences">Date</th>
+						<th class="short" id="id_no">ID Number</th>
+						<th class="long" id="last_name">Name</th>
+						<th class="short" id="level">Grade/Level</th>
+						<th class="short" id="section">Section</th>	
+					</tr>
+					<tr class="search-panel">
+						<td class="xs"></td>	
+						<td class="short"><input type="text" id="absent_search_date" class="form-control search-text search-absent"></td>	
+						<td class="short"><input type="text" id="absent_search_id_no" class="form-control search-text search-absent"></td>	
+						<td class="long"><input type="text" id="absent_search_name" class="form-control search-text search-absent"></td>
+						<td class="short">
+							<select class="form-control search-text search-absent" id="absent_search_level">
+							        <option value="">All</option>
+							        <option>1st Grade</option>
+							        <option>2nd Grade</option>
+							        <option>3rd Grade</option>
+							        <option>4th Grade</option>
+							        <option>5th Grade</option>
+							        <option>6th Grade</option>
+							        <option>7th Grade</option>
+							        <option>8th Grade</option>
+							        <option>9th Grade</option>
+							        <option>10th Grade</option>
+							        <option>11th Grade</option>
+							        <option>12th Grade</option>
+							</select>
+						</td>
+						<td class="short">
+							<select class="form-control search-text search-absent" id="absent_search_section">
+							        <option value="">All</option>
+							        {% for section in sections %}
+							        <option>{{section.name}}</option>
+							        {% endfor %}
+							</select><br />
+						</td>
+					</tr>
+				</thead>
+				<tbody id="absent">
+					{% if absent[0] %}
+					{% for index in absent %}
+					<tr class="rows">
+						<td class="xs">{{loop.index}}</td>	
+						<td class="short">{{index.date}}</td>
+						<td class="short">{{index.id_no}}</td>	
+						<td class="long">{{index.name}}</td>	
+						<td class="short">{{index.level}}</td>
+						<td class="short">{{index.section}}</td>				
+					</tr>
+					{% endfor %}
+
+					{% else %}
+					<tr>
+					<td class="no-records">No Records Yet</td>	
+					</tr>
+					{% endif %}
+				</tbody>
+			</table>
 		</div>
 
 		<div class="tab-pane" id="late-tab">
 			<table class="table">
 				<thead>
-					<th class="xs"></th>
-					<th class="short">Date</th>	
-					<th class="long">Name</th>
-					<th class="short">Grade/Year</th>
-					<th class="short">Section</th>			
-					<th class="short">In</th>
-
+					<tr>
+						<th class="xs"></th>
+						<th class="short">Date</th>	
+						<th class="short">ID Number</th>
+						<th class="long">Name</th>
+						<th class="short">Grade/Year</th>
+						<th class="short">Section</th>			
+						<th class="short">In</th>
+					</tr>
+					<tr class="search-panel">
+						<td class="xs"></td>	
+						<td class="short"><input type="text" id="late_search_date" class="form-control search-text search-late"></td>	
+						<td class="short"><input type="text" id="late_search_id_no" class="form-control search-text search-late"></td>	
+						<td class="long"><input type="text" id="late_search_name" class="form-control search-text search-late"></td>
+						<td class="short">
+							<select class="form-control search-text search-late" id="late_search_level">
+							        <option value="">All</option>
+							        <option>1st Grade</option>
+							        <option>2nd Grade</option>
+							        <option>3rd Grade</option>
+							        <option>4th Grade</option>
+							        <option>5th Grade</option>
+							        <option>6th Grade</option>
+							        <option>7th Grade</option>
+							        <option>8th Grade</option>
+							        <option>9th Grade</option>
+							        <option>10th Grade</option>
+							        <option>11th Grade</option>
+							        <option>12th Grade</option>
+							</select>
+						</td>
+						<td class="short">
+							<select class="form-control search-text search-late" id="late_search_section">
+							        <option value="">All</option>
+							        {% for section in sections %}
+							        <option>{{section.name}}</option>
+							        {% endfor %}
+							</select><br />
+						</td>
+					</tr>
 				</thead>
 				<tbody id="late">
 					{% if late[0] %}
@@ -154,6 +269,7 @@
 					<tr class="rows">
 						<td class="xs">{{loop.index}}</td>
 						<td class="short">{{a.date}}</td>	
+						<td class="short">{{a.id_no}}</td>	
 						<td class="long">{{a.name}}</td>					
 						<td class="short">{{a.level}}</td>
 						<td class="short">{{a.section}}</td>				

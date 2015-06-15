@@ -1,9 +1,10 @@
 <table class="table">
 	<tbody>
 		{% for a in data %}
-		<tr>
+		<tr class="rows">
 			<td class="xs">{{loop.index+limit}}</td>
 			<td class="short">{{a.date}}</td>
+			<td class="short">{{a.id_no}}</td>
 			<td class="long">{{a.name}}</td>
 			<td class="short">{{a.level}}</td>
 			<td class="short">{{a.section}}</td>

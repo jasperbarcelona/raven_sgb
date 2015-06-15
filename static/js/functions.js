@@ -1,4 +1,4 @@
-tab = 'log'
+tab = 'logs'
 function change_tab(page){
   tab = page;
   if (tab == 'attendance'){
@@ -107,16 +107,16 @@ function clear_data(){
 })(jQuery);
 
 
-function search_data(){
-    var last_name = $('#search_last_name').val();
-    var first_name = $('#search_first_name').val();
-    var middle_name = $('#search_middle_name').val();
-    var id_no = $('#search_id_no').val();
-    var level = $('#search_level').val();
-    var section = $('#search_section').val();
-    var contact = $('#search_contact').val();
-    var absences = $('#search_absences').val();
-    var lates = $('#search_lates').val();
+function search_attendance(){
+    var last_name = $('#attendance_search_last_name').val();
+    var first_name = $('#attendance_search_first_name').val();
+    var middle_name = $('#attendance_search_middle_name').val();
+    var id_no = $('#attendance_search_id_no').val();
+    var level = $('#attendance_search_level').val();
+    var section = $('#attendance_search_section').val();
+    var contact = $('#attendance_search_contact').val();
+    var absences = $('#attendance_search_absences').val();
+    var lates = $('#attendance_search_lates').val();
 
     $.post('/search/attendance',{
         needed:tab,
@@ -129,7 +129,69 @@ function search_data(){
         contact:contact,    
         absences:absences,
         lates:lates
-        
+    },
+    function(data){
+        $('#'+tab).html(data);
+    });
+}
+
+
+function search_logs(){
+  var date = $('#log_search_date').val();
+  var id_no = $('#log_search_id_no').val();
+  var name = $('#log_search_name').val();
+  var level = $('#log_search_level').val();
+  var section = $('#log_search_section').val();
+
+    $.post('/search/logs',{
+        needed:tab,
+        date:date,
+        id_no:id_no,
+        name:name,
+        level:level,
+        section:section,
+    },
+    function(data){
+        $('#'+tab).html(data);
+    });
+}
+
+
+function search_absent(){
+  var date = $('#absent_search_date').val();
+  var id_no = $('#absent_search_id_no').val();
+  var name = $('#absent_search_name').val();
+  var level = $('#absent_search_level').val();
+  var section = $('#absent_search_section').val();
+
+    $.post('/search/absent',{
+        needed:tab,
+        date:date,
+        id_no:id_no,
+        name:name,
+        level:level,
+        section:section,
+    },
+    function(data){
+        $('#'+tab).html(data);
+    });
+}
+
+
+function search_late(){
+  var date = $('#late_search_date').val();
+  var id_no = $('#late_search_id_no').val();
+  var name = $('#late_search_name').val();
+  var level = $('#late_search_level').val();
+  var section = $('#late_search_section').val();
+
+    $.post('/search/late',{
+        needed:tab,
+        date:date,
+        id_no:id_no,
+        name:name,
+        level:level,
+        section:section,
     },
     function(data){
         $('#'+tab).html(data);

@@ -21,7 +21,7 @@ $("tbody").css("height",height-40);
 $(window).resize(function(){
     var height = $(window).height()-72;
     $("#main-content").css("height",height);
-$("tbody").css("height",height-40);
+    $("tbody").css("height",height-40);
 });
 
 $('#message').on('keyup', function(){
@@ -137,12 +137,36 @@ $('#save-user').on('click', function(){
     save_user(last_name, first_name, middle_name, level, section, contact, id_no);
 });
 
-$('.search-text').donetyping(function(){
-    search_data()
+$('.search-attendance').donetyping(function(){
+    search_attendance()
 });
 
-$('.search-text').on('change', function(){
-    search_data()
+$('.search-attendance').on('change', function(){
+    search_attendance()
+});
+
+$('.search-logs').donetyping(function(){
+    search_logs()
+});
+
+$('.search-logs').on('change', function(){
+    search_logs()
+});
+
+$('.search-absent').donetyping(function(){
+    search_absent()
+});
+
+$('.search-absent').on('change', function(){
+    search_absent()
+});
+
+$('.search-late').donetyping(function(){
+    search_late()
+});
+
+$('.search-late').on('change', function(){
+    search_late()
 });
 
 });
