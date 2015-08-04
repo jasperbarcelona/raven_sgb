@@ -951,103 +951,6 @@ def est():
     return '',204
 
 
-# @app.route('/db/rebuild', methods=['GET', 'POST'])
-# def rebuild_database():
-#     db.drop_all()
-#     db.create_all()
-
-#     school = School(
-#         id=1234,
-#         api_key='ecc67d28db284a2fb351d58fe18965f9',
-#         password='test',
-#         name="Scuola Gesu Bambino",
-#         address="10, Brgy Isabang",
-#         city="Lucena City",
-#         email="sgb.edu@gmail.com",
-#         tel="555-8898",
-
-#         primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
-#         primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-#         primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-#         primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
-
-#         junior_morning_start = str(now.replace(hour=8, minute=0, second=0))[11:16],
-#         junior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-#         junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-#         junior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16],
-
-#         senior_morning_start = str(now.replace(hour=9, minute=0, second=0))[11:16],
-#         senior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-#         senior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-#         senior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16]
-#         )
-#     db.session.add(school)
-
-#     a = Student(
-#         school_id=1234,
-#         id_no='2011334281',
-#         first_name='Jasper',
-#         last_name='Barcelona',
-#         middle_name='Estrada',
-#         level='2nd Grade',
-#         department='student',
-#         section='Charity',
-#         absences='0',
-#         lates='0',
-#         parent_contact='639183339068'
-#         )
-#     b = Student(
-#         school_id=1234,
-#         id_no='2011334282',
-#         first_name='Janno',
-#         last_name='Armamento',
-#         middle_name='Estrada',
-#         level='8th Grade',
-#         department='student',
-#         section='Fidelity',
-#         absences='0',
-#         lates='0',
-#         parent_contact='639183339068'
-#         )
-
-#     c = Student(
-#         school_id=1234,
-#         id_no='2011334283',
-#         first_name='Bear',
-#         last_name='Delos Reyes',
-#         middle_name='Estrada',
-#         level='12th Grade',
-#         department='student',
-#         section='Fidelity',
-#         absences='0',
-#         lates='0',
-#         parent_contact='639183339068'
-#         )
-
-#     d = Section(
-#         school_id=1234,
-#         name='Charity'
-#         )
-
-#     e = Section(
-#         school_id=1234,
-#         name='Fidelity'
-#         )
-
-#     f = Section(
-#         school_id=1234,
-#         name='Peace'
-#         )
-
-#     db.session.add(a)
-#     db.session.add(b)
-#     db.session.add(c)
-#     db.session.add(d)
-#     db.session.add(e)
-#     db.session.add(f)
-#     db.session.commit()
-#     return SWJsonify({'Status': 'Database Rebuild Success'})
-
 @app.route('/db/rebuild', methods=['GET', 'POST'])
 def rebuild_database():
     db.drop_all()
@@ -1080,35 +983,46 @@ def rebuild_database():
         )
     db.session.add(school)
 
-    for i in range(400):
+    a = Student(
+        school_id=1234,
+        id_no='2011334281',
+        first_name='Jasper',
+        last_name='Barcelona',
+        middle_name='Estrada',
+        level='2nd Grade',
+        department='student',
+        section='Charity',
+        absences='0',
+        lates='0',
+        parent_contact='639183339068'
+        )
+    b = Student(
+        school_id=1234,
+        id_no='2011334282',
+        first_name='Janno',
+        last_name='Armamento',
+        middle_name='Estrada',
+        level='8th Grade',
+        department='student',
+        section='Fidelity',
+        absences='0',
+        lates='0',
+        parent_contact='639183339068'
+        )
 
-        a = Student(
-            school_id=1234,
-            id_no='2011334281',
-            first_name='Jasper',
-            last_name='Barcelona',
-            middle_name='Estrada',
-            level='2nd Grade',
-            department='student',
-            section='Charity',
-            absences='0',
-            lates='0',
-            parent_contact='09183339068'
-            )
-
-        b = Log(
-            school_id=1234,
-            date='1234',
-            id_no='2011334281',
-            name='Jasper',
-            level='2nd Grade',
-            department='student',
-            section='Charity',
-            time_in='0',
-            )
-
-        db.session.add(a)
-        db.session.add(b)
+    c = Student(
+        school_id=1234,
+        id_no='2011334283',
+        first_name='Bear',
+        last_name='Delos Reyes',
+        middle_name='Estrada',
+        level='12th Grade',
+        department='student',
+        section='Fidelity',
+        absences='0',
+        lates='0',
+        parent_contact='639183339068'
+        )
 
     d = Section(
         school_id=1234,
@@ -1125,11 +1039,97 @@ def rebuild_database():
         name='Peace'
         )
 
+    db.session.add(a)
+    db.session.add(b)
+    db.session.add(c)
     db.session.add(d)
     db.session.add(e)
     db.session.add(f)
     db.session.commit()
     return SWJsonify({'Status': 'Database Rebuild Success'})
+
+# @app.route('/db/rebuild', methods=['GET', 'POST'])
+# def rebuild_database():
+#     db.drop_all()
+#     db.create_all()
+
+#     school = School(
+#         id=1234,
+#         api_key='ecc67d28db284a2fb351d58fe18965f9',
+#         password='test',
+#         name="Scuola Gesu Bambino",
+#         address="10, Brgy Isabang",
+#         city="Lucena City",
+#         email="sgb.edu@gmail.com",
+#         tel="555-8898",
+
+#         primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
+#         primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+#         primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+#         primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
+
+#         junior_morning_start = str(now.replace(hour=8, minute=0, second=0))[11:16],
+#         junior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+#         junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+#         junior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16],
+
+#         senior_morning_start = str(now.replace(hour=9, minute=0, second=0))[11:16],
+#         senior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+#         senior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+#         senior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16]
+#         )
+#     db.session.add(school)
+
+#     for i in range(400):
+
+#         a = Student(
+#             school_id=1234,
+#             id_no='2011334281',
+#             first_name='Jasper',
+#             last_name='Barcelona',
+#             middle_name='Estrada',
+#             level='2nd Grade',
+#             department='student',
+#             section='Charity',
+#             absences='0',
+#             lates='0',
+#             parent_contact='09183339068'
+#             )
+
+#         b = Log(
+#             school_id=1234,
+#             date='1234',
+#             id_no='2011334281',
+#             name='Jasper',
+#             level='2nd Grade',
+#             department='student',
+#             section='Charity',
+#             time_in='0',
+#             )
+
+#         db.session.add(a)
+#         db.session.add(b)
+
+#     d = Section(
+#         school_id=1234,
+#         name='Charity'
+#         )
+
+#     e = Section(
+#         school_id=1234,
+#         name='Fidelity'
+#         )
+
+#     f = Section(
+#         school_id=1234,
+#         name='Peace'
+#         )
+
+#     db.session.add(d)
+#     db.session.add(e)
+#     db.session.add(f)
+#     db.session.commit()
+#     return SWJsonify({'Status': 'Database Rebuild Success'})
 
 
 if __name__ == '__main__':
