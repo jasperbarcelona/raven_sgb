@@ -1,6 +1,6 @@
 
         {% for index in data %}
-        <tr class="rows">
+        <tr id="{{index.id}}" class="rows" data-toggle="modal" data-target="#edit-user-modal" onclick="supply_data(this.id)">
             <td class="xs">{{loop.index+limit}}</td> 
             <td class="short">{{index.id_no}}</td>
             <td class="long">{{index.last_name}}</td>   

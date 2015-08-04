@@ -2,23 +2,38 @@ $(document).ready(function(){
 
 var isPreviousEventComplete = true;
 
-$('tbody').scroll(function () {
+/*$('tbody').scroll(function () {
     if($(this).scrollTop() + $(this).height() > (this.scrollHeight * .7))  {
         var that = this;
         if (isPreviousEventComplete) {
-            load_next(String(that.getAttribute('id')));
+            if(searchStatus == 'off'){
+                load_next(String(that.getAttribute('id')));
+            }
+            else{
+                eval(String(that.getAttribute('id'))+'_next_search()');
+            }
         }
     }
-});
+});*/
 
-function load_next(tab){
-    isPreviousEventComplete = false;
-    var data = tab
-    $.post('/loadmore',{data:data},
-    function(data){
-        $('#'+tab).append(data);
-        isPreviousEventComplete = true;
+$('tbody').scroll(function () {
+        var $this = jQuery(this);
+        if ($this.data('activated')) return false;  // Pending, return
+
+        $this.data('activated', true);
+        setTimeout(function() {
+            $this.data('activated', false)
+        }, 500); // Freeze for 500ms
+        if($(this).scrollTop() + $(this).height() > (this.scrollHeight * .7))  {
+            if(isPreviousEventComplete){
+                if(searchStatus == 'off'){
+                    load_next(String(this.getAttribute('id')));
+                }
+                else{
+                    eval(String(this.getAttribute('id'))+'_next_search()');
+                }
+            }
+        }
     });
-}
 
 });

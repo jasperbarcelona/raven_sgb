@@ -1,4 +1,12 @@
-tab = 'logs'
+tab = $('#tab').val();
+
+if (tab == 'attendance'){
+    $('#add-user-btn').show();
+  }
+  else{
+    $('#add-user-btn').hide();
+  }
+
 function change_tab(page){
   tab = page;
   if (tab == 'attendance'){
@@ -7,6 +15,24 @@ function change_tab(page){
   else{
     $('#add-user-btn').hide();
   }
+
+  $.post('/tab/change',{
+        tab:tab,
+    });
+}
+
+function supply_data(studentId){
+  $.post('/student/info/get',{
+        student_id:studentId,
+    },
+    function(data){
+        $('.edit-user-modal-dialog .modal-content').html(data);
+    });
+}
+
+function resize_tbody(height,subtrahend){
+  $("#main-content").css("height",height);
+  $("tbody").css("height",height-subtrahend);
 }
 
 function textCounter(field,field2,maxlimit){
@@ -117,6 +143,7 @@ function search_attendance(){
     var contact = $('#attendance_search_contact').val();
     var absences = $('#attendance_search_absences').val();
     var lates = $('#attendance_search_lates').val();
+    var reset = 'yes';
 
     $.post('/search/attendance',{
         needed:tab,
@@ -128,20 +155,53 @@ function search_attendance(){
         section:section,
         contact:contact,    
         absences:absences,
-        lates:lates
+        lates:lates,
+        reset:reset
     },
     function(data){
         $('#'+tab).html(data);
     });
 }
 
+function attendance_next_search(){
+  var last_name = $('#attendance_search_last_name').val();
+    var first_name = $('#attendance_search_first_name').val();
+    var middle_name = $('#attendance_search_middle_name').val();
+    var id_no = $('#attendance_search_id_no').val();
+    var level = $('#attendance_search_level').val();
+    var section = $('#attendance_search_section').val();
+    var contact = $('#attendance_search_contact').val();
+    var absences = $('#attendance_search_absences').val();
+    var lates = $('#attendance_search_lates').val();
+  var reset = 'no';
+
+    $.post('/search/attendance',{
+        needed:tab,
+        last_name:last_name,
+        first_name:first_name,
+        middle_name:middle_name,
+        id_no:id_no,
+        level:level,
+        section:section,
+        contact:contact,    
+        absences:absences,
+        lates:lates,
+        reset:reset
+    },
+    function(data){
+        $('#'+tab).append(data);
+    });
+}
+
 
 function search_logs(){
+  isPreviousEventComplete = false;
   var date = $('#log_search_date').val();
   var id_no = $('#log_search_id_no').val();
   var name = $('#log_search_name').val();
   var level = $('#log_search_level').val();
   var section = $('#log_search_section').val();
+  var reset = 'yes';
 
     $.post('/search/logs',{
         needed:tab,
@@ -150,9 +210,33 @@ function search_logs(){
         name:name,
         level:level,
         section:section,
+        reset:reset
     },
     function(data){
         $('#'+tab).html(data);
+        isPreviousEventComplete = true;
+    });
+}
+
+function logs_next_search(){
+  var date = $('#log_search_date').val();
+  var id_no = $('#log_search_id_no').val();
+  var name = $('#log_search_name').val();
+  var level = $('#log_search_level').val();
+  var section = $('#log_search_section').val();
+  var reset = 'no';
+
+    $.post('/search/logs',{
+        needed:tab,
+        date:date,
+        id_no:id_no,
+        name:name,
+        level:level,
+        section:section,
+        reset:reset
+    },
+    function(data){
+        $('#'+tab).append(data);
     });
 }
 
@@ -163,6 +247,7 @@ function search_absent(){
   var name = $('#absent_search_name').val();
   var level = $('#absent_search_level').val();
   var section = $('#absent_search_section').val();
+  var reset = 'yes';
 
     $.post('/search/absent',{
         needed:tab,
@@ -171,9 +256,32 @@ function search_absent(){
         name:name,
         level:level,
         section:section,
+        reset:reset
     },
     function(data){
         $('#'+tab).html(data);
+    });
+}
+
+function absent_next_search(){
+  var date = $('#absent_search_date').val();
+  var id_no = $('#absent_search_id_no').val();
+  var name = $('#absent_search_name').val();
+  var level = $('#absent_search_level').val();
+  var section = $('#absent_search_section').val();
+  var reset = 'no';
+
+    $.post('/search/absent',{
+        needed:tab,
+        date:date,
+        id_no:id_no,
+        name:name,
+        level:level,
+        section:section,
+        reset:reset
+    },
+    function(data){
+        $('#'+tab).append(data);
     });
 }
 
@@ -184,6 +292,7 @@ function search_late(){
   var name = $('#late_search_name').val();
   var level = $('#late_search_level').val();
   var section = $('#late_search_section').val();
+  var reset = 'yes';
 
     $.post('/search/late',{
         needed:tab,
@@ -192,9 +301,42 @@ function search_late(){
         name:name,
         level:level,
         section:section,
+        reset:reset
     },
     function(data){
         $('#'+tab).html(data);
+    });
+}
+
+function late_next_search(){
+  var date = $('#late_search_date').val();
+  var id_no = $('#late_search_id_no').val();
+  var name = $('#late_search_name').val();
+  var level = $('#late_search_level').val();
+  var section = $('#late_search_section').val();
+  var reset = 'no';
+
+    $.post('/search/late',{
+        needed:tab,
+        date:date,
+        id_no:id_no,
+        name:name,
+        level:level,
+        section:section,
+        reset:reset
+    },
+    function(data){
+        $('#'+tab).append(data);
+    });
+}
+
+function load_next(tab){
+    isPreviousEventComplete = false;
+    var data = tab
+    $.post('/loadmore',{data:data},
+    function(data){
+        $('#'+tab).append(data);
+        isPreviousEventComplete = true;
     });
 }
 
@@ -245,6 +387,36 @@ function save_user(last_name, first_name, middle_name, level, section, contact, 
     });
 }
 
+function back_home(){
+  $.post('/home',{
+    tab:tab
+  },
+    function(data){
+    $('#'+tab).html(data);
+    });
+}
+
+function edit_user(last_name, first_name, middle_name, level, section, contact, id_no, user_id){
+  $('.edit-user-modal-footer .done-btn span').css({'display':'none'});
+    $('.edit-user-modal-footer .done-btn').css({'background-image':'url(../static/images/preloader_white.png)','background-repeat': 'no-repeat','background-position': 'center'});
+    $.post('/user/edit',{
+        last_name:last_name,
+        first_name:first_name,
+        middle_name:middle_name,
+        level:level,
+        section:section,
+        contact:contact,
+        id_no:id_no,
+        user_id:user_id
+    },
+    function(data){
+        $('.edit-user-modal-footer .done-btn').attr('disabled',true);
+        $('.edit-user-modal-footer .done-btn').css({'background-image':'none'});
+        $('.edit-user-modal-footer .done-btn span').show();
+        $('#attendance').html(data);
+        $('#edit-user-modal').modal('hide');
+    });
+}
 
 
 

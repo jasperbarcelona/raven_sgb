@@ -1,0 +1,78 @@
+<div class="modal-header message-modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">Student Information</h4>
+</div>
+<div class="modal-body edit-user-modal-body">
+        <input type="text" class="form-control" id="edit_last_name" placeholder="Last Name" value="{{student.last_name}}" /><br />
+        <input type="text" class="form-control" id="edit_first_name" placeholder="First Name" value="{{student.first_name}}"/><br />
+        <input type="text" class="form-control" id="edit_middle_name" placeholder="Middle Name" value="{{student.middle_name}}"/><br />
+        <select class="form-control select" id="edit_level">
+                <option selected>{{student.level}}</option>
+                <option>1st Grade</option>
+                <option>2nd Grade</option>
+                <option>3rd Grade</option>
+                <option>4th Grade</option>
+                <option>5th Grade</option>
+                <option>6th Grade</option>
+                <option>7th Grade</option>
+                <option>8th Grade</option>
+                <option>9th Grade</option>
+                <option>10th Grade</option>
+                <option>11th Grade</option>
+                <option>12th Grade</option>
+        </select><br />
+        <select class="form-control select" id="edit_section">
+                <option selected>{{student.section}}</option>
+                {% for section in sections %}
+                {% if section.name != student.section %}
+                <option>{{section.name}}</option>
+                {% endif %}
+                {% endfor %}
+        </select><br />
+        <input type="text" class="form-control" id="edit_contact" placeholder="Parent Contact Number" value="{{student.parent_contact}}" /><br />
+        <input type="text" class="form-control" id="edit_id_no" placeholder="ID Number" value="{{student.id_no}}"/><br />
+</div>
+<div class="modal-footer edit-user-modal-footer">
+        <button id = "edit-user-cancel" type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+        <!-- <a href="/"> --><button id="{{student.id}}" type="button" class="btn btn-primary done-btn" disabled><span>Save</span></button><!-- </a> -->
+</div>
+
+<script type="text/javascript">
+$('.edit-user-modal-body .form-control').on('keyup', function () {
+var re = /[A-Za-z]+$/;
+if (($('#edit_last_name').val() != "") && ($('#edit_first_name').val() != "") && ($('#edit_middle_name').val() != "") && 
+(re.test($('#edit_last_name').val())) && (re.test($('#edit_first_name').val())) && (re.test($('#edit_middle_name').val()))&& 
+($('#edit_level').val() != null) && ($('#edit_section').val() != null) && ($('#edit_contact').val() != null) &&
+(!isNaN($('#edit_contact').val())) &&  ($('#edit_contact').val().length == 11) ){
+$('.edit-user-modal-footer .done-btn').removeAttr('disabled'); 
+}
+else{
+$('.edit-user-modal-footer .done-btn').attr('disabled',true);
+}
+});
+
+$('.edit-user-modal-body .form-control').on('change', function () {
+var re = /[A-Za-z]+$/;
+if (($('#edit_last_name').val() != "") && ($('#edit_first_name').val() != "") && ($('#edit_middle_name').val() != "") && 
+(re.test($('#edit_last_name').val())) && (re.test($('#edit_first_name').val())) && (re.test($('#edit_middle_name').val()))&& 
+($('#edit_level').val() != null) && ($('#edit_section').val() != null) && ($('#edit_contact').val() != null) &&
+(!isNaN($('#edit_contact').val())) &&  ($('#edit_contact').val().length == 11) ){
+$('.edit-user-modal-footer .done-btn').removeAttr('disabled'); 
+}
+else{
+$('.edit-user-modal-footer .done-btn').attr('disabled',true);
+}
+});
+
+$('.edit-user-modal-footer .done-btn').on('click', function(){
+    var last_name = $('#edit_last_name').val();
+    var first_name = $('#edit_first_name').val();
+    var middle_name = $('#edit_middle_name').val();
+    var level = $('#edit_level').val();
+    var section = $('#edit_section').val();
+    var contact = $('#edit_contact').val();
+    var id_no = $('#edit_id_no').val();
+    var user_id = $(this).attr('id')
+    edit_user(last_name, first_name, middle_name, level, section, contact, id_no, user_id);
+});
+</script>

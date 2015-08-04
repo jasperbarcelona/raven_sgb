@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 {% block content %} 
 <div id="table-container">
-	<div class="tab-content">	
+	<div class="tab-content">
+		{% if tab == 'logs' %}
 		<div class="tab-pane active" id="logs-tab">
+		{% else %}
+		<div class="tab-pane" id="logs-tab">
+		{% endif %}
 			<table class="table">
 				<thead >
 					<tr>
@@ -26,25 +30,25 @@
 						<td class="short">
 							<select id="log_search_level" class="form-control search-text search-logs">
 							        <option value="">All</option>
-							        <option>1st Grade</option>
-							        <option>2nd Grade</option>
-							        <option>3rd Grade</option>
-							        <option>4th Grade</option>
-							        <option>5th Grade</option>
-							        <option>6th Grade</option>
-							        <option>7th Grade</option>
-							        <option>8th Grade</option>
-							        <option>9th Grade</option>
-							        <option>10th Grade</option>
-							        <option>11th Grade</option>
-							        <option>12th Grade</option>
+							        <option value="1st Grade">1st Grade</option>
+							        <option value="2nd Grade">2nd Grade</option>
+							        <option value="3rd Grade">3rd Grade</option>
+							        <option value="4th Grade">4th Grade</option>
+							        <option value="5th Grade">5th Grade</option>
+							        <option value="6th Grade">6th Grade</option>
+							        <option value="7th Grade">7th Grade</option>
+							        <option value="8th Grade">8th Grade</option>
+							        <option value="9th Grade">9th Grade</option>
+							        <option value="10th Grade">10th Grade</option>
+							        <option value="11th Grade">11th Grade</option>
+							        <option value="12th Grade">12th Grade</option>
 							</select>
 						</td>
 						<td class="short">
 							<select id="log_search_section" class="form-control search-text search-logs">
 							        <option value="">All</option>
 							        {% for section in sections %}
-							        <option>{{section.name}}</option>
+							        <option  value="{{section.name}}">{{section.name}}</option>
 							        {% endfor %}
 							</select><br />
 						</td>
@@ -80,7 +84,12 @@
 		</div>
 
 		{% if view=='student' %}
+		{% if tab == 'attendance' %}
+		<div class="tab-pane active" id="attendance-tab">
+		{% else %}
 		<div class="tab-pane" id="attendance-tab">
+		{% endif %}
+		
 			<table class="table">
 				<thead>	
 					<tr>
@@ -101,38 +110,38 @@
 						<td class="short"><input id="attendance_search_first_name" type="text" class="form-control search-text search-attendance"></td>
 						<td class="short"><input id="attendance_search_middle_name" type="text" class="form-control search-text search-attendance"></td>
 						<td class="short">
-							<select class="form-control search-text" id="attendance_search_level">
+							<select class="form-control search-text search-attendance" id="attendance_search_level">
 							        <option value="">All</option>
-							        <option>1st Grade</option>
-							        <option>2nd Grade</option>
-							        <option>3rd Grade</option>
-							        <option>4th Grade</option>
-							        <option>5th Grade</option>
-							        <option>6th Grade</option>
-							        <option>7th Grade</option>
-							        <option>8th Grade</option>
-							        <option>9th Grade</option>
-							        <option>10th Grade</option>
-							        <option>11th Grade</option>
-							        <option>12th Grade</option>
+							        <option value="1st Grade">1st Grade</option>
+							        <option value="2nd Grade">2nd Grade</option>
+							        <option value="3rd Grade">3rd Grade</option>
+							        <option value="4th Grade">4th Grade</option>
+							        <option value="5th Grade">5th Grade</option>
+							        <option value="6th Grade">6th Grade</option>
+							        <option value="7th Grade">7th Grade</option>
+							        <option value="8th Grade">8th Grade</option>
+							        <option value="9th Grade">9th Grade</option>
+							        <option value="10th Grade">10th Grade</option>
+							        <option value="11th Grade">11th Grade</option>
+							        <option value="12th Grade">12th Grade</option>
 							</select>
 						</td>
 						<td class="short">
-							<select class="form-control search-text" id="attendance_search_section">
+							<select class="form-control search-text search-attendance" id="attendance_search_section">
 							        <option value="">All</option>
 							        {% for section in sections %}
-							        <option>{{section.name}}</option>
+							        <option  value="{{section.name}}">{{section.name}}</option>
 							        {% endfor %}
 							</select><br />
 						</td>
-						<td class="attendance-count"><input id="search_absences" type="text" class="form-control search-text"></td>
-						<td class="attendance-count"><input id="search_lates" type="text" class="form-control search-text">	</td>
+						<td class="attendance-count"><input id="search_absences" type="text" class="form-control search-text search-attendance"></td>
+						<td class="attendance-count"><input id="search_lates" type="text" class="form-control search-text search-attendance">	</td>
 					</tr>
 				</thead>
 				<tbody id="attendance">
 					{% if attendance[0] %}
 					{% for index in attendance %}
-					<tr class="rows">
+					<tr id="{{index.id}}" class="rows" data-toggle="modal" data-target="#edit-user-modal" onclick="supply_data(this.id)">
 						<td class="xs">{{loop.index}}</td>	
 						<td class="short">{{index.id_no}}</td>	
 						<td class="long">{{index.last_name}}</td>	
@@ -154,7 +163,12 @@
 			</table>
 		</div>
 
+		{% if tab == 'absent' %}
+		<div class="tab-pane active" id="absent-tab">
+		{% else %}
 		<div class="tab-pane" id="absent-tab">
+		{% endif %}
+		
 			<table class="table">
 				<thead>	
 					<tr>
@@ -173,25 +187,24 @@
 						<td class="short">
 							<select class="form-control search-text search-absent" id="absent_search_level">
 							        <option value="">All</option>
-							        <option>1st Grade</option>
-							        <option>2nd Grade</option>
-							        <option>3rd Grade</option>
-							        <option>4th Grade</option>
-							        <option>5th Grade</option>
-							        <option>6th Grade</option>
-							        <option>7th Grade</option>
-							        <option>8th Grade</option>
-							        <option>9th Grade</option>
-							        <option>10th Grade</option>
-							        <option>11th Grade</option>
-							        <option>12th Grade</option>
-							</select>
+							        <option value="1st Grade">1st Grade</option>
+							        <option value="2nd Grade">2nd Grade</option>
+							        <option value="3rd Grade">3rd Grade</option>
+							        <option value="4th Grade">4th Grade</option>
+							        <option value="5th Grade">5th Grade</option>
+							        <option value="6th Grade">6th Grade</option>
+							        <option value="7th Grade">7th Grade</option>
+							        <option value="8th Grade">8th Grade</option>
+							        <option value="9th Grade">9th Grade</option>
+							        <option value="10th Grade">10th Grade</option>
+							        <option value="11th Grade">11th Grade</option>
+							        <option value="12th Grade">12th Grade</option>
 						</td>
 						<td class="short">
 							<select class="form-control search-text search-absent" id="absent_search_section">
 							        <option value="">All</option>
 							        {% for section in sections %}
-							        <option>{{section.name}}</option>
+							        <option  value="{{section.name}}">{{section.name}}</option>
 							        {% endfor %}
 							</select><br />
 						</td>
@@ -219,7 +232,12 @@
 			</table>
 		</div>
 
+		{% if tab == 'late' %}
+		<div class="tab-pane active" id="late-tab">
+		{% else %}
 		<div class="tab-pane" id="late-tab">
+		{% endif %}
+		
 			<table class="table">
 				<thead>
 					<tr>
@@ -239,25 +257,25 @@
 						<td class="short">
 							<select class="form-control search-text search-late" id="late_search_level">
 							        <option value="">All</option>
-							        <option>1st Grade</option>
-							        <option>2nd Grade</option>
-							        <option>3rd Grade</option>
-							        <option>4th Grade</option>
-							        <option>5th Grade</option>
-							        <option>6th Grade</option>
-							        <option>7th Grade</option>
-							        <option>8th Grade</option>
-							        <option>9th Grade</option>
-							        <option>10th Grade</option>
-							        <option>11th Grade</option>
-							        <option>12th Grade</option>
+							        <option value="1st Grade">1st Grade</option>
+							        <option value="2nd Grade">2nd Grade</option>
+							        <option value="3rd Grade">3rd Grade</option>
+							        <option value="4th Grade">4th Grade</option>
+							        <option value="5th Grade">5th Grade</option>
+							        <option value="6th Grade">6th Grade</option>
+							        <option value="7th Grade">7th Grade</option>
+							        <option value="8th Grade">8th Grade</option>
+							        <option value="9th Grade">9th Grade</option>
+							        <option value="10th Grade">10th Grade</option>
+							        <option value="11th Grade">11th Grade</option>
+							        <option value="12th Grade">12th Grade</option>
 							</select>
 						</td>
 						<td class="short">
 							<select class="form-control search-text search-late" id="late_search_section">
 							        <option value="">All</option>
 							        {% for section in sections %}
-							        <option>{{section.name}}</option>
+							        <option  value="{{section.name}}">{{section.name}}</option>
 							        {% endfor %}
 							</select><br />
 						</td>

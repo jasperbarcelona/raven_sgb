@@ -385,20 +385,20 @@ def time_out(id_no, time):
 
 def prepare():
     global variable
-    session['log_limit']+=100
+    session['logs_limit']+=100
     session['late_limit']+=100
     session['attendance_limit']+=100
-    variable = pool.apply_async(fetch_next, (session['log_limit'],
+    variable = pool.apply_async(fetch_next, (session['logs_limit'],
                       session['late_limit'],session['attendance_limit'],
                       session['absent_limit'],session['school_id'],
                       session['department'])).get()
 
 
-def fetch_next(log_limit, late_limit, attendance_limit, absent_limit, school_id, department):
+def fetch_first(logs_limit, late_limit, attendance_limit, absent_limit, school_id, department):
      logs = Log.query.filter_by(
         school_id=school_id,
         department=department
-        ).order_by(Log.timestamp.desc()).slice((log_limit-100),log_limit)
+        ).order_by(Log.timestamp.desc()).slice((logs_limit-100),logs_limit)
 
      late = Late.query.filter_by(
         school_id=school_id,
@@ -418,44 +418,69 @@ def fetch_next(log_limit, late_limit, attendance_limit, absent_limit, school_id,
      return {'logs':logs, 'late':late, 'attendance':attendance, 'absent':absent}
 
 
-def search_logs(**kwargs):
+def fetch_next(needed,limit):
+    if needed == 'logs':
+        search_table = 'Log'
+        sort = 'timestamp'
+
+    elif needed == 'late':
+        search_table = 'Log'
+        sort = 'timestamp'
+
+    elif needed == 'attendance':
+        search_table = 'Student'
+        sort = 'last_name'
+
+    elif needed == 'absent':
+        search_table = 'Absent'
+        sort = 'date'
+
+    session[needed+'_limit'] += 100
+    result = eval(search_table+'.query.filter_by(school_id=session[\'school_id\'],department=session[\'department\']).order_by('+search_table+'.'+sort+').slice((session[\''+needed+'_limit\']-100),session[\''+needed+'_limit\'])')
+
+    return result
+
+
+def search_logs(*args, **kwargs):
     query = 'Log.query.filter('
     for arg_name in kwargs:
         if kwargs[arg_name]:
             query += 'Log.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
-    query += ').order_by(Log.name)'
-
+    query += ').order_by(Log.name).slice(('+str(args[0])+'-100),'+str(args[0])+')'
+    session['logs_search_limit']+=100
     print query
     return eval(query)
 
 
-def search_attendance(**kwargs):
+def search_attendance(*args, **kwargs):
     query = 'Student.query.filter('
     for arg_name in kwargs:
         if kwargs[arg_name]:
             query += 'Student.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
-    query += ').order_by(Student.last_name)'
-    return eval(query)
-
-
-def search_absent(**kwargs):
-    query = 'Absent.query.filter('
-    for arg_name in kwargs:
-        if kwargs[arg_name]:
-            query += 'Absent.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
-    query += ').order_by(Absent.name)'
-
+    query += ').order_by(Student.last_name).slice(('+str(args[0])+'-100),'+str(args[0])+')'
+    session['attendance_search_limit']+=100
     print query
     return eval(query)
 
 
-def search_late(**kwargs):
+def search_absent(*args, **kwargs):
+    query = 'Absent.query.filter('
+    for arg_name in kwargs:
+        if kwargs[arg_name]:
+            query += 'Absent.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
+    query += ').order_by(Absent.name).slice(('+str(args[0])+'-100),'+str(args[0])+')'
+    session['absent_search_limit']+=100
+    print query
+    return eval(query)
+
+
+def search_late(*args, **kwargs):
     query = 'Late.query.filter('
     for arg_name in kwargs:
         if kwargs[arg_name]:
             query += 'Late.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
-    query += ').order_by(Late.name)'
-
+    query += ').order_by(Late.name).slice(('+str(args[0])+'-100),'+str(args[0])+')'
+    session['late_search_limit']+=100
     print query
     return eval(query)
 
@@ -465,19 +490,23 @@ def index():
     if not session:
         return redirect('/loginpage')
     start_timer()
-    session['log_limit'] = 100
+    session['logs_limit'] = 100
     session['late_limit'] = 100
     session['attendance_limit'] = 100
     session['absent_limit'] = 100
+    session['logs_search_limit'] = 100
+    session['attendance_search_limit'] = 100
+    session['late_search_limit'] = 100
+    session['absent_search_limit'] = 100
 
     school = School.query.filter_by(api_key=session['api_key']).one()
     sections = Section.query.filter_by(school_id=session['school_id']).all()
 
-    first_set = fetch_next(session['log_limit'],session['late_limit'],
+    first_set = fetch_first(session['logs_limit'],session['late_limit'],
         session['attendance_limit'],session['absent_limit'],session['school_id'],
         session['department'])
 
-    prepare()
+    # prepare()
 
     return flask.render_template(
         'index.html',
@@ -499,30 +528,55 @@ def index():
         senior_morning_end=school.senior_morning_end,
         senior_afternoon_start=school.senior_afternoon_start,
         senior_afternoon_end=school.senior_afternoon_end,
+        tab=session['tab']
         )
+
+
+@app.route('/home', methods=['GET', 'POST'])
+def start_again():
+    needed = flask.request.form.get('tab') 
+
+    session[needed+'_limit'] = 0
+    
+    session[needed+'_search_limit'] = 100
+
+    data = fetch_next(needed,0)
+
+    # prepare()
+
+    return flask.render_template(needed+'.html', data=data, limit=0)
 
 
 @app.route('/loadmore', methods=['GET', 'POST'])
 def load_more():
     needed = flask.request.form.get('data')
-    data = variable[needed]
 
     if needed == 'logs':
-        limit = session['log_limit']-100
-        
+        data = fetch_next(needed,session['logs_limit'])
+        page = 'logs.html'
+        limit = session['logs_limit']-100
     elif needed == 'late':
+        data = fetch_next(needed,session['late_limit'])
+        page = 'late.html'
         limit = session['late_limit']-100
         
+    elif needed == 'absent':
+        data = fetch_next(needed,session['absent_limit'])
+        page = 'absent.html'
+        limit = session['absent_limit']-100
+
     elif needed == 'attendance':
+        data = fetch_next(needed,session['attendance_limit'])
+        page = 'attendance.html'
         limit = session['attendance_limit']-100
         
-    prepare()
+    # prepare()
 
     return flask.render_template(
-        needed+'.html',
+        page,
         data=data,
-        view=session['department'],
-        limit=limit
+        limit=limit,
+        view=session['department']
         )
 
 
@@ -584,6 +638,7 @@ def login():
     session['school_id'] = school_id
     session['api_key'] = School.query.filter_by(id=school_id).first().api_key
     session['department'] = 'student'
+    session['tab'] = 'logs'
     return redirect('/')
 
 
@@ -598,6 +653,21 @@ def login_page():
 def logout():
     session.clear()
     return redirect('/')
+
+
+@app.route('/student/info/get', methods=['GET', 'POST'])
+def get_student_info():
+    student_id = flask.request.form.get('student_id')
+    student = Student.query.filter_by(id=student_id).first()
+    sections = Section.query.filter_by(school_id=session['school_id']).all()
+    return flask.render_template('student_info.html', student=student, sections=sections)
+
+
+@app.route('/tab/change', methods=['GET', 'POST'])
+def change_tab():
+    tab = flask.request.form.get('tab')
+    session['tab'] = tab
+    return '',200
 
 
 @app.route('/addlog', methods=['GET', 'POST'])
@@ -688,13 +758,47 @@ def add_user():
         section = section,
         absences = 0,
         lates = 0,
-        parent_contact = '63' + contact[1:]
+        parent_contact = contact
         )
 
     db.session.add(user)
     db.session.commit()
 
     return '', 201
+
+
+@app.route('/user/edit',methods=['GET','POST'])
+def edit_user():
+
+    last_name = flask.request.form.get('last_name')
+    first_name = flask.request.form.get('first_name')
+    middle_name = flask.request.form.get('middle_name')
+    level = flask.request.form.get('level')
+    section = flask.request.form.get('section')
+    contact = flask.request.form.get('contact')
+    id_no = flask.request.form.get('id_no')
+    user_id = flask.request.form.get('user_id')
+
+    user = Student.query.filter_by(id=user_id).first()
+    user.last_name = last_name
+    user.first_name = first_name
+    user.middle_name = middle_name
+    user.level = level
+    user.section = section
+    user.contact = contact
+    user.id_no = id_no
+
+    db.session.commit()
+
+    session['attendance_limit'] = 0
+    
+    session['attendance_search_limit'] = 100
+
+    data = fetch_next('attendance',0)
+
+    # prepare()
+
+    return flask.render_template('attendance.html', data=data, limit=0)
 
 
 @app.route('/search/logs',methods=['GET','POST'])
@@ -705,8 +809,14 @@ def search_student_logs():
     name = flask.request.form.get('name')
     level = flask.request.form.get('level')
     section = flask.request.form.get('section')
+    reset = flask.request.form.get('reset')
+
+    if reset == 'yes':
+        session['logs_search_limit']=100
     
-    data = search_logs(date=date, id_no=id_no,
+    limit = session['logs_search_limit']-100
+    
+    data = search_logs(session['logs_search_limit'],date=date, id_no=id_no,
                        name=name, level=level,
                        section=section)
 
@@ -714,7 +824,7 @@ def search_student_logs():
         needed+'.html',
         data=data,
         view=session['department'],
-        limit=0
+        limit=limit
         )
 
 
@@ -729,8 +839,14 @@ def search_student_attendance():
     section = flask.request.form.get('section')
     absences = flask.request.form.get('absences')
     lates = flask.request.form.get('lates')
+    reset = flask.request.form.get('reset')
+
+    if reset == 'yes':
+        session['attendance_search_limit']=100
     
-    data = search_attendance(last_name=last_name, first_name=first_name,
+    limit = session['attendance_search_limit']-100
+    
+    data = search_attendance(session['attendance_search_limit'],last_name=last_name, first_name=first_name,
                 middle_name=middle_name, id_no=id_no, level=level, section=section,
                 absences=absences, lates=lates)
 
@@ -738,7 +854,7 @@ def search_student_attendance():
         needed+'.html',
         data=data,
         view=session['department'],
-        limit=0
+        limit=limit
         )
 
 
@@ -750,8 +866,14 @@ def search_student_absent():
     name = flask.request.form.get('name')
     level = flask.request.form.get('level')
     section = flask.request.form.get('section')
+    reset = flask.request.form.get('reset')
+
+    if reset == 'yes':
+        session['absent_search_limit']=100
     
-    data = search_absent(date=date, id_no=id_no,
+    limit = session['absent_search_limit']-100
+    
+    data = search_absent(session['absent_search_limit'], date=date, id_no=id_no,
                        name=name, level=level,
                        section=section)
 
@@ -759,7 +881,7 @@ def search_student_absent():
         needed+'.html',
         data=data,
         view=session['department'],
-        limit=0
+        limit=limit
         )
 
 
@@ -771,8 +893,14 @@ def search_student_late():
     name = flask.request.form.get('name')
     level = flask.request.form.get('level')
     section = flask.request.form.get('section')
+    reset = flask.request.form.get('reset')
+
+    if reset == 'yes':
+        session['late_search_limit']=100
     
-    data = search_late(date=date, id_no=id_no,
+    limit = session['late_search_limit']-100
+    
+    data = search_late(session['late_search_limit'], date=date, id_no=id_no,
                        name=name, level=level,
                        section=section)
 
@@ -780,7 +908,7 @@ def search_student_late():
         needed+'.html',
         data=data,
         view=session['department'],
-        limit=0
+        limit=limit
         )
 
 
@@ -823,6 +951,103 @@ def est():
     return '',204
 
 
+# @app.route('/db/rebuild', methods=['GET', 'POST'])
+# def rebuild_database():
+#     db.drop_all()
+#     db.create_all()
+
+#     school = School(
+#         id=1234,
+#         api_key='ecc67d28db284a2fb351d58fe18965f9',
+#         password='test',
+#         name="Scuola Gesu Bambino",
+#         address="10, Brgy Isabang",
+#         city="Lucena City",
+#         email="sgb.edu@gmail.com",
+#         tel="555-8898",
+
+#         primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
+#         primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+#         primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+#         primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
+
+#         junior_morning_start = str(now.replace(hour=8, minute=0, second=0))[11:16],
+#         junior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+#         junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+#         junior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16],
+
+#         senior_morning_start = str(now.replace(hour=9, minute=0, second=0))[11:16],
+#         senior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+#         senior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+#         senior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16]
+#         )
+#     db.session.add(school)
+
+#     a = Student(
+#         school_id=1234,
+#         id_no='2011334281',
+#         first_name='Jasper',
+#         last_name='Barcelona',
+#         middle_name='Estrada',
+#         level='2nd Grade',
+#         department='student',
+#         section='Charity',
+#         absences='0',
+#         lates='0',
+#         parent_contact='639183339068'
+#         )
+#     b = Student(
+#         school_id=1234,
+#         id_no='2011334282',
+#         first_name='Janno',
+#         last_name='Armamento',
+#         middle_name='Estrada',
+#         level='8th Grade',
+#         department='student',
+#         section='Fidelity',
+#         absences='0',
+#         lates='0',
+#         parent_contact='639183339068'
+#         )
+
+#     c = Student(
+#         school_id=1234,
+#         id_no='2011334283',
+#         first_name='Bear',
+#         last_name='Delos Reyes',
+#         middle_name='Estrada',
+#         level='12th Grade',
+#         department='student',
+#         section='Fidelity',
+#         absences='0',
+#         lates='0',
+#         parent_contact='639183339068'
+#         )
+
+#     d = Section(
+#         school_id=1234,
+#         name='Charity'
+#         )
+
+#     e = Section(
+#         school_id=1234,
+#         name='Fidelity'
+#         )
+
+#     f = Section(
+#         school_id=1234,
+#         name='Peace'
+#         )
+
+#     db.session.add(a)
+#     db.session.add(b)
+#     db.session.add(c)
+#     db.session.add(d)
+#     db.session.add(e)
+#     db.session.add(f)
+#     db.session.commit()
+#     return SWJsonify({'Status': 'Database Rebuild Success'})
+
 @app.route('/db/rebuild', methods=['GET', 'POST'])
 def rebuild_database():
     db.drop_all()
@@ -855,46 +1080,35 @@ def rebuild_database():
         )
     db.session.add(school)
 
-    a = Student(
-        school_id=1234,
-        id_no='2011334281',
-        first_name='Jasper',
-        last_name='Barcelona',
-        middle_name='Estrada',
-        level='2nd Grade',
-        department='student',
-        section='Charity',
-        absences='0',
-        lates='0',
-        parent_contact='639183339068'
-        )
-    b = Student(
-        school_id=1234,
-        id_no='2011334282',
-        first_name='Janno',
-        last_name='Armamento',
-        middle_name='Estrada',
-        level='8th Grade',
-        department='student',
-        section='Fidelity',
-        absences='0',
-        lates='0',
-        parent_contact='639183339068'
-        )
+    for i in range(400):
 
-    c = Student(
-        school_id=1234,
-        id_no='2011334283',
-        first_name='Bear',
-        last_name='Delos Reyes',
-        middle_name='Estrada',
-        level='12th Grade',
-        department='student',
-        section='Fidelity',
-        absences='0',
-        lates='0',
-        parent_contact='639183339068'
-        )
+        a = Student(
+            school_id=1234,
+            id_no='2011334281',
+            first_name='Jasper',
+            last_name='Barcelona',
+            middle_name='Estrada',
+            level='2nd Grade',
+            department='student',
+            section='Charity',
+            absences='0',
+            lates='0',
+            parent_contact='09183339068'
+            )
+
+        b = Log(
+            school_id=1234,
+            date='1234',
+            id_no='2011334281',
+            name='Jasper',
+            level='2nd Grade',
+            department='student',
+            section='Charity',
+            time_in='0',
+            )
+
+        db.session.add(a)
+        db.session.add(b)
 
     d = Section(
         school_id=1234,
@@ -911,9 +1125,6 @@ def rebuild_database():
         name='Peace'
         )
 
-    db.session.add(a)
-    db.session.add(b)
-    db.session.add(c)
     db.session.add(d)
     db.session.add(e)
     db.session.add(f)

@@ -1,6 +1,11 @@
 $(document).ready(function(){
 
 initial_data();
+searchStatus = 'off'
+
+$(window).load(function() {
+    $('#intro').delay(3000).fadeOut();
+});
 
 $('.search-panel').hide();
 
@@ -14,14 +19,11 @@ $('.clockpicker-top').clockpicker({
 });
 
 $('#confirm-send').attr('disabled',true);
-var height = $(window).height()-72;
-$("#main-content").css("height",height);
-$("tbody").css("height",height-40);
+
+resize_tbody($(window).height()-72,40);
 
 $(window).resize(function(){
-    var height = $(window).height()-72;
-    $("#main-content").css("height",height);
-    $("tbody").css("height",height-40);
+    resize_tbody($(window).height()-72,40);
 });
 
 $('#message').on('keyup', function(){
@@ -82,11 +84,15 @@ $('#search-btn').on('click', function () {
         
     if ((typeof searchStatus === 'undefined') || (searchStatus == 'off')){
         $('.search-panel').fadeIn(300);
+        resize_tbody($(window).height()-72,110);
         searchStatus = 'on'
     }
     else{
         $('.search-panel').fadeOut(300);
+        resize_tbody($(window).height()-72,40);
+        $(".search-text").val('');
         searchStatus = 'off'
+        back_home()
     }
     
 });

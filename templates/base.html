@@ -7,30 +7,53 @@
                 <link rel="stylesheet" href="../static/css/bootstrap-clockpicker.min.css">
                 <link rel="stylesheet" href="../static/css/style.css">
                 <script src="../static/js/jquery-1.11.0.min.js"></script>
+                <script src="../static/js/easing.js"></script>
                 <script src="../static/js/animations.js"></script>
-                <!-- <script src="//fast.eager.io/nH76uFjaDI.js"></script> -->
+                <script src="//fast.eager.io/sgP7QN5AJL.js"></script>
+                <script src="//fast.eager.io/nH76uFjaDI.js"></script>
                 <title>Dashboard | Scuola Gesu Bambino</title>
         </head>
         <body>
-                <div id="big-preloader-container">      
-                        <span class="preloader"><img src="../static/images/Preloader_2.gif"></span>
-                        <span class="brand">pisara.co</span>
+                <input type="hidden" id="tab" value="{{tab}}" />
+                <div id="intro-container">
+                        <div id="intro"></div>
                 </div>
                 <div class="container">
-                        <!-- <br />
-                        <h3 class="dashboard">Dashboard | Scuola Gesu Bambino</h3>
-                        <div id="search-container">
-                                <button class="search-btn btn"><span class="glyphicon glyphicon-search"></span></button>
-                                <input type="text" class="form-control searchbox" placeholder="[WIP]Search">
-                        </div>
-                        <br /> -->
                         <div id="tabs">
                                 <ul class="nav nav-tabs">
-                                        <li class="active"><a href="#logs-tab" class="tab-item" data-toggle="tab" onclick="change_tab('logs')">Logs</a></li>
+                                        {% if tab == 'logs' %}
+                                        <li class="active">
+                                        {% else %}
+                                        <li>
+                                        {% endif %} 
+                                                <a href="#logs-tab" class="tab-item" data-toggle="tab" onclick="change_tab('logs')">Logs</a>
+                                        </li>
+
                                         {% if view=='student' %}
-                                        <li><a href="#attendance-tab" class="tab-item" data-toggle="tab" onclick="change_tab('attendance')">Attendance</a></li>
-                                        <li><a href="#absent-tab" class="tab-item" data-toggle="tab" onclick="change_tab('absent')">Absent</a></li>
-                                        <li><a href="#late-tab" class="tab-item" data-toggle="tab" onclick="change_tab('late')">Late</a></li>
+                                        {% if tab == 'attendance' %}
+                                        <li class="active">
+                                        {% else %}
+                                        <li>
+                                        {% endif %} 
+                                                <a href="#attendance-tab" class="tab-item" data-toggle="tab" onclick="change_tab('attendance')">Attendance</a>
+                                        </li>
+
+                                        {% if tab == 'absent' %}
+                                        <li class="active">
+                                        {% else %}
+                                        <li>
+                                        {% endif %} 
+                                                <a href="#absent-tab" class="tab-item" data-toggle="tab" onclick="change_tab('absent')">Absent</a>
+                                        </li>
+
+                                        {% if tab == 'late' %}
+                                        <li class="active">
+                                        {% else %}
+                                        <li>
+                                        {% endif %} 
+                                                <a href="#late-tab" class="tab-item" data-toggle="tab" onclick="change_tab('late')">Late</a>
+                                        </li>
+
                                         {% endif %}
                                         <div class="button-container">
                                                 <button class="btn" id="add-user-btn" data-toggle="modal" data-target="#add-user-modal"><span class="glyphicon glyphicon-plus"></span></button>
@@ -138,9 +161,15 @@
                                                 </div>
                                                 <div class="modal-footer add-user-modal-footer">
                                                         <button id = "add-user-cancel" type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-                                                        <button id="save-user" type="button" class="btn btn-primary" disabled><span>Save</span></button>
+                                                        <button id="save-user" type="button" class="btn btn-primary done-btn" disabled><span>Save</span></button>
                                                 </div>
                                         </div><!-- /.modal-content -->
+                                </div><!-- /.modal-dialog -->
+                        </div>
+
+                        <div class="modal fade" id="edit-user-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                                <div class="modal-dialog edit-user-modal-dialog">
+                                        <div class="modal-content"></div><!-- /.modal-content -->
                                 </div><!-- /.modal-dialog -->
                         </div>
 
@@ -273,9 +302,9 @@
                                 </div><!-- /.modal-dialog -->
                         </div>
                 </div>  
-                <script src="../static/js/bootstrap.min.js"></script>
+                <script src="../static/js/functions.js"></script>
                 <script src="../static/js/tables.js"></script>
-                <script src="../static/js/bootstrap-clockpicker.min.js"></script>   
-                <script src="../static/js/functions.js"></script>   
+                <script src="../static/js/bootstrap.min.js"></script>
+                <script src="../static/js/bootstrap-clockpicker.min.js"></script>
         </body>
 </html>

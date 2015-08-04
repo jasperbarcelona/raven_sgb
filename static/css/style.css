@@ -16,7 +16,6 @@ body{
 	font-family: OpenSans, sans-serif;
 	background-image: url('../images/footer_lodyas.png');
 	background-repeat: repeat;
-
 }
 
 span:hover{
@@ -50,13 +49,16 @@ textarea:focus{
 	width: 400px;
 }
 
+.edit-user-modal-dialog{
+	width: 400px;
+}
+
 #add-user-btn{
 	background-color: transparent;
 	color: #FFFFFF;
 	height: 30px;	
 	font-size: 20px;
 	padding-top: 2px;
-	display: none;
 }
 
 #add-user-btn:focus{
@@ -198,19 +200,20 @@ textarea:focus{
 	margin-bottom: 0px;
 }
 
-::-webkit-scrollbar {
-    	width: 12px;
+/*::-webkit-scrollbar {
+    width: 14px;
 }
 
 ::-webkit-scrollbar-track {
-   	 -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.9); 
-    	border-radius: 10px;
+	background-color: #E7E2DD;
+   	-webkit-box-shadow: inset 0 0 3px rgba(0,0,0,0.5); 
 }
 
 ::-webkit-scrollbar-thumb {
-    	border-radius: 10px;
-    	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
-}
+	background-color: #F6F4F2;
+	border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.5); 
+}*/
 
 .time-label{
 	margin-bottom: 5px;
@@ -254,9 +257,9 @@ textarea:focus{
 	width: 200px;
 }
 
-.brand::first-letter {
+.brand::first-letter{
     color: #0089A8;
-} 
+}
 
 .dashboard{
 	float: left;
@@ -287,7 +290,7 @@ textarea:focus{
 	width: 120px;
 }
 
-#save-user{
+.done-btn{
 	width: 80px;
 }
 
@@ -299,7 +302,7 @@ textarea:focus{
 #search-btn{
 	background-color: #F4F4F4;
 	color: #6D6D6D;
-	border: 1px solid #B6B6B6;
+	margin-right: 1px;
 }
 
 #search-btn:focus{
@@ -309,7 +312,6 @@ textarea:focus{
 #refresh-btn{
 	background-color: #F4F4F4;
 	color: #6D6D6D;
-	border: 1px solid #B6B6B6;
 }
 
 #refresh-btn:focus{
@@ -337,13 +339,11 @@ textarea:focus{
 #compose-btn{
 	background-color: #4485F5;
 	color: #FFFFFF;
-	margin-right: 2px;
 }
 
 #settings-btn{
 	background-color: #F4F4F4;
 	color: #6D6D6D;
-	border: 1px solid #B6B6B6;
 }
 
 .no-records{
@@ -354,22 +354,15 @@ textarea:focus{
 	padding-top: 20% !important;
 }
 
-#big-preloader-container{
+#intro{
 	position: absolute;
-	z-index: 100;
-	background-color: #ffffff;
+	bottom: 0;
+	left: 0;
+	z-index: 1000;
 	height: 100%;
 	width: 100%;
-	text-align: center;
-	font-size: 26px;
-	display: -webkit-flex;
-	display: flex;
-	-webkit-flex-direction: column;
-	flex-direction: column;
-	-webkit-align-items: center;
-	align-items: center;
-	-webkit-justify-content: center;
-	justify-content: center;
+	background-image: url('../images/footer_lodyas.png');
+	background-repeat: repeat;
 	display: none;
 }
 
@@ -400,21 +393,21 @@ thead{
 tbody tr {
     display:table;
     width: calc(100% + 13px);
-}
-
-table {
-    	width:400px;
+    background-color: #FFFFFF;
 }
 
 .tab-pane{
 	height: 100%;
 	width: 100%;
+	background-color: transparent;
 	/*overflow: scroll;
 	overflow-x: hidden;*/
 }
 
 .tab-content{
 	height: 100%;
+	width: 100%;
+	background-color: transparent;
 }
 
 .nav-tabs{
@@ -458,12 +451,11 @@ td .form-control{
 	text-overflow: ellipsis;
 }
 
-
-
 #main-content{
 	overflow: hidden;
 	overflow-x: hidden; 
-	background-color: rgba(255,255,255,1);
+	/*background-color: rgba(255,255,255,1);*/
+	background-color: transparent;
 }
 
 #copyright{
@@ -480,6 +472,8 @@ td .form-control{
 
 #table-container{
 	height: 100%;
+	width: 100%;
+	background-color: transparent;
 }
 
 .radio{
