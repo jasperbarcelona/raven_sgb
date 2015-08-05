@@ -383,6 +383,7 @@ tbody{
 	display:block;
 	overflow: scroll;
 	overflow-x:hidden;
+	background-color: #FFFFFF;
 }
 
 thead{
@@ -401,7 +402,6 @@ tbody tr {
 	width: 100%;
 	/*overflow: scroll;
 	overflow-x: hidden;*/
-	background-color: #FFFFFF;
 }
 
 .tab-content{
