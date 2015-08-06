@@ -217,7 +217,7 @@ function search_logs(){
       $('#'+tab).html(data);
       isPreviousEventComplete = true;
   });
-  /*$('#search-loading').hide();*/
+  $('#search-loading').hide();
 }
 
 function logs_next_search(){
