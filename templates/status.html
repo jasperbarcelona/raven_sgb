@@ -1,8 +1,9 @@
 <html>
-	{% if status == 'Success' %}
+	{% if status == 'Message Sent' %}
 	<span class="glyphicon glyphicon-ok-sign status-success"></span>
 	{% else %}
 	<span class="glyphicon glyphicon-remove-sign status-error"></span>
 	{% endif %}
+	<br />
 	<span class="status-message">{{status}}</span>
 </html>

@@ -17,7 +17,16 @@ function change_tab(page){
   }
 
   $.post('/tab/change',{
-        tab:tab,
+      tab:tab,
+    });
+}
+
+function validate_id(id_no){
+  $.post('/id/validate',{
+        id_no:id_no,
+    },
+    function(data){
+        $('#id-error').html(data);
     });
 }
 
@@ -104,6 +113,7 @@ function clear_data(){
     $('#add_section').val('');
     $('#add_contact').val('');
     $('#add_id_no').val('');
+    $('#id-error').text('');
 }
 
 ;(function($){
@@ -371,24 +381,27 @@ function save_sched(){
     });
 }
 
-function save_user(last_name, first_name, middle_name, level, section, contact, id_no){
-  $('#save-user span').css({'display':'none'});
-    $('#save-user').css({'background-image':'url(../static/images/preloader_white.png)','background-repeat': 'no-repeat','background-position': 'center'});
-    $.post('/user/add',{
-        last_name:last_name,
-        first_name:first_name,
-        middle_name:middle_name,
-        level:level,
-        section:section,
-        contact:contact,
-        id_no:id_no
-    },
-    function(data){
-        clear_data();
-        $('#save-user').attr('disabled',true);
-        $('#save-user').css({'background-image':'none'});
-        $('#save-user span').show();
-    });
+function save_user(last_name, first_name, middle_name, level, section, contact, id_no){ 
+  $.post('/user/add',{
+      last_name:last_name,
+      first_name:first_name,
+      middle_name:middle_name,
+      level:level,
+      section:section,
+      contact:contact,
+      id_no:id_no
+  },
+  function(data){
+      clear_data();
+      $('#attendance').html(data);
+      $('#save-user').css({'background-image':'none'});
+      $('#save-user span').show();
+      $('.add-user-footer-left').fadeIn();
+      setTimeout(function() {
+          $('.add-user-footer-left').fadeOut();
+      }, 2000);
+      
+  });
 }
 
 function back_home(){
@@ -405,7 +418,7 @@ function back_home(){
 
 function edit_user(last_name, first_name, middle_name, level, section, contact, id_no, user_id){
   $('.edit-user-modal-footer .done-btn span').css({'display':'none'});
-    $('.edit-user-modal-footer .done-btn').css({'background-image':'url(../static/images/preloader_white.png)','background-repeat': 'no-repeat','background-position': 'center'});
+    $('.edit-user-modal-footer .done-btn').css({'background-image':'url(../static/images/white.GIF)','background-repeat': 'no-repeat','background-position': 'center'});
     $.post('/user/edit',{
         last_name:last_name,
         first_name:first_name,
@@ -422,6 +435,10 @@ function edit_user(last_name, first_name, middle_name, level, section, contact, 
         $('.edit-user-modal-footer .done-btn span').show();
         $('#attendance').html(data);
         $('#edit-user-modal').modal('hide');
+        $('#snackbar').fadeIn();
+        setTimeout(function() {
+          $('#snackbar').fadeOut();
+      }, 2000);
     });
 }
 

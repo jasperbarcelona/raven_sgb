@@ -4,6 +4,9 @@ initial_data();
 searchStatus = 'off'
 
 $('.loading').hide();
+$('.add-user-footer-left').hide();
+$('#snackbar').hide();
+
 $('tbody').css('overflow-y','scroll');
 
 $(window).load(function() {
@@ -109,7 +112,7 @@ $('.add-user-modal-body .form-control').on('change', function () {
     if (($('#add_last_name').val() != "") && ($('#add_first_name').val() != "") && ($('#add_middle_name').val() != "") && 
         (re.test($('#add_last_name').val())) && (re.test($('#add_first_name').val())) && (re.test($('#add_middle_name').val()))&& 
         ($('#add_level').val() != null) && ($('#add_section').val() != null) && ($('#add_contact').val() != null) &&
-        (!isNaN($('#add_contact').val())) &&  ($('#add_contact').val().length == 11) ){
+        (!isNaN($('#add_contact').val())) &&  ($('#add_contact').val().length == 11) && ($('#id-error').text().length == 0) ){
         $('#save-user').removeAttr('disabled'); 
     }
     else{
@@ -122,7 +125,7 @@ $('.add-user-modal-body .form-control').on('keyup', function () {
     if (($('#add_last_name').val() != "") && ($('#add_first_name').val() != "") && ($('#add_middle_name').val() != "") && 
         (re.test($('#add_last_name').val())) && (re.test($('#add_first_name').val())) && (re.test($('#add_middle_name').val()))&& 
         ($('#add_level').val() != null) && ($('#add_section').val() != null) && ($('#add_contact').val() != null) &&
-        (!isNaN($('#add_contact').val())) &&  ($('#add_contact').val().length == 11) ){
+        (!isNaN($('#add_contact').val())) &&  ($('#add_contact').val().length == 11) && ($('#id-error').text().length == 0) ){
         $('#save-user').removeAttr('disabled'); 
     }
     else{
@@ -131,6 +134,10 @@ $('.add-user-modal-body .form-control').on('keyup', function () {
 });
 
 $('#save-user').on('click', function(){
+    $('#save-user').attr('disabled',true);
+    $('#save-user span').css({'display':'none'});
+    $('#save-user').css({'background-image':'url(../static/images/white.GIF)','background-repeat': 'no-repeat','background-position': 'center'});
+
     var last_name = $('#add_last_name').val();
     var first_name = $('#add_first_name').val();
     var middle_name = $('#add_middle_name').val();

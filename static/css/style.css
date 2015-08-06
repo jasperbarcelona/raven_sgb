@@ -87,9 +87,45 @@ textarea:focus{
 }
 
 #message-status-modal .modal-body{
-	height: 80px;
+	height: 100px;
 	padding-left: 30px;
 	box-shadow:inset 0px 0px 10px 0px rgba(0,0,0,0.3);
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: column;
+	flex-direction: column;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+}
+
+.status-success{
+	color: #4485F5;
+	font-size: 42px;
+	float: left;
+}
+
+.save-status-success{
+	color: #4485F5;
+	font-size: 28px;
+}
+
+.save-status-message{
+	margin-left: 5px;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+#snackbar{
+	position: absolute;
+	bottom: 25px;
+	right: calc(2.5% + 33px);
+	z-index: 950;
+	height: 75px;
+	width: 220px;
+	background-color: #4485F5;
+	color: #FFFFFF;
 	display: -webkit-flex;
 	display: flex;
 	-webkit-flex-direction: row;
@@ -98,22 +134,40 @@ textarea:focus{
 	align-items: center;
 }
 
-.status-success{
-	color: #80D580;
+.snackbar-status{
+	font-size: 50px;
+	margin-left: 10px;
 	margin-right: 10px;
-	font-size: 32px;
+}
+
+.snackbar-status-message{
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.add-user-footer-left{
+	width: 50%;
+	height: 35px;
 	float: left;
+	text-align: left;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
 }
 
 .status-error{
 	color: #CD3D2D;
-	margin-right: 10px;
-	font-size: 32px;
+	font-size: 42px;
 	float: left;
 }
 
 .status-message{
-	font-size: 16px;
+	font-size: 22px;
 }
 
 .message-modal-body{
@@ -200,8 +254,8 @@ textarea:focus{
 	margin-bottom: 0px;
 }
 
-/*::-webkit-scrollbar {
-    width: 14px;
+::-webkit-scrollbar {
+    width: 13px;
 }
 
 ::-webkit-scrollbar-track {
@@ -213,7 +267,7 @@ textarea:focus{
 	background-color: #F6F4F2;
 	border-radius: 10px;
     -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.5); 
-}*/
+}
 
 .time-label{
 	margin-bottom: 5px;
@@ -295,6 +349,10 @@ textarea:focus{
 	width: 80px;
 }
 
+.cancel-btn{
+	width: 80px;
+}
+
 
 #compose-btn:focus{
 	outline: none;
@@ -372,6 +430,7 @@ textarea:focus{
 	align-items: center;
 	-webkit-justify-content: center;
 	justify-content: center;
+	z-index: 900;
 }
 
 #table-loading{

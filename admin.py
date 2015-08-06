@@ -767,7 +767,7 @@ def blast_message():
                                  args=[message, user.parent_contact, SMS_URL])
         blast_thread.start()
     
-    return flask.render_template('status.html', status='Success')
+    return flask.render_template('status.html', status='Message Sent')
 
 
 @app.route('/sync',methods=['GET','POST'])
@@ -805,7 +805,15 @@ def add_user():
     db.session.add(user)
     db.session.commit()
 
-    return '', 201
+    session['attendance_limit'] = 0
+    
+    session['attendance_search_limit'] = 100
+
+    data = fetch_next('attendance',0)
+
+    # prepare()
+
+    return flask.render_template('attendance.html', data=data, limit=0)
 
 
 @app.route('/user/edit',methods=['GET','POST'])
@@ -985,6 +993,17 @@ def change_sched():
 
     db.session.commit()
     return redirect('/')
+
+
+@app.route('/id/validate',methods=['GET','POST'])
+def validate_id():
+    id_no = flask.request.form.get('id_no')
+    student = Student.query.filter_by(id_no=id_no).first()
+    if student != None:
+        error = 1
+    else:
+        error = 0
+    return flask.render_template('validate_id.html',error=error,id_no=id_no)
 
 
 @app.route('/favicon.ico',methods=['GET','POST'])

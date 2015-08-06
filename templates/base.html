@@ -24,10 +24,14 @@
                 <div id="search-loading" class="loading">
                         <img src="../static/images/282.GIF">
                 </div>
+                <div id="snackbar">
+                        <span class="glyphicon glyphicon-ok-sign snackbar-status"></span>
+                        <span class="snackbar-status-message">Changes Saved</span>
+                </div>
                 <div class="container">
                         <div id="tabs">
                                 <ul class="nav nav-tabs">
-                                        {% if tab == 'logs' %}
+                                        {% if tab == 'logs' or view=='faculty' %}
                                         <li class="active">
                                         {% else %}
                                         <li>
@@ -100,7 +104,7 @@
                                                 </div>
                                                 <div class="modal-footer">
                                                         <input disabled  value="Remaining: 420" id="counter">
-                                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                                                        <button type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Cancel</button>
                                                         <button id="send" type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirm-modal" disabled>Send</button>
                                                 </div>
                                         </div><!-- /.modal-content -->
@@ -115,7 +119,7 @@
                                                 </div>
                                                 <div class="modal-footer">
                                                         <input type="password" id="message-confirm-password" class="form-control" placeholder="Re-enter password" />
-                                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                                                        <button type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Cancel</button>
                                                         <button type="button" id="confirm-send" class="btn btn-primary" onclick="blast_message()" disabled>Send</button>
                                                 </div>
                                         </div><!-- /.modal-content -->
@@ -125,7 +129,11 @@
                         <div class="modal fade" id="message-status-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
                                 <div class="modal-dialog status-modal-dialog">
                                         <div class="modal-content">
-                                                <div id="status-modal-body" class="modal-body"></div>                     
+                                                <div id="status-modal-body" class="modal-body">
+                                                        <center>
+                                                                <img src="../static/images/282.GIF">
+                                                        </center>
+                                                </div>                     
                                         </div><!-- /.modal-content -->
                                 </div><!-- /.modal-dialog -->
                         </div>
@@ -163,10 +171,17 @@
                                                                 {% endfor %}
                                                         </select><br />
                                                         <input type="text" class="form-control" id="add_contact" placeholder="Parent Contact Number" /><br />
-                                                        <input type="text" class="form-control" id="add_id_no" placeholder="ID Number" /><br />
+                                                        <input type="text" class="form-control" id="add_id_no" placeholder="ID Number" oninput="validate_id(this.value)" />
+                                                        <br />
+                                                        <span id="id-error"></span>
                                                 </div>
                                                 <div class="modal-footer add-user-modal-footer">
-                                                        <button id = "add-user-cancel" type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                                                        <div class="add-user-footer-left">
+                                                                <span class="glyphicon glyphicon-ok-sign save-status-success"></span>
+                                                                <span class="save-status-message">Saved</span>
+                                                        </div>
+
+                                                        <button id = "add-user-cancel" type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Cancel</button>
                                                         <button id="save-user" type="button" class="btn btn-primary done-btn" disabled><span>Save</span></button>
                                                 </div>
                                         </div><!-- /.modal-content -->
@@ -301,7 +316,7 @@
                                                         </div>
                                                 </div>
                                                 <div class="modal-footer">
-                                                        <button type="button" id="sched-cancel" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                                                        <button type="button" id="sched-cancel" class="btn btn-danger cancel-btn" data-dismiss="modal">Cancel</button>
                                                         <button id="save-sched" type="button" class="btn btn-primary" data-toggle="modal" disabled><span>Save Changes</span></button>
                                                 </div>
                                         </div><!-- /.modal-content -->
