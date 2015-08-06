@@ -145,7 +145,6 @@ function search_attendance(){
   var lates = $('#attendance_search_lates').val();
   var reset = 'yes';
 
-  $('#search-loading').show();
   $.post('/search/attendance',{
       needed:tab,
       last_name:last_name,
@@ -204,8 +203,7 @@ function search_logs(){
   var level = $('#log_search_level').val();
   var section = $('#log_search_section').val();
   var reset = 'yes';
-
-  $('#search-loading').show();
+  
   $.post('/search/logs',{
       needed:tab,
       date:date,
@@ -253,7 +251,6 @@ function search_absent(){
   var section = $('#absent_search_section').val();
   var reset = 'yes';
 
-  $('#search-loading').show();
   $.post('/search/absent',{
       needed:tab,
       date:date,
@@ -300,7 +297,6 @@ function search_late(){
   var section = $('#late_search_section').val();
   var reset = 'yes';
 
-  $('#search-loading').show();
   $.post('/search/late',{
       needed:tab,
       date:date,

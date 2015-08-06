@@ -142,34 +142,42 @@ $('#save-user').on('click', function(){
 });
 
 $('.search-attendance').donetyping(function(){
+    $('#search-loading').show();
     search_attendance()
 });
 
 $('.search-attendance').on('change', function(){
+    $('#search-loading').show();
     search_attendance()
 });
 
 $('.search-logs').donetyping(function(){
+    $('#search-loading').show();
     search_logs()
 });
 
 $('.search-logs').on('change', function(){
+    $('#search-loading').show();
     search_logs()
 });
 
 $('.search-absent').donetyping(function(){
+    $('#search-loading').show();
     search_absent()
 });
 
 $('.search-absent').on('change', function(){
+    $('#search-loading').show();
     search_absent()
 });
 
 $('.search-late').donetyping(function(){
+    $('#search-loading').show();
     search_late()
 });
 
 $('.search-late').on('change', function(){
+    $('#search-loading').show();
     search_late()
 });
 
