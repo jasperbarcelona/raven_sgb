@@ -18,6 +18,12 @@
                 <div id="intro-container">
                         <div id="intro"></div>
                 </div>
+                <div id="table-loading" class="loading">
+                        <img src="../static/images/282.GIF">
+                </div>
+                <div id="search-loading" class="loading">
+                        <img src="../static/images/282.GIF">
+                </div>
                 <div class="container">
                         <div id="tabs">
                                 <ul class="nav nav-tabs">
@@ -59,7 +65,7 @@
                                                 <button class="btn" id="add-user-btn" data-toggle="modal" data-target="#add-user-modal"><span class="glyphicon glyphicon-plus"></span></button>
                                                 <button id="compose-btn" class="buttons btn" data-toggle="modal" data-target="#message-modal"><span class="glyphicon glyphicon-pencil"></span></button>
                                                 <a href="#"><button id="search-btn" class="buttons btn"><span class="glyphicon glyphicon-search"></span></button></a>
-                                                <a href="/"><button id="refresh-btn" class="buttons btn"><span class="glyphicon glyphicon-repeat"></span></button></a>
+                                                <a><button id="refresh-btn" class="buttons btn" onclick="back_home()"><span class="glyphicon glyphicon-repeat"></span></button></a>
 
                                                 <div class="btn-group">
                                                         <button id="settings-btn" type="button" class="btn buttons dropdown-toggle" data-toggle="dropdown" aria-expanded="false">

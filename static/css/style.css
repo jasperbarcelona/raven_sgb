@@ -267,8 +267,9 @@ textarea:focus{
 }
 
 .container{
-	width: 98%;
+	width: 95%;
 	min-width: 800px;
+	padding: 0 !important;
 }
 
 .button-container{
@@ -354,6 +355,33 @@ textarea:focus{
 	padding-top: 20% !important;
 }
 
+.loading{
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	background-color: #FFFFFF;
+	width: 95%;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+}
+
+#table-loading{
+	height: calc(100% - 108px);
+}
+
+#search-loading{
+	height: calc(100% - 178px);
+}
+
 #intro{
 	position: absolute;
 	bottom: 0;
@@ -381,7 +409,7 @@ textarea:focus{
 
 tbody{
 	display:block;
-	overflow: scroll;
+	overflow: hidden;
 	overflow-x:hidden;
 	background-color: #FFFFFF;
 }
@@ -439,6 +467,10 @@ td .form-control{
 .search-panel td{
 	padding-left: 2px !important;
 	padding-right: 2px !important;
+}
+
+.search-panel{
+	background-color: #FFFFFF;
 }
 
 .attendance-count{

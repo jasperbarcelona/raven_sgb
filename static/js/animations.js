@@ -3,8 +3,11 @@ $(document).ready(function(){
 initial_data();
 searchStatus = 'off'
 
+$('.loading').hide();
+$('tbody').css('overflow-y','scroll');
+
 $(window).load(function() {
-    $('#intro').delay(3000).fadeOut();
+    $('#intro').fadeOut();
 });
 
 $('.search-panel').hide();
@@ -95,11 +98,6 @@ $('#search-btn').on('click', function () {
         back_home()
     }
     
-});
-
-$('#refresh-btn').on('click', function(){
-    $('#refresh-btn span').css({'display':'none'});
-    $('#refresh-btn').css({'background-image':'url(../static/images/preloader_gray.png)','background-repeat': 'no-repeat','background-position': 'center'});
 });
 
 $('#save-sched').on('click', function(){
