@@ -453,6 +453,16 @@ textarea:focus{
 	/*display: none;*/
 }
 
+#intro-mask{
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	z-index: 970;
+	height: 100%;
+	width: 100%;
+	background-color: #FFFFFF;
+}
+
 .searchbox{
 	width: 280px;
 	height: 32px;

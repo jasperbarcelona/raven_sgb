@@ -10,6 +10,7 @@ $('#snackbar').hide();
 $('tbody').css('overflow-y','scroll');
 
 $(window).load(function() {
+    $('#intro-mask').hide();
     $('#intro').fadeOut();
 });
 
