@@ -171,7 +171,7 @@ function search_attendance(){
   function(data){
       $('#'+tab).html(data);
   });
-  /*$('#search-loading').hide();*/
+  $('#search-loading').hide();
 }
 
 function attendance_next_search(){
