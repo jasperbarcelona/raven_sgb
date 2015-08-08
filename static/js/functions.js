@@ -22,6 +22,7 @@ function change_tab(page){
 }
 
 function validate_id(id_no){
+  $('#id-error img').show();
   $.post('/id/validate',{
         id_no:id_no,
     },

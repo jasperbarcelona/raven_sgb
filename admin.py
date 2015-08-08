@@ -271,7 +271,7 @@ def authenticate_user(school_id, password):
     return True
 
 
-def mark_all_absent(school_id,api_key):
+def mark_morning_absent(school_id,api_key):
     all_students = Student.query.filter_by(school_id=school_id).all()
 
     for student in all_students:
@@ -297,12 +297,16 @@ def mark_all_absent(school_id,api_key):
             db.session.commit()
 
 
-def mark_specific_absent(school_id,id_no):
-    student = Student.query.filter_by(school_id=school_id,id_no=id_no).first()
-    absent = Absent(
+def mark_afternoon_absent(school_id,api_key):
+    all_students = Student.query.filter_by(school_id=school_id).all()
+
+    for student in all_students:
+        logged = Log.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no).order_by(Log.timestamp.desc()).first()
+        if not logged or logged.time_out != 'None':
+            absent = Absent(
             school_id=school_id,
             date=time.strftime("%B %d, %Y"),
-            id_no=id_no,
+            id_no=student.id_no,
             name=student.last_name+', '+\
                          student.first_name+' '+\
                          student.middle_name[:1]+'.',
@@ -311,11 +315,32 @@ def mark_specific_absent(school_id,id_no):
             department=student.department,
             timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
             )
-    db.session.add(absent)
-    db.session.commit()
 
-    student.absences=Absent.query.filter_by(id_no=id_no, school_id=school_id).count()
-    db.session.commit()
+            db.session.add(absent)
+            db.session.commit()
+
+            student.absences=Absent.query.filter_by(id_no=student.id_no, school_id=school_id).count()
+            db.session.commit()
+
+# def mark_specific_absent(school_id,id_no):
+#     student = Student.query.filter_by(school_id=school_id,id_no=id_no).first()
+#     absent = Absent(
+#             school_id=school_id,
+#             date=time.strftime("%B %d, %Y"),
+#             id_no=id_no,
+#             name=student.last_name+', '+\
+#                          student.first_name+' '+\
+#                          student.middle_name[:1]+'.',
+#             level=student.level,
+#             section=student.section,
+#             department=student.department,
+#             timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+#             )
+#     db.session.add(absent)
+#     db.session.commit()
+
+#     student.absences=Absent.query.filter_by(id_no=id_no, school_id=school_id).count()
+#     db.session.commit()
 
 
 def check_if_late(school_id,api_key,id_no,name,level,section,
@@ -337,34 +362,30 @@ def check_if_late(school_id,api_key,id_no,name,level,section,
     afternoon_start = eval(query+'_afternoon_start')
     afternoon_end = eval(query+'_afternoon_end')
 
-    print 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-    print 'time now: ' + time_now
-    print 'morning_start: ' + morning_start
-    print 'morning_end: ' + morning_end
-    
-    # if (parse_date(time_now) >= parse_date(morning_start) and parse_date(time_now) < parse_date(morning_end)) or \
-    #    (parse_date(time_now) >= parse_date(afternoon_start) and parse_date(time_now) < parse_date(afternoon_end)):
+    if ((parse_date(time_now) >= parse_date(morning_start) and parse_date(time_now) < parse_date(morning_end)) or \
+        (parse_date(time_now) >= parse_date(afternoon_start) and parse_date(time_now) < parse_date(afternoon_end))) and\
+        Absent.query.filter_by(school_id=school_id,id_no=id_no,date=date).first() == None:
 
-    #     record_as_late(school_id, id_no, name, level, section, 
-    #                    date, department, time, military_time)
+        record_as_late(school_id, id_no, name, level, section, 
+                       date, department, time, military_time)
 
-    if (parse_date(time_now) >= parse_date(morning_start) and\
-        parse_date(time_now) < parse_date(morning_end)):
+    # if (parse_date(time_now) >= parse_date(morning_start) and\
+    #     parse_date(time_now) < parse_date(morning_end)):
 
-        if str(parse_date(time_now) - parse_date(morning_start)) > '1:00:00':
-            mark_specific_absent(school_id,id_no)
-        else:
-            record_as_late(school_id, id_no, name, level, section, 
-                        date, department, time, military_time)
+    #     if str(parse_date(time_now) - parse_date(morning_start)) > '1:00:00':
+    #         mark_specific_absent(school_id,id_no)
+    #     else:
+    #         record_as_late(school_id, id_no, name, level, section, 
+    #                     date, department, time, military_time)
 
-    elif (parse_date(time_now) >= parse_date(afternoon_start) and\
-        parse_date(time_now) < parse_date(afternoon_end)):
+    # elif (parse_date(time_now) >= parse_date(afternoon_start) and\
+    #     parse_date(time_now) < parse_date(afternoon_end)):
 
-        if str(parse_date(time_now) - parse_date(afternoon_start)) > parse_date('1:00:00'):
-            mark_specific_absent(school_id,id_no)
-        else:
-            record_as_late(school_id, id_no, name, level, section, 
-                        date, department, time, military_time)
+    #     if str(parse_date(time_now) - parse_date(afternoon_start)) > parse_date('1:00:00'):
+    #         mark_specific_absent(school_id,id_no)
+    #     else:
+    #         record_as_late(school_id, id_no, name, level, section, 
+    #                     date, department, time, military_time)
 
 
 def record_as_late(school_id, id_no, name, level, section, 
@@ -549,6 +570,45 @@ def search_late(*args, **kwargs):
     return eval(query)
 
 
+def get_latest_schedule(api_key):
+    school = School.query.filter_by(api_key=api_key).first()
+
+    if school == None:
+        return {
+            'status': 'Failed',
+            'message': 'School not found',
+            }
+
+    primary_morning_start = school.primary_morning_start
+    junior_morning_start = school.junior_morning_start
+    senior_morning_start = school.senior_morning_start
+
+    primary_afternoon_start = school.primary_afternoon_start
+    junior_afternoon_start = school.junior_afternoon_start
+    senior_afternoon_start = school.senior_afternoon_start
+
+
+    if (primary_morning_start > junior_morning_start) and (primary_morning_start > senior_morning_start):
+        morning_time = primary_morning_start
+    elif (junior_morning_start > primary_morning_start) and (junior_morning_start > senior_morning_start):
+        morning_time = junior_morning_start
+    else:
+        morning_time = senior_morning_start
+
+    if (primary_afternoon_start > junior_afternoon_start) and (primary_afternoon_start > senior_afternoon_start):
+        afternoon_time = primary_afternoon_start
+    elif (junior_afternoon_start > primary_afternoon_start) and (junior_afternoon_start > senior_afternoon_start):
+        afternoon_time = junior_afternoon_start
+    else:
+        afternoon_time = senior_afternoon_start
+
+    return {
+        'status': 'success',
+        'morning_time': morning_time,
+        'afternoon_time': afternoon_time
+        }
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if not session:
@@ -650,18 +710,27 @@ def change_view():
     return redirect('/')
 
 
-@app.route('/markabsent', methods=['GET', 'POST'])
-def mark_absent():
+@app.route('/absent/morning/mark', methods=['GET', 'POST'])
+def mark_absent_morning():
     school_id = flask.request.form.get('school_id')
     api_key = flask.request.form.get('api_key')
 
     if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
-        return SWJsonify({
-                        'Status': '500',
-                        'Message': 'Unauthorized'
-                    }), 500
+        return primary_morning_start
 
-    mark_all_absent(school_id,api_key)
+    mark_morning_absent(school_id,api_key)
+    return '',201
+
+
+@app.route('/absent/afternoon/mark', methods=['GET', 'POST'])
+def mark_absent_afternoon():
+    school_id = flask.request.form.get('school_id')
+    api_key = flask.request.form.get('api_key')
+
+    if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
+        return primary_morning_start
+
+    mark_afternoon_absent(school_id,api_key)
     return '',201
 
 
@@ -718,8 +787,8 @@ def add_log():
 
     if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
         return SWJsonify({
-                        'Status': '500',
-                         'Message': 'Unauthorized'
+                        'status': 'Fail',
+                         'message': 'Unauthorized'
                     }), 500
 
     id_no = flask.request.form.get('id_no')
@@ -740,16 +809,16 @@ def add_log():
         log_thread.start()     
 
         return SWJsonify({
-                        'Status': '201',
-                         'Message': 'Looged In'
+                        'status': '201',
+                         'message': 'Looged In'
                     }), 201
 
     log_thread = threading.Thread(target=time_out,args=[id_no, time])
     log_thread.start()      
 
     return SWJsonify({
-                        'Status': '201',
-                         'Message': 'Looged Out'
+                        'status': '201',
+                         'message': 'Looged Out'
                     }), 201
 
 
@@ -1011,6 +1080,11 @@ def est():
     return '',204
 
 
+@app.route('/schedule/sync',methods=['GET','POST'])
+def sync_schedule():
+    api_key = flask.request.args.get('api_key')
+    return jsonify(get_latest_schedule(api_key)),200
+
 @app.route('/db/rebuild', methods=['GET', 'POST'])
 def rebuild_database():
     db.drop_all()
@@ -1106,7 +1180,7 @@ def rebuild_database():
     db.session.add(e)
     db.session.add(f)
     db.session.commit()
-    return SWJsonify({'Status': 'Database Rebuild Success'})
+    return SWJsonify({'status': 'Database Rebuild Success'})
 
 # @app.route('/db/rebuild', methods=['GET', 'POST'])
 # def rebuild_database():
@@ -1189,7 +1263,7 @@ def rebuild_database():
 #     db.session.add(e)
 #     db.session.add(f)
 #     db.session.commit()
-#     return SWJsonify({'Status': 'Database Rebuild Success'})
+#     return SWJsonify({'status': 'Database Rebuild Success'})
 
 
 if __name__ == '__main__':
