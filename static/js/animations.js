@@ -6,7 +6,7 @@ searchStatus = 'off'
 $('.loading').hide();
 $('.add-user-footer-left').hide();
 $('#snackbar').hide();
-$('#id-error img').hide();
+$('#id-loader').hide();
 
 $('tbody').css('overflow-y','scroll');
 

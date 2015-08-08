@@ -22,12 +22,13 @@ function change_tab(page){
 }
 
 function validate_id(id_no){
-  $('#id-error img').show();
+  $('#id-loader').show();
   $.post('/id/validate',{
         id_no:id_no,
     },
     function(data){
         $('#id-error').html(data);
+        $('#id-loader').hide();
     });
 }
 
