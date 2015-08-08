@@ -22,6 +22,7 @@ function change_tab(page){
 }
 
 function validate_id(id_no){
+  $('#id-error').hide();
   $('#id-loader').show();
   $.post('/id/validate',{
         id_no:id_no,
@@ -29,6 +30,7 @@ function validate_id(id_no){
     function(data){
         $('#id-error').html(data);
         $('#id-loader').hide();
+        $('#id-error').show();
     });
 }
 
