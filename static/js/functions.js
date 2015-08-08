@@ -1,4 +1,5 @@
 tab = $('#tab').val();
+is_done = true;
 
 if (tab == 'attendance'){
     $('#add-user-btn').show();
@@ -174,8 +175,9 @@ function search_attendance(){
   },
   function(data){
       $('#'+tab).html(data);
+      $('#search-loading').hide();
+      is_done = true
   });
-  $('#search-loading').hide();
 }
 
 function attendance_next_search(){
@@ -229,9 +231,10 @@ function search_logs(){
   },
   function(data){
       $('#'+tab).html(data);
-      isPreviousEventComplete = true;
+      $('#search-loading').hide();
+      is_done = true
+      isPreviousEventComplete = true
   });
-  $('#search-loading').hide();
 }
 
 function logs_next_search(){
@@ -276,8 +279,9 @@ function search_absent(){
   },
   function(data){
       $('#'+tab).html(data);
+      $('#search-loading').hide();
+      is_done = true
   });
-  $('#search-loading').hide();
 }
 
 function absent_next_search(){
@@ -322,8 +326,9 @@ function search_late(){
   },
   function(data){
       $('#'+tab).html(data);
+      $('#search-loading').hide();
+      is_done = true
   });
-  $('#search-loading').hide();
 }
 
 function late_next_search(){
@@ -444,6 +449,14 @@ function edit_user(last_name, first_name, middle_name, level, section, contact, 
           $('#snackbar').fadeOut();
       }, 2000);
     });
+}
+
+function show_search_load(){
+  if (is_done == true){
+  console.log('showing');
+  $('#search-loading').show();
+  is_done = false
+  }
 }
 
 

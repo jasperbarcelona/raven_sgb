@@ -152,43 +152,39 @@ $('#save-user').on('click', function(){
     save_user(last_name, first_name, middle_name, level, section, contact, id_no);
 });
 
+$('.search-text').on('keyup', function(){
+    show_search_load();
+});
+
 $('.search-attendance').donetyping(function(){
-    $('#search-loading').show();
     search_attendance()
 });
 
 $('.search-attendance').on('change', function(){
-    $('#search-loading').show();
     search_attendance()
 });
 
 $('.search-logs').donetyping(function(){
-    $('#search-loading').show();
     search_logs()
 });
 
 $('.search-logs').on('change', function(){
-    $('#search-loading').show();
     search_logs()
 });
 
 $('.search-absent').donetyping(function(){
-    $('#search-loading').show();
     search_absent()
 });
 
 $('.search-absent').on('change', function(){
-    $('#search-loading').show();
     search_absent()
 });
 
 $('.search-late').donetyping(function(){
-    $('#search-loading').show();
     search_late()
 });
 
 $('.search-late').on('change', function(){
-    $('#search-loading').show();
     search_late()
 });
 
