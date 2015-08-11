@@ -128,12 +128,11 @@ $('.add-user-modal-body .form-control').on('keyup', function () {
     if (($('#add_last_name').val() != "") && ($('#add_first_name').val() != "") && ($('#add_middle_name').val() != "") && 
         (re.test($('#add_last_name').val())) && (re.test($('#add_first_name').val())) && (re.test($('#add_middle_name').val())) && 
         ($('#add_level').val() != null) && ($('#add_section').val() != null) && ($('#add_contact').val() != null) &&
-        (!isNaN($('#add_contact').val())) && ($('#add_contact').val().length == 11) && ($('#id-error').text().length == 0)  &&
-        ($('#add_id_no').val().length == 10)){
-        $('#save-user').removeAttr('disabled'); 
+        (!isNaN($('#add_contact').val())) && ($('#add_contact').val().length == 11)){
+        validate_user_form(true);
     }
     else{
-        $('#save-user').attr('disabled',true);
+        validate_user_form(false);
     }
 });
 

@@ -1,5 +1,7 @@
 tab = $('#tab').val();
 is_done = true;
+form_validated = false
+id_no_validated = false
 
 if (tab == 'attendance'){
     $('#add-user-btn').show();
@@ -7,6 +9,31 @@ if (tab == 'attendance'){
   else{
     $('#add-user-btn').hide();
   }
+
+function validate_user_form(status){
+  form_validated = status;
+  if ((form_validated == true) && (id_no_validated == true)){
+    $('#save-user').removeAttr('disabled');
+  }
+  else{
+    $('#save-user').attr('disabled',true);
+  }
+}
+
+function validate_id_no(){
+  if (($('#id-error').text().length == 0) && ($('#add_id_no').val().length == 10)){
+    id_no_validated = true;
+  }
+  else{
+    id_no_validated = false;
+  }
+  if ((form_validated == true) && (id_no_validated == true)){
+    $('#save-user').removeAttr('disabled');
+  }
+  else{
+    $('#save-user').attr('disabled',true);
+  }
+}
 
 function change_tab(page){
   tab = page;
@@ -32,6 +59,7 @@ function validate_id(id_no){
         $('#id-error').html(data);
         $('#id-loader').hide();
         $('#id-error').show();
+        validate_id_no();
     });
 }
 
