@@ -15,7 +15,6 @@ var isPreviousEventComplete = true;
         }
     }
 });*/
-
 $('tbody').scroll(function () {
         var $this = jQuery(this);
         if ($this.data('activated')) return false;  // Pending, return

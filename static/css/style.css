@@ -14,8 +14,7 @@ body{
 	width: 100%;
 	color: #494949 !important;
 	font-family: OpenSans, sans-serif;
-	background-image: url('../images/footer_lodyas.png');
-	background-repeat: repeat;
+	background-color: #242424;
 }
 
 span:hover{
@@ -56,9 +55,25 @@ textarea:focus{
 #add-user-btn{
 	background-color: transparent;
 	color: #FFFFFF;
-	height: 30px;	
-	font-size: 20px;
-	padding-top: 2px;
+	height: 30px;
+	width: 50px;
+	padding-top: 0px;
+}
+
+.md-28{
+	font-size: 42px !important;
+}
+
+.md-30{
+	font-size: 30px !important;
+}
+
+.md-42{
+	font-size: 42px !important;
+}
+
+.md-50{
+	font-size: 38px !important;
 }
 
 #add-user-btn:focus{
@@ -89,7 +104,6 @@ textarea:focus{
 #message-status-modal .modal-body{
 	height: 100px;
 	padding-left: 30px;
-	box-shadow:inset 0px 0px 10px 0px rgba(0,0,0,0.3);
 	display: -webkit-flex;
 	display: flex;
 	-webkit-flex-direction: column;
@@ -108,13 +122,11 @@ textarea:focus{
 
 .save-status-success{
 	color: #4485F5;
-	font-size: 28px;
+	margin-top: -2px;
 }
 
 .save-status-message{
-	margin-left: 5px;
 	font-size: 16px;
-	font-weight: bold;
 }
 
 #snackbar{
@@ -123,26 +135,21 @@ textarea:focus{
 	right: calc(2.5% + 33px);
 	z-index: 950;
 	height: 75px;
-	width: 220px;
+	width: 210px;
 	background-color: #4485F5;
 	color: #FFFFFF;
 	display: -webkit-flex;
 	display: flex;
-	-webkit-flex-direction: row;
-	flex-direction: row;
+	-webkit-flex-direction: column;
+	flex-direction: column;
 	-webkit-align-items: center;
 	align-items: center;
-}
-
-.snackbar-status{
-	font-size: 50px;
-	margin-left: 10px;
-	margin-right: 10px;
+	-webkit-justify-content: center;
+	justify-content: center;
 }
 
 .snackbar-status-message{
 	font-size: 16px;
-	font-weight: bold;
 }
 
 .add-user-footer-left{
@@ -162,12 +169,11 @@ textarea:focus{
 
 .status-error{
 	color: #CD3D2D;
-	font-size: 42px;
 	float: left;
 }
 
 .status-message{
-	font-size: 22px;
+	font-size: 16px;
 }
 
 .message-modal-body{
@@ -180,6 +186,10 @@ textarea:focus{
 }
 
 .message-modal-header{
+	padding-left: 10px !important;
+}
+
+.modal-header{
 	height: 40px;
 	background-color: #4485F5;
 	border-top-left-radius: 5px;
@@ -297,6 +307,10 @@ textarea:focus{
 	padding: 20px;
 }
 
+.modal-header, .modal-footer, .modal-content{
+	border-radius: 0px !important;
+}
+
 .message-modal-dialog{
 	width: 500px;
 }
@@ -308,7 +322,7 @@ textarea:focus{
 
 #message-confirm-password{
 	float: left;
-	width: 200px;
+	width: 180px;
 }
 
 .brand::first-letter{
@@ -331,13 +345,20 @@ textarea:focus{
 }
 
 .btn{
+	border-radius: 0px !important;
 	height: 35px;
 }
 
-.buttons{	
+.buttons{
+	margin-top: 2px;
+	color: #FFFFFF !important;
+	background-color: #494949 !important;
+	border-radius: 0px;
 	height: 30px;
 	width: 70px;	
 	font-size: 16px;
+	margin-left: 1px !important;
+	margin-right: 1px !important;
 	padding:4px;
 }
 
@@ -349,10 +370,17 @@ textarea:focus{
 	width: 80px;
 }
 
+.done-btn:focus{
+	outline: none !important;
+}
+
 .cancel-btn{
 	width: 80px;
 }
 
+.cancel-btn:focus{
+	outline: none !important;
+}
 
 #compose-btn:focus{
 	outline: none;
@@ -396,7 +424,8 @@ textarea:focus{
 }
 
 #compose-btn{
-	background-color: #4485F5;
+	background-color: #4485F5 !important;
+	height: 30px;
 	color: #FFFFFF;
 }
 
@@ -420,7 +449,7 @@ textarea:focus{
 	right: 0;
 	margin-left: auto;
 	margin-right: auto;
-	background-color: #FFFFFF;
+	background-color: #F5F5F5;
 	width: 95%;
 	display: -webkit-flex;
 	display: flex;
@@ -441,6 +470,24 @@ textarea:focus{
 	height: calc(100% - 178px);
 }
 
+#student-info-loading{
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	background-color: #FFFFFF;
+	z-index: 1000;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+}
+
 #intro{
 	position: absolute;
 	bottom: 0;
@@ -448,7 +495,7 @@ textarea:focus{
 	z-index: 1000;
 	height: 100%;
 	width: 100%;
-	background-image: url('../images/footer_lodyas.png');
+	background-image: url('../images/assets/footer_lodyas.png');
 	background-repeat: repeat;
 	/*display: none;*/
 }
@@ -473,14 +520,14 @@ textarea:focus{
 }
 
 #tabs{
-	margin-top: 30px;
+	margin-top: 10px;
 }
 
 tbody{
 	display:block;
 	overflow: hidden;
 	overflow-x:hidden;
-	background-color: #FFFFFF;
+	background-color: #F5F5F5;
 }
 
 thead{
@@ -491,7 +538,11 @@ thead{
 tbody tr {
     display:table;
     width: calc(100% + 13px);
-    background-color: #FFFFFF;
+    background-color: #F1F1F1;
+}
+
+tbody tr:nth-child(odd) {
+	background-color: #F8F8F8;
 }
 
 .tab-pane{
@@ -539,7 +590,7 @@ td .form-control{
 }
 
 .search-panel{
-	background-color: #FFFFFF;
+	background-color: #F1F1F1;
 }
 
 .attendance-count{
@@ -596,11 +647,11 @@ td{
 
 .rows:hover{
 	cursor: pointer;
-	background-color: #E5E5E5;
+	background-color: #DCDBDB!important;
 }
 
 table.table thead tr th, table.table tfoot tr th {
-	background-color: #494949;
+	background: #494949;	
 	color: #ffffff;
 }
 
@@ -612,7 +663,12 @@ table.table thead tr th, table.table tfoot tr th {
 .nav-tabs li .tab-item{
 	color: #FFFFFF;
 	font-weight: bold;
+	border-radius: 0px;
 	border: none !important;
+}
+
+.nav-tabs li .tab-item:hover{
+	background-color: #6D6D6D;
 }
 
 .nav-tabs > li.active > a,
@@ -620,7 +676,7 @@ table.table thead tr th, table.table tfoot tr th {
 .nav-tabs > li.active > a:focus{
           color: #FFFFFF;
           cursor: default;
-          background-color: #494949;
+          background-color: #494949;	
           border: 1px solid #dddddd;
           border-bottom-color: transparent;
           outline: none;

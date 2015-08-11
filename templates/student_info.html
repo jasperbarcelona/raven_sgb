@@ -1,8 +1,11 @@
-<div class="modal-header message-modal-header">
+<div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">Student Information</h4>
 </div>
 <div class="modal-body edit-user-modal-body">
+        <div id="student-info-loading">
+            <img src="../static/images/assets/282.GIF">
+        </div>
         <input type="text" class="form-control" id="edit_last_name" placeholder="Last Name" value="{{student.last_name}}" /><br />
         <input type="text" class="form-control" id="edit_first_name" placeholder="First Name" value="{{student.first_name}}"/><br />
         <input type="text" class="form-control" id="edit_middle_name" placeholder="Middle Name" value="{{student.middle_name}}"/><br />
@@ -38,6 +41,9 @@
 </div>
 
 <script type="text/javascript">
+
+$('#student-info-loading').hide();
+
 $('.edit-user-modal-body .form-control').on('keyup', function () {
 var re = /[A-Za-z]+$/;
 if (($('#edit_last_name').val() != "") && ($('#edit_first_name').val() != "") && ($('#edit_middle_name').val() != "") && 

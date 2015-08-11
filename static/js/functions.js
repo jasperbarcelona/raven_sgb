@@ -36,6 +36,7 @@ function validate_id(id_no){
 }
 
 function supply_data(studentId){
+  $('#student-info-loading').show();
   $.post('/student/info/get',{
         student_id:studentId,
     },
@@ -363,10 +364,16 @@ function load_next(tab){
     });
 }
 
+/*function render_watermark(){
+  
+path = $('#path').val();
+alert(path)
+$(".tab-pane").css({'background-image':'url(../static/images/watermark.png)','background-repeat': 'no-repeat','background-position': 'center'});
+}*/
 
 function save_sched(){
   $('#save-sched span').css({'display':'none'});
-    $('#save-sched').css({'background-image':'url(../static/images/preloader_white.png)','background-repeat': 'no-repeat','background-position': 'center'});
+    $('#save-sched').css({'background-image':'url(../static/images/assets/white.GIF)','background-repeat': 'no-repeat','background-position': 'center'});
     initial_data()
     $.post('/sched',{
         primary_morning_start:primary_morning_start,
@@ -427,7 +434,7 @@ function back_home(){
 
 function edit_user(last_name, first_name, middle_name, level, section, contact, id_no, user_id){
   $('.edit-user-modal-footer .done-btn span').css({'display':'none'});
-    $('.edit-user-modal-footer .done-btn').css({'background-image':'url(../static/images/white.GIF)','background-repeat': 'no-repeat','background-position': 'center'});
+    $('.edit-user-modal-footer .done-btn').css({'background-image':'url(../static/images/assets/white.GIF)','background-repeat': 'no-repeat','background-position': 'center'});
     $.post('/user/edit',{
         last_name:last_name,
         first_name:first_name,

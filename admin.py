@@ -651,7 +651,8 @@ def index():
         senior_morning_end=school.senior_morning_end,
         senior_afternoon_start=school.senior_afternoon_start,
         senior_afternoon_end=school.senior_afternoon_end,
-        tab=session['tab']
+        tab=session['tab'],
+        path='../images/watermark.png'
         )
 
 
@@ -1084,6 +1085,7 @@ def est():
 def sync_schedule():
     api_key = flask.request.args.get('api_key')
     return jsonify(get_latest_schedule(api_key)),200
+
 
 @app.route('/db/rebuild', methods=['GET', 'POST'])
 def rebuild_database():

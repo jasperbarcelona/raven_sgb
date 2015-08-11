@@ -28,10 +28,10 @@ $('.clockpicker-top').clockpicker({
 
 $('#confirm-send').attr('disabled',true);
 
-resize_tbody($(window).height()-72,40);
+resize_tbody($(window).height()-49,40);
 
 $(window).resize(function(){
-    resize_tbody($(window).height()-72,40);
+    resize_tbody($(window).height()-49,40);
 });
 
 $('#message').on('keyup', function(){
@@ -91,12 +91,12 @@ $('#search-btn').on('click', function () {
         }, 500); // Freeze for 500ms
         
     if ((typeof searchStatus === 'undefined') || (searchStatus == 'off')){
-        $('.search-panel').fadeIn(300);
+        $('.search-panel').show();
         resize_tbody($(window).height()-72,110);
         searchStatus = 'on'
     }
     else{
-        $('.search-panel').fadeOut(300);
+        $('.search-panel').hide();
         resize_tbody($(window).height()-72,40);
         $(".search-text").val('');
         searchStatus = 'off'
@@ -140,7 +140,7 @@ $('.add-user-modal-body .form-control').on('keyup', function () {
 $('#save-user').on('click', function(){
     $('#save-user').attr('disabled',true);
     $('#save-user span').css({'display':'none'});
-    $('#save-user').css({'background-image':'url(../static/images/white.GIF)','background-repeat': 'no-repeat','background-position': 'center'});
+    $('#save-user').css({'background-image':'url(../static/images/assets/white.GIF)','background-repeat': 'no-repeat','background-position': 'center'});
 
     var last_name = $('#add_last_name').val();
     var first_name = $('#add_first_name').val();
