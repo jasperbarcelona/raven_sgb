@@ -437,6 +437,8 @@ function save_user(last_name, first_name, middle_name, level, section, contact, 
   },
   function(data){
       clear_data();
+      form_validated = false
+      id_no_validated = false
       $('#attendance').html(data);
       $('#save-user').css({'background-image':'none'});
       $('#save-user span').show();
