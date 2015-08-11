@@ -463,11 +463,11 @@ textarea:focus{
 }
 
 #table-loading{
-	height: calc(100% - 108px);
+	height: calc(100% - 85px);
 }
 
 #search-loading{
-	height: calc(100% - 178px);
+	height: calc(100% - 157px);
 }
 
 #student-info-loading{

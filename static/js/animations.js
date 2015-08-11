@@ -152,8 +152,10 @@ $('#save-user').on('click', function(){
     save_user(last_name, first_name, middle_name, level, section, contact, id_no);
 });
 
-$('.search-text').on('keyup', function(){
-    show_search_load();
+$('.search-text').keypress(function(e) {
+    if ((e.which !== 0) && (e.which != 13)) {
+        show_search_load();
+    }
 });
 
 $('.search-attendance').donetyping(function(){
