@@ -5,6 +5,9 @@
                 <meta name="viewport" content="width=device-width,initial-scale=1.0, user-scalable=no">
                 <link rel="stylesheet" href="../static/css/bootstrap.min.css">
                 <link rel="stylesheet" href="../static/css/bootstrap-clockpicker.min.css">
+                <link rel="stylesheet" href="../static/css/jquery-ui.css">
+                <link rel="stylesheet" href="../static/css/jquery-ui.theme.css">
+                <link rel="stylesheet" href="../static/css/jquery-ui.structure.css">
                 <link rel="stylesheet" href="../static/css/style.css">
                 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
                 <link rel="shortcut icon" type="image/x-icon" href="../static/images/icons/favicon.ico" />
@@ -65,7 +68,7 @@
                                         {% endif %}
                                         <div class="button-container">
                                                 <button class="btn" id="add-user-btn" data-toggle="modal" data-target="#add-user-modal"><i class="material-icons md-30">add</i></button>
-                                                <button id="compose-btn" class="buttons btn" data-toggle="modal" data-target="#message-modal"><span class="glyphicon glyphicon-pencil"></span></button>
+                                                <button id="compose-btn" class="buttons btn" data-toggle="modal" data-target="#message-modal"><span class="glyphicon glyphicon-envelope"></span></button>
                                                 <a href="#"><button id="search-btn" class="buttons btn"><span class="glyphicon glyphicon-search"></span></button></a>
                                                 <a><button id="refresh-btn" class="buttons btn" onclick="back_home()"><span class="glyphicon glyphicon-repeat"></span></button></a>
 
@@ -78,7 +81,7 @@
                                                                 <li><a href="/view?view=student">Students{% if view=='student' %}<span class="glyphicon glyphicon-ok active-view"></span>{% endif %}</a></li>
                                                                 <li><a href="/view?view=faculty">Faculty{% if view=='faculty' %}<span class="glyphicon glyphicon-ok active-view"></span>{% endif %}</a></li>
                                                                 <li class="divider"></li>
-                                                                <li><a href="#" data-toggle="modal" data-target="#schedule-modal">Class Schedules</a></li>
+                                                                <li><a href="#" data-toggle="modal" data-target="#schedule-modal">Class Schedule</a></li>
                                                                 <li><a href="/logout">Logout</a></li>
                                                         </ul>
                                                 </div>
@@ -199,7 +202,7 @@
                                         <div class="modal-content schedule-modal-content">
                                                 <div class="modal-header">
                                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                        <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">Class Schedules</h4>
+                                                        <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">Regular Class Schedule</h4>
                                                 </div>
                                                 <div class="modal-body schedule-modal-body">
 
@@ -325,6 +328,7 @@
                 </div> 
                 <script src="../static/js/jquery-1.11.0.min.js"></script>
                 <script src="../static/js/easing.js"></script>
+                <script src="../static/js/jquery-ui.js"></script>
                 <script src="../static/js/animations.js"></script>
                 <script src="../static/js/functions.js"></script>
                 <script src="../static/js/tables.js"></script>
