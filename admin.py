@@ -161,6 +161,7 @@ class Absent(db.Model):
     level = db.Column(db.String(30))
     section = db.Column(db.String(30))
     department = db.Column(db.String(30))
+    time_of_day = db.Column(db.String(20))
     timestamp = db.Column(db.String(50))
 
 
@@ -261,7 +262,7 @@ def send_message(message, msisdn, request_url):
 
         except requests.exceptions.ConnectionError as e:
             sleep(5)
-            print "Too slow Mojo!"
+            print "Disconnected!"
             pass
 
 
@@ -275,8 +276,11 @@ def mark_morning_absent(school_id,api_key):
     all_students = Student.query.filter_by(school_id=school_id).all()
 
     for student in all_students:
-        logged = Log.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no).first()
-        if not logged:
+        logged = Log.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no).order_by(Log.timestamp.desc()).first()
+        print 'xxxxxxxxxxxxxxxxxx'
+        print logged.id_no
+        print logged.time_out
+        if logged == None or logged.time_out != 'None':
             absent = Absent(
             school_id=school_id,
             date=time.strftime("%B %d, %Y"),
@@ -287,6 +291,7 @@ def mark_morning_absent(school_id,api_key):
             level=student.level,
             section=student.section,
             department=student.department,
+            time_of_day='morning',
             timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
             )
 
@@ -313,6 +318,7 @@ def mark_afternoon_absent(school_id,api_key):
             level=student.level,
             section=student.section,
             department=student.department,
+            time_of_day='afternoon',
             timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
             )
 
@@ -322,25 +328,26 @@ def mark_afternoon_absent(school_id,api_key):
             student.absences=Absent.query.filter_by(id_no=student.id_no, school_id=school_id).count()
             db.session.commit()
 
-# def mark_specific_absent(school_id,id_no):
-#     student = Student.query.filter_by(school_id=school_id,id_no=id_no).first()
-#     absent = Absent(
-#             school_id=school_id,
-#             date=time.strftime("%B %d, %Y"),
-#             id_no=id_no,
-#             name=student.last_name+', '+\
-#                          student.first_name+' '+\
-#                          student.middle_name[:1]+'.',
-#             level=student.level,
-#             section=student.section,
-#             department=student.department,
-#             timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
-#             )
-#     db.session.add(absent)
-#     db.session.commit()
+def mark_specific_absent(school_id,id_no,time_of_day):
+    student = Student.query.filter_by(school_id=school_id,id_no=id_no).first()
+    absent = Absent(
+            school_id=school_id,
+            date=time.strftime("%B %d, %Y"),
+            id_no=id_no,
+            name=student.last_name+', '+\
+                         student.first_name+' '+\
+                         student.middle_name[:1]+'.',
+            level=student.level,
+            section=student.section,
+            department=student.department,
+            time_of_day=time_of_day,
+            timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+            )
+    db.session.add(absent)
+    db.session.commit()
 
-#     student.absences=Absent.query.filter_by(id_no=id_no, school_id=school_id).count()
-#     db.session.commit()
+    student.absences=Absent.query.filter_by(id_no=id_no, school_id=school_id).count()
+    db.session.commit()
 
 
 def check_if_late(school_id,api_key,id_no,name,level,section,
@@ -362,30 +369,34 @@ def check_if_late(school_id,api_key,id_no,name,level,section,
     afternoon_start = eval(query+'_afternoon_start')
     afternoon_end = eval(query+'_afternoon_end')
 
-    if ((parse_date(time_now) >= parse_date(morning_start) and parse_date(time_now) < parse_date(morning_end)) or \
-        (parse_date(time_now) >= parse_date(afternoon_start) and parse_date(time_now) < parse_date(afternoon_end))) and\
-        Absent.query.filter_by(school_id=school_id,id_no=id_no,date=date).first() == None:
+    # if ((parse_date(time_now) >= parse_date(morning_start) and parse_date(time_now) < parse_date(morning_end)) or \
+    #     (parse_date(time_now) >= parse_date(afternoon_start) and parse_date(time_now) < parse_date(afternoon_end))) and\
+    #     Absent.query.filter_by(school_id=school_id,id_no=id_no,date=date).first() == None:
 
-        record_as_late(school_id, id_no, name, level, section, 
-                       date, department, time, military_time)
+    #     record_as_late(school_id, id_no, name, level, section, 
+    #                    date, department, time, military_time)
 
-    # if (parse_date(time_now) >= parse_date(morning_start) and\
-    #     parse_date(time_now) < parse_date(morning_end)):
+    if parse_date(time_now) >= parse_date(morning_start) and\
+        parse_date(time_now) < parse_date(morning_end) and\
+        Absent.query.filter_by(school_id=school_id,id_no=id_no,date=date,time_of_day='morning').first() == None:
 
-    #     if str(parse_date(time_now) - parse_date(morning_start)) > '1:00:00':
-    #         mark_specific_absent(school_id,id_no)
-    #     else:
-    #         record_as_late(school_id, id_no, name, level, section, 
-    #                     date, department, time, military_time)
+        print 'doing this'
 
-    # elif (parse_date(time_now) >= parse_date(afternoon_start) and\
-    #     parse_date(time_now) < parse_date(afternoon_end)):
+        if str(parse_date(time_now) - parse_date(morning_start)) > '1:00:00':
+            mark_specific_absent(school_id,id_no,'morning')
+        else:
+            record_as_late(school_id, id_no, name, level, section, 
+                        date, department, time, military_time)
 
-    #     if str(parse_date(time_now) - parse_date(afternoon_start)) > parse_date('1:00:00'):
-    #         mark_specific_absent(school_id,id_no)
-    #     else:
-    #         record_as_late(school_id, id_no, name, level, section, 
-    #                     date, department, time, military_time)
+    elif (parse_date(time_now) >= parse_date(afternoon_start) and\
+        parse_date(time_now) < parse_date(afternoon_end)) and\
+        Absent.query.filter_by(school_id=school_id,id_no=id_no,date=date,time_of_day='afternoon').first() == None:
+
+        if str(parse_date(time_now) - parse_date(afternoon_start)) > '1:00:00':
+            mark_specific_absent(school_id,id_no,'afternoon')
+        else:
+            record_as_late(school_id, id_no, name, level, section, 
+                        date, department, time, military_time)
 
 
 def record_as_late(school_id, id_no, name, level, section, 
@@ -504,9 +515,8 @@ def fetch_next(needed,limit):
         sort_by = 'timestamp'
         sort_type='.desc()'
 
-
     elif needed == 'late':
-        search_table = 'Log'
+        search_table = 'Late'
         sort_by = 'timestamp'
         sort_type='.desc()'
 
@@ -517,7 +527,7 @@ def fetch_next(needed,limit):
 
     elif needed == 'absent':
         search_table = 'Absent'
-        sort_by = 'date'
+        sort_by = 'timestamp'
         sort_type='.desc()'
 
     session[needed+'_limit'] += 100
@@ -533,7 +543,6 @@ def search_logs(*args, **kwargs):
             query += 'Log.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
     query += ').order_by(Log.name).slice(('+str(args[0])+'-100),'+str(args[0])+')'
     session['logs_search_limit']+=100
-    print query
     return eval(query)
 
 
@@ -544,7 +553,6 @@ def search_attendance(*args, **kwargs):
             query += 'Student.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
     query += ').order_by(Student.last_name).slice(('+str(args[0])+'-100),'+str(args[0])+')'
     session['attendance_search_limit']+=100
-    print query
     return eval(query)
 
 
@@ -555,7 +563,6 @@ def search_absent(*args, **kwargs):
             query += 'Absent.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
     query += ').order_by(Absent.name).slice(('+str(args[0])+'-100),'+str(args[0])+')'
     session['absent_search_limit']+=100
-    print query
     return eval(query)
 
 
@@ -566,7 +573,10 @@ def search_late(*args, **kwargs):
             query += 'Late.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
     query += ').order_by(Late.name).slice(('+str(args[0])+'-100),'+str(args[0])+')'
     session['late_search_limit']+=100
+
+    print 'xxxxxxxxxxxxxxxxxxx'
     print query
+
     return eval(query)
 
 
@@ -1076,9 +1086,9 @@ def validate_id():
     return flask.render_template('validate_id.html',error=error,id_no=id_no)
 
 
-@app.route('/favicon.ico',methods=['GET','POST'])
-def est():
-    return '',204
+# @app.route('/favicon.ico',methods=['GET','POST'])
+# def est():
+#     return '',204
 
 
 @app.route('/schedule/sync',methods=['GET','POST'])

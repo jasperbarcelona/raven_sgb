@@ -15,6 +15,10 @@ $(window).load(function() {
     $('#intro').fadeOut();
 });
 
+$( ".datepicker " ).datepicker({
+  dateFormat: "MM dd, yy"
+});
+
 $('.search-panel').hide();
 
 $('.clockpicker').clockpicker({
