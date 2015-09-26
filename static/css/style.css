@@ -15,6 +15,9 @@ body{
 	color: #494949 !important;
 	font-family: OpenSans, sans-serif;
 	background-color: #242424;
+	-webkit-user-select: none;  /* Chrome all / Safari all */
+  	-moz-user-select: none;     /* Firefox all */
+  	-ms-user-select: none;
 }
 
 span:hover{

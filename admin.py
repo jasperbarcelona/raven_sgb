@@ -3,6 +3,7 @@ from flask import url_for, request, session, redirect, jsonify, Response, make_r
 from jinja2 import environment, FileSystemLoader
 from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.orderinglist import ordering_list
+from sqlalchemy import Boolean
 from flask.ext import admin
 from flask.ext.admin.contrib import sqla
 from flask.ext.admin.contrib.sqla import ModelView
@@ -85,6 +86,14 @@ class School(db.Model, Serializer):
     city = db.Column(db.String(30))
     email = db.Column(db.String(60))
     tel = db.Column(db.String(15))
+
+    primary_morning_class = db.Column(Boolean, unique=False)
+    primary_afternoon_class = db.Column(Boolean, unique=False)
+    junior_morning_class = db.Column(Boolean, unique=False)
+    junior_afternoon_class = db.Column(Boolean, unique=False)
+    senior_morning_class = db.Column(Boolean, unique=False)
+    senior_afternoon_class = db.Column(Boolean, unique=False)
+
     primary_morning_start = db.Column(db.String(30))
     primary_morning_end = db.Column(db.String(30))
     primary_afternoon_start = db.Column(db.String(30))
@@ -248,7 +257,7 @@ def message_options(message, msisdn):
     return message_options
 
 
-def send_message(message, msisdn, request_url):
+def send_message(type, message, msisdn, request_url):
     sent = False
     while not sent:
         try:
@@ -277,9 +286,6 @@ def mark_morning_absent(school_id,api_key):
 
     for student in all_students:
         logged = Log.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no).order_by(Log.timestamp.desc()).first()
-        print 'xxxxxxxxxxxxxxxxxx'
-        print logged.id_no
-        print logged.time_out
         if logged == None or logged.time_out != 'None':
             absent = Absent(
             school_id=school_id,
@@ -445,8 +451,15 @@ def time_in(school_id,api_key,id_no,name,level,section,
                 student.last_name+' has entered the school gate at '+\
                 time+'.'
 
-    message_thread = threading.Thread(target=send_message,args=[
-                                    message, student.parent_contact, SMS_URL])
+    message_thread = threading.Thread(
+        target=send_message,
+        args=[
+            'log',
+            message,
+            student.parent_contact,
+            SMS_URL
+            ]
+        )
     message_thread.start()
 
     if department != 'faculty':
@@ -466,8 +479,15 @@ def time_out(id_no, time):
                 student.last_name+' has exited the school gate at '+\
                 time+'.'
 
-    message_thread = threading.Thread(target=send_message,args=[
-                                    message, student.parent_contact, SMS_URL])
+    message_thread = threading.Thread(
+        target=send_message,
+        args=[
+            'log',
+            message,
+            student.parent_contact,
+            SMS_URL
+            ]
+        )
     
     message_thread.start()
 
@@ -619,6 +639,10 @@ def get_latest_schedule(api_key):
         }
 
 
+def str2bool(v):
+  return v.lower() in ("yes", "true", "t", "1")
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if not session:
@@ -664,6 +688,12 @@ def index():
         tab=session['tab'],
         path='../images/watermark.png'
         )
+
+
+@app.route('/rollback', methods=['GET', 'POST'])
+def rollback():
+    db.session.rollback()
+    return 'ok'
 
 
 @app.route('/home', methods=['GET', 'POST'])
@@ -798,7 +828,7 @@ def add_log():
 
     if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
         return SWJsonify({
-                        'status': 'Fail',
+                        'status': '500',
                          'message': 'Unauthorized'
                     }), 500
 
@@ -829,7 +859,7 @@ def add_log():
 
     return SWJsonify({
                         'status': '201',
-                         'message': 'Looged Out'
+                        'message': 'Looged Out'
                     }), 201
 
 
@@ -843,8 +873,15 @@ def blast_message():
     for user in db.session.query(Student.parent_contact).filter\
               (Student.school_id==session['school_id']).distinct(): 
 
-        blast_thread = threading.Thread(target=send_message,
-                                 args=[message, user.parent_contact, SMS_URL])
+        blast_thread = threading.Thread(
+            target=send_message,
+            args=[
+                'blast',
+                message,
+                user.parent_contact,
+                SMS_URL
+                ]
+            )
         blast_thread.start()
     
     return flask.render_template('status.html', status='Message Sent')
@@ -1043,6 +1080,7 @@ def search_student_late():
 
 @app.route('/sched',methods=['GET','POST'])
 def change_sched():
+
     primary_morning_start = flask.request.form.get('primary_morning_start')
     primary_morning_end = flask.request.form.get('primary_morning_end')
     junior_morning_start = flask.request.form.get('junior_morning_start')
@@ -1050,7 +1088,7 @@ def change_sched():
     senior_morning_start = flask.request.form.get('senior_morning_start')
     senior_morning_end = flask.request.form.get('senior_morning_end')
     primary_afternoon_start = flask.request.form.get('primary_afternoon_start')
-    primary_afternoon_end =flask.request.form.get('primary_afternoon_end')
+    primary_afternoon_end = flask.request.form.get('primary_afternoon_end')
     junior_afternoon_start = flask.request.form.get('junior_afternoon_start')
     junior_afternoon_end = flask.request.form.get('junior_afternoon_end')
     senior_afternoon_start = flask.request.form.get('senior_afternoon_start')
@@ -1072,6 +1110,38 @@ def change_sched():
     school.senior_afternoon_end = senior_afternoon_end
 
     db.session.commit()
+
+    sched_data = {
+        'school_id': session['school_id'],
+        'primary_morning_start': primary_morning_start,
+        'primary_morning_end': primary_morning_end,
+        'junior_morning_start': junior_morning_start,
+        'junior_morning_end': junior_morning_end,
+        'senior_morning_start': senior_morning_start,
+        'senior_morning_end': senior_morning_end,
+        'primary_afternoon_start': primary_afternoon_start,
+        'primary_afternoon_end':primary_afternoon_end,
+        'junior_afternoon_start': junior_afternoon_start,
+        'junior_afternoon_end': junior_afternoon_end,
+        'senior_afternoon_start': senior_afternoon_start,
+        'senior_afternoon_end': senior_afternoon_end
+    }
+
+    sent = False
+    while not sent:
+        try:
+            r = requests.post(
+                'http://127.0.0.1:8000/schedule/regular/update',
+                sched_data         
+            )
+            sent =True
+            print r.status_code #update log database (put 'sent' to status)
+
+        except requests.exceptions.ConnectionError as e:
+            sleep(5)
+            print "Disconnected!"
+            pass
+
     return redirect('/')
 
 
@@ -1093,8 +1163,32 @@ def validate_id():
 
 @app.route('/schedule/sync',methods=['GET','POST'])
 def sync_schedule():
-    api_key = flask.request.args.get('api_key')
-    return jsonify(get_latest_schedule(api_key)),200
+    data = flask.request.form.to_dict()
+
+    school = School.query.filter_by(id=data['school_id']).one()
+
+    school.primary_morning_class = str2bool(data['primary_morning_class'])
+    school.primary_afternoon_class = str2bool(data['primary_afternoon_class'])
+    school.junior_morning_class = str2bool(data['junior_morning_class'])
+    school.junior_afternoon_class = str2bool(data['junior_afternoon_class'])
+    school.senior_morning_class = str2bool(data['senior_morning_class'])
+    school.senior_afternoon_class = str2bool(data['senior_afternoon_class'])
+
+    school.primary_morning_start = data['primary_morning_start']
+    school.primary_morning_end = data['primary_morning_end']
+    school.junior_morning_start = data['junior_morning_start']
+    school.junior_morning_end = data['junior_morning_end']
+    school.senior_morning_start = data['senior_morning_start']
+    school.senior_morning_end = data['senior_morning_end']
+    school.primary_afternoon_start = data['primary_afternoon_start']
+    school.primary_afternoon_end = data['primary_afternoon_end']
+    school.junior_afternoon_start = data['junior_afternoon_start']
+    school.junior_afternoon_end = data['junior_afternoon_end']
+    school.senior_afternoon_start = data['senior_afternoon_start']
+    school.senior_afternoon_end = data['senior_afternoon_end']
+
+    db.session.commit()
+    return '',201
 
 
 @app.route('/db/rebuild', methods=['GET', 'POST'])
@@ -1128,6 +1222,33 @@ def rebuild_database():
         senior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16]
         )
     db.session.add(school)
+
+    school1 = School(
+        id=4321,
+        api_key='ecc67d28db284a2fb351d58fe18965f0',
+        password='test',
+        name="Sacred Heart College",
+        address="10, Brgy Isabang",
+        city="Lucena City",
+        email="sgb.edu@gmail.com",
+        tel="555-8898",
+
+        primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
+        primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+        primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
+
+        junior_morning_start = str(now.replace(hour=8, minute=0, second=0))[11:16],
+        junior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+        junior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16],
+
+        senior_morning_start = str(now.replace(hour=9, minute=0, second=0))[11:16],
+        senior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        senior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+        senior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16]
+        )
+    db.session.add(school1)
 
     a = Student(
         school_id=1234,
