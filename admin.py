@@ -258,21 +258,22 @@ def message_options(message, msisdn):
 
 
 def send_message(type, message, msisdn, request_url):
-    sent = False
-    while not sent:
-        try:
-            r = requests.post(
-                request_url,
-                message_options(message, msisdn)
-                # timeout=(int(CONNECT_TIMEOUT))           
-            )
-            sent =True
-            print r.text #update log database (put 'sent' to status)
+    # sent = False
+    # while not sent:
+    #     try:
+    #         r = requests.post(
+    #             request_url,
+    #             message_options(message, msisdn)
+    #             # timeout=(int(CONNECT_TIMEOUT))           
+    #         )
+    #         sent =True
+    #         print r.status_code #update log database (put 'sent' to status)
 
-        except requests.exceptions.ConnectionError as e:
-            sleep(5)
-            print "Disconnected!"
-            pass
+    #     except requests.exceptions.ConnectionError as e:
+    #         sleep(5)
+    #         print "Disconnected!"
+    #         pass
+    print 'send'
 
 
 def authenticate_user(school_id, password):
@@ -951,7 +952,7 @@ def edit_user():
     user.middle_name = middle_name
     user.level = level
     user.section = section
-    user.contact = contact
+    user.parent_contact = contact
     user.id_no = id_no
 
     db.session.commit()
@@ -1156,9 +1157,9 @@ def validate_id():
     return flask.render_template('validate_id.html',error=error,id_no=id_no)
 
 
-# @app.route('/favicon.ico',methods=['GET','POST'])
-# def est():
-#     return '',204
+@app.route('/favicon.ico',methods=['GET','POST'])
+def est():
+    return '',204
 
 
 @app.route('/schedule/sync',methods=['GET','POST'])
