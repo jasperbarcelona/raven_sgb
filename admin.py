@@ -824,6 +824,7 @@ def change_tab():
 
 @app.route('/addlog', methods=['GET', 'POST'])
 def add_log():
+    sleep(1)
     school_id = flask.request.form.get('school_id')
     api_key = flask.request.form.get('api_key')
 
