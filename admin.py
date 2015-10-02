@@ -442,21 +442,22 @@ def time_in(school_id,api_key,id_no,name,level,section,
 
 
 def compose_message(id_no,time,action):
-    student = get_student_data(id_no)
-    message = 'Good day! We would like to inform you that '+student.first_name+' '+\
-                student.last_name+' has '+action+' the school gate at '+\
-                time+'.'
+    # student = get_student_data(id_no)
+    # message = 'Good day! We would like to inform you that '+student.first_name+' '+\
+    #             student.last_name+' has '+action+' the school gate at '+\
+    #             time+'.'
 
-    message_thread = threading.Thread(
-        target=send_message,
-        args=[
-            'log',
-            message,
-            student.parent_contact,
-            SMS_URL
-            ]
-        )
-    message_thread.start()
+    # message_thread = threading.Thread(
+    #     target=send_message,
+    #     args=[
+    #         'log',
+    #         message,
+    #         student.parent_contact,
+    #         SMS_URL
+    #         ]
+    #     )
+    # message_thread.start()
+    print 'done'
 
 
 def time_out(id_no, time, school_id):
