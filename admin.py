@@ -258,7 +258,7 @@ def message_options(message, msisdn):
 
 def send_message(type, message, msisdn, request_url):
     sent = False
-    while not sent
+    while not sent:
         try:
             r = requests.post(
                 request_url,
