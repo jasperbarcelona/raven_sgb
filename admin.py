@@ -257,20 +257,19 @@ def message_options(message, msisdn):
 
 
 def send_message(type, message, msisdn, request_url):
-    attempts = 0
-    while attempts < 3:
+    sent = False
+    while not sent
         try:
             r = requests.post(
                 request_url,
                 message_options(message, msisdn)
                 # timeout=(int(CONNECT_TIMEOUT))           
             )
-            attempts = 3
+            sent = True
             print r.status_code #update log database (put 'sent' to status)
 
         except requests.exceptions.ConnectionError as e:
-            attempts += 1
-            print "Disconnected!"
+            print "Sending Failed!"
             sleep(5)
 
 
