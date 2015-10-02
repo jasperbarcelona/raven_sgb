@@ -126,7 +126,6 @@ class Log(db.Model, Serializer):
     section = db.Column(db.String(30))
     department = db.Column(db.String(30))
     time_in = db.Column(db.String(10))
-    military_time = db.Column(db.DateTime)
     time_out = db.Column(db.String(10))
     timestamp = db.Column(db.String(50))
 
@@ -176,7 +175,7 @@ class Absent(db.Model):
 
 class IngAdmin(sqla.ModelView):
     column_display_pk = True
-admin = Admin(app)
+admin = Admin(app, name='raven', template_mode='bootstrap3')
 admin.add_view(IngAdmin(School, db.session))
 admin.add_view(IngAdmin(Section, db.session))
 admin.add_view(IngAdmin(Log, db.session))
@@ -357,8 +356,9 @@ def mark_specific_absent(school_id,id_no,time_of_day):
     db.session.commit()
 
 
-def check_if_late(school_id,api_key,id_no,name,level,section,
-                             date,department,time,military_time):
+def check_if_late(school_id,api_key,id_no,name,level,
+                section,date,department,time,timestamp):
+
     time_now = str(now.replace(hour=get_hour(time), minute=int(time[3:5])))[11:16]
     school = School.query.filter_by(api_key=api_key).first()
 
@@ -381,19 +381,17 @@ def check_if_late(school_id,api_key,id_no,name,level,section,
     #     Absent.query.filter_by(school_id=school_id,id_no=id_no,date=date).first() == None:
 
     #     record_as_late(school_id, id_no, name, level, section, 
-    #                    date, department, time, military_time)
+    #                    date, department, time)
 
     if parse_date(time_now) >= parse_date(morning_start) and\
         parse_date(time_now) < parse_date(morning_end) and\
         Absent.query.filter_by(school_id=school_id,id_no=id_no,date=date,time_of_day='morning').first() == None:
 
-        print 'doing this'
-
         if str(parse_date(time_now) - parse_date(morning_start)) > '1:00:00':
             mark_specific_absent(school_id,id_no,'morning')
         else:
             record_as_late(school_id, id_no, name, level, section, 
-                        date, department, time, military_time)
+                        date, department, time, timestamp)
 
     elif (parse_date(time_now) >= parse_date(afternoon_start) and\
         parse_date(time_now) < parse_date(afternoon_end)) and\
@@ -403,94 +401,83 @@ def check_if_late(school_id,api_key,id_no,name,level,section,
             mark_specific_absent(school_id,id_no,'afternoon')
         else:
             record_as_late(school_id, id_no, name, level, section, 
-                        date, department, time, military_time)
+                        date, department, time, timestamp)
 
 
 def record_as_late(school_id, id_no, name, level, section, 
-                               date, department, time, military_time):
+                    date, department, time, timestamp):
     late = Late(
-            school_id=school_id,
-            date=date,
-            id_no=id_no,
-            name=name,
-            level=level,
-            section=section,
-            time_in=time,
-            department=department,
-            timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+            school_id=school_id,date=date,id_no=id_no,
+            name=name,level=level,section=section,
+            time_in=time,department=department,
+            timestamp=timestamp
             )
 
     db.session.add(late)
     db.session.commit()
-    attendance=Student.query.filter_by(id_no=id_no, school_id=school_id).one()
-    attendance.lates=Late.query.filter_by(id_no=id_no, school_id=school_id).count()
+
+    student=Student.query.filter_by(id_no=id_no, school_id=school_id).one()
+    student.lates=Late.query.filter_by(id_no=id_no, school_id=school_id).count()
     db.session.commit()
 
 
 def time_in(school_id,api_key,id_no,name,level,section,
-                    date,department,time,military_time):
+            date,department,time,timestamp):
 
     add_this = Log(
-                    school_id=school_id,
-                    date=date,
-                    id_no=id_no,
-                    name=name,
-                    level=level,
-                    section=section,
-                    department=department,
-                    time_in=time,
-                    time_out='None',
-                    military_time=military_time,
-                    timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
-                    )
+        school_id=school_id,date=date,id_no=id_no,
+        name=name,level=level,section=section,
+        department=department,time_in=time,
+        time_out='None',timestamp=timestamp
+        )
 
     db.session.add(add_this)
     db.session.commit()
 
-    student = get_student_data(id_no)
-    message = 'Good day! We would like to inform you that '+student.first_name+' '+\
-                student.last_name+' has entered the school gate at '+\
-                time+'.'
+    # student = get_student_data(id_no)
+    # message = 'Good day! We would like to inform you that '+student.first_name+' '+\
+    #             student.last_name+' has entered the school gate at '+\
+    #             time+'.'
 
-    message_thread = threading.Thread(
-        target=send_message,
-        args=[
-            'log',
-            message,
-            student.parent_contact,
-            SMS_URL
-            ]
-        )
-    message_thread.start()
+    # message_thread = threading.Thread(
+    #     target=send_message,
+    #     args=[
+    #         'log',
+    #         message,
+    #         student.parent_contact,
+    #         SMS_URL
+    #         ]
+    #     )
+    # message_thread.start()
 
     if department != 'faculty':
         return check_if_late(school_id, api_key, id_no,name,level,
-                  section, date, department, time, military_time)
+                  section, date, department, time, timestamp)
 
     return '', 201
 
 
-def time_out(id_no, time):
-    a = Log.query.filter_by(id_no=id_no).order_by(Log.timestamp.desc()).first()
+def time_out(id_no, time, school_id):
+    a = Log.query.filter_by(id_no=id_no,school_id=school_id).order_by(Log.timestamp.desc()).first()
     a.time_out=time  
     db.session.commit()
 
-    student = get_student_data(id_no)
-    message = 'Good day! We would like to inform you that '+student.first_name+' '+\
-                student.last_name+' has exited the school gate at '+\
-                time+'.'
+    # student = get_student_data(id_no)
+    # message = 'Good day! We would like to inform you that '+student.first_name+' '+\
+    #             student.last_name+' has exited the school gate at '+\
+    #             time+'.'
 
-    message_thread = threading.Thread(
-        target=send_message,
-        args=[
-            'log',
-            message,
-            student.parent_contact,
-            SMS_URL
-            ]
-        )
+    # message_thread = threading.Thread(
+    #     target=send_message,
+    #     args=[
+    #         'log',
+    #         message,
+    #         student.parent_contact,
+    #         SMS_URL
+    #         ]
+    #     )
     
-    message_thread.start()
+    # message_thread.start()
 
     return '', 201
 
@@ -562,7 +549,7 @@ def search_logs(*args, **kwargs):
     for arg_name in kwargs:
         if kwargs[arg_name]:
             query += 'Log.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
-    query += ').order_by(Log.name).slice(('+str(args[0])+'-100),'+str(args[0])+')'
+    query += ').order_by(Log.timestamp.desc()).slice(('+str(args[0])+'-100),'+str(args[0])+')'
     session['logs_search_limit']+=100
     return eval(query)
 
@@ -633,15 +620,21 @@ def get_latest_schedule(api_key):
     else:
         afternoon_time = senior_afternoon_start
 
-    return {
-        'status': 'success',
-        'morning_time': morning_time,
-        'afternoon_time': afternoon_time
-        }
+    return jsonify(
+        status= 'success',
+        morning_time= morning_time,
+        afternoon_time= afternoon_time
+        )
 
 
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
+
+
+@app.route('/sched/get', methods=['GET', 'POST'])
+def get_schedule():
+    api_key = flask.request.args.get('api_key')
+    return get_latest_schedule(api_key)
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -822,47 +815,35 @@ def change_tab():
     return '',200
 
 
-@app.route('/addlog', methods=['GET', 'POST'])
+@app.route('/addlog', methods=['POST'])
 def add_log():
     sleep(1)
-    school_id = flask.request.form.get('school_id')
-    api_key = flask.request.form.get('api_key')
+    data = flask.request.form.to_dict()
 
-    if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
-        return SWJsonify({
-                        'status': '500',
-                         'message': 'Unauthorized'
-                    }), 500
+    if not data['api_key'] or not School.query.filter_by(id=data['school_id'],api_key=data['api_key']):
+        return jsonify(status='500',message='Unauthorized'), 500
 
-    id_no = flask.request.form.get('id_no')
-    name = flask.request.form.get('name')
-    level = flask.request.form.get('level')
-    section = flask.request.form.get('section')
-    date = flask.request.form.get('date')
-    department = flask.request.form.get('department')
-    time = flask.request.form.get('time')
-    military_time = parse_date(flask.request.form.get('military_time'))
+    logged = Log.query.filter_by(date=data['date'],school_id=data['school_id'],id_no=data['id_no']).order_by(Log.timestamp.desc()).first()
 
-    if not Log.query.filter_by(date=date, id_no=id_no).first() or \
-              Log.query.filter_by(date=date, id_no=id_no).order_by\
-              (Log.timestamp.desc()).first().time_out != 'None':
+    if not logged or logged.time_out != 'None':
 
-        log_thread = threading.Thread(target=time_in,args=[school_id,api_key,
-                              id_no,name,level,section,date,department,time,military_time])
+        log_thread = threading.Thread(
+            target=time_in,
+            args=[
+            data['school_id'],data['api_key'],
+            data['id_no'],data['name'],data['level'],
+            data['section'],data['date'],data['department'],
+            data['time'],data['timestamp']
+            ])
+
         log_thread.start()     
 
-        return SWJsonify({
-                        'status': '201',
-                         'message': 'Looged In'
-                    }), 201
+        return jsonify(status= '201',message= 'Looged In'), 201
 
-    log_thread = threading.Thread(target=time_out,args=[id_no, time])
+    log_thread = threading.Thread(target=time_out,args=[data['id_no'],data['time'],data['school_id']])
     log_thread.start()      
 
-    return SWJsonify({
-                        'status': '201',
-                        'message': 'Looged Out'
-                    }), 201
+    return jsonify(status='201',message='Looged Out'), 201
 
 
 @app.route('/blast',methods=['GET','POST'])
@@ -1403,6 +1384,6 @@ def rebuild_database():
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(port=int(os.environ['PORT']), host='0.0.0.0')
+    app.run(port=int(os.environ['PORT']), host='0.0.0.0',threaded=True)
 
     # port=int(os.environ['PORT']), host='0.0.0.0'
