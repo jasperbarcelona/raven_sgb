@@ -175,7 +175,7 @@ class Absent(db.Model):
 
 class IngAdmin(sqla.ModelView):
     column_display_pk = True
-admin = Admin(app, name='raven', template_mode='bootstrap3')
+admin = Admin(app, name='raven')
 admin.add_view(IngAdmin(School, db.session))
 admin.add_view(IngAdmin(Section, db.session))
 admin.add_view(IngAdmin(Log, db.session))
