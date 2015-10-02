@@ -433,7 +433,7 @@ def time_in(school_id,api_key,id_no,name,level,section,
     db.session.add(add_this)
     db.session.commit()
 
-    compose_message(id_no,time)
+    compose_message(id_no,time,'entered')
 
     if department != 'faculty':
         return check_if_late(school_id, api_key, id_no,name,level,
@@ -442,10 +442,10 @@ def time_in(school_id,api_key,id_no,name,level,section,
     return '', 201
 
 
-def compose_message(id_no,time):
+def compose_message(id_no,time,action):
     student = get_student_data(id_no)
     message = 'Good day! We would like to inform you that '+student.first_name+' '+\
-                student.last_name+' has entered the school gate at '+\
+                student.last_name+' has '+action+' the school gate at '+\
                 time+'.'
 
     message_thread = threading.Thread(
@@ -465,7 +465,7 @@ def time_out(id_no, time, school_id):
     a.time_out=time  
     db.session.commit()
 
-    compose_message(id_no,time)
+    compose_message(id_no,time,'exited')
 
     return '', 201
 
