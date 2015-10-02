@@ -1384,6 +1384,6 @@ def rebuild_database():
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(port=int(os.environ['PORT']), host='0.0.0.0')
+    app.run(port=int(os.environ['PORT']), host='0.0.0.0',threaded=True)
 
     # port=int(os.environ['PORT']), host='0.0.0.0'
