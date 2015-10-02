@@ -257,22 +257,21 @@ def message_options(message, msisdn):
 
 
 def send_message(type, message, msisdn, request_url):
-    # sent = False
-    # while not sent:
-    #     try:
-    #         r = requests.post(
-    #             request_url,
-    #             message_options(message, msisdn)
-    #             # timeout=(int(CONNECT_TIMEOUT))           
-    #         )
-    #         sent =True
-    #         print r.status_code #update log database (put 'sent' to status)
+    attempts = 0
+    while attempts < 3:
+        try:
+            r = requests.post(
+                request_url,
+                message_options(message, msisdn)
+                # timeout=(int(CONNECT_TIMEOUT))           
+            )
+            attempts = 3
+            print r.status_code #update log database (put 'sent' to status)
 
-    #     except requests.exceptions.ConnectionError as e:
-    #         sleep(5)
-    #         print "Disconnected!"
-    #         pass
-    print 'send'
+        except requests.exceptions.ConnectionError as e:
+            attempts += 1
+            print "Disconnected!"
+            sleep(5)
 
 
 def authenticate_user(school_id, password):
@@ -434,21 +433,7 @@ def time_in(school_id,api_key,id_no,name,level,section,
     db.session.add(add_this)
     db.session.commit()
 
-    # student = get_student_data(id_no)
-    # message = 'Good day! We would like to inform you that '+student.first_name+' '+\
-    #             student.last_name+' has entered the school gate at '+\
-    #             time+'.'
-
-    # message_thread = threading.Thread(
-    #     target=send_message,
-    #     args=[
-    #         'log',
-    #         message,
-    #         student.parent_contact,
-    #         SMS_URL
-    #         ]
-    #     )
-    # message_thread.start()
+    compose_message(id_no,time)
 
     if department != 'faculty':
         return check_if_late(school_id, api_key, id_no,name,level,
@@ -457,27 +442,30 @@ def time_in(school_id,api_key,id_no,name,level,section,
     return '', 201
 
 
+def compose_message(id_no,time):
+    student = get_student_data(id_no)
+    message = 'Good day! We would like to inform you that '+student.first_name+' '+\
+                student.last_name+' has entered the school gate at '+\
+                time+'.'
+
+    message_thread = threading.Thread(
+        target=send_message,
+        args=[
+            'log',
+            message,
+            student.parent_contact,
+            SMS_URL
+            ]
+        )
+    message_thread.start()
+
+
 def time_out(id_no, time, school_id):
     a = Log.query.filter_by(id_no=id_no,school_id=school_id).order_by(Log.timestamp.desc()).first()
     a.time_out=time  
     db.session.commit()
 
-    # student = get_student_data(id_no)
-    # message = 'Good day! We would like to inform you that '+student.first_name+' '+\
-    #             student.last_name+' has exited the school gate at '+\
-    #             time+'.'
-
-    # message_thread = threading.Thread(
-    #     target=send_message,
-    #     args=[
-    #         'log',
-    #         message,
-    #         student.parent_contact,
-    #         SMS_URL
-    #         ]
-    #     )
-    
-    # message_thread.start()
+    compose_message(id_no,time)
 
     return '', 201
 
