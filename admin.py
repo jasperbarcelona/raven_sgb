@@ -432,8 +432,6 @@ def time_in(school_id,api_key,id_no,name,level,section,
     db.session.add(add_this)
     db.session.commit()
 
-    compose_message(id_no,time,'entered')
-
     if department != 'faculty':
         return check_if_late(school_id, api_key, id_no,name,level,
                   section, date, department, time, timestamp)
@@ -442,30 +440,27 @@ def time_in(school_id,api_key,id_no,name,level,section,
 
 
 def compose_message(id_no,time,action):
-    # student = get_student_data(id_no)
-    # message = 'Good day! We would like to inform you that '+student.first_name+' '+\
-    #             student.last_name+' has '+action+' the school gate at '+\
-    #             time+'.'
+    student = get_student_data(id_no)
+    message = 'Good day! We would like to inform you that '+student.first_name+' '+\
+                student.last_name+' has '+action+' the school gate at '+\
+                time+'.'
 
-    # message_thread = threading.Thread(
-    #     target=send_message,
-    #     args=[
-    #         'log',
-    #         message,
-    #         student.parent_contact,
-    #         SMS_URL
-    #         ]
-    #     )
-    # message_thread.start()
-    print 'done'
+    message_thread = threading.Thread(
+        target=send_message,
+        args=[
+            'log',
+            message,
+            student.parent_contact,
+            SMS_URL
+            ]
+        )
+    message_thread.start()
 
 
 def time_out(id_no, time, school_id):
     a = Log.query.filter_by(id_no=id_no,school_id=school_id).order_by(Log.timestamp.desc()).first()
     a.time_out=time  
     db.session.commit()
-
-    compose_message(id_no,time,'exited')
 
     return '', 201
 
@@ -533,17 +528,18 @@ def fetch_next(needed,limit):
 
 
 def search_logs(*args, **kwargs):
-    query = 'Log.query.filter('
+    query = 'Log.query.filter(Log.department.ilike("'+session['department']+'"),Log.school_id.ilike('+session['school_id']+'),'
     for arg_name in kwargs:
         if kwargs[arg_name]:
             query += 'Log.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
     query += ').order_by(Log.timestamp.desc()).slice(('+str(args[0])+'-100),'+str(args[0])+')'
     session['logs_search_limit']+=100
+    print query
     return eval(query)
 
 
 def search_attendance(*args, **kwargs):
-    query = 'Student.query.filter('
+    query = 'Student.query.filter(Student.department.ilike("'+session['department']+'"),Student.school_id.ilike('+session['school_id']+'),'
     for arg_name in kwargs:
         if kwargs[arg_name]:
             query += 'Student.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
@@ -553,7 +549,7 @@ def search_attendance(*args, **kwargs):
 
 
 def search_absent(*args, **kwargs):
-    query = 'Absent.query.filter('
+    query = 'Absent.query.filter(Absent.school_id.ilike('+session['school_id']+'),'
     for arg_name in kwargs:
         if kwargs[arg_name]:
             query += 'Absent.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
@@ -563,7 +559,7 @@ def search_absent(*args, **kwargs):
 
 
 def search_late(*args, **kwargs):
-    query = 'Late.query.filter('
+    query = 'Late.query.filter(Late.school_id.ilike('+session['school_id']+'),'
     for arg_name in kwargs:
         if kwargs[arg_name]:
             query += 'Late.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
@@ -676,6 +672,11 @@ def index():
 def rollback():
     db.session.rollback()
     return 'ok'
+
+
+@app.route('/mock/redirect', methods=['GET', 'POST'])
+def redirect_uri():
+    return request.args['code']
 
 
 @app.route('/home', methods=['GET', 'POST'])
@@ -826,12 +827,12 @@ def add_log():
 
         log_thread.start()     
 
-        return jsonify(status= '201',message= 'Looged In'), 201
+        return jsonify(status= '201',message='logged in',action='entered'), 201
 
     log_thread = threading.Thread(target=time_out,args=[data['id_no'],data['time'],data['school_id']])
     log_thread.start()      
 
-    return jsonify(status='201',message='Looged Out'), 201
+    return jsonify(status='201',message='logged out',action='left'), 201
 
 
 @app.route('/blast',methods=['GET','POST'])
@@ -862,33 +863,36 @@ def blast_message():
 def sync_database():
     school_id = flask.request.args.get('school_id')
     return SWJsonify({
-        'Records': Student.query.filter_by(school_id=school_id).all()
+        'Records': Student.query.filter_by(school_id=school_id,department='student').all()
         }), 201
 
 
-@app.route('/user/add',methods=['GET','POST'])
+@app.route('/user/new',methods=['GET','POST'])
 def add_user():
-    last_name = flask.request.form.get('last_name')
-    first_name = flask.request.form.get('first_name')
-    middle_name = flask.request.form.get('middle_name')
-    level = flask.request.form.get('level')
-    section = flask.request.form.get('section')
-    contact = flask.request.form.get('contact')
-    id_no = flask.request.form.get('id_no')
-
-    user = Student(
-        school_id = session['school_id'],
-        id_no = id_no,
-        first_name = first_name,
-        last_name = last_name,
-        middle_name = middle_name,
-        level = level,
-        department = session['department'],
-        section = section,
-        absences = 0,
-        lates = 0,
-        parent_contact = contact
-        )
+    student_data = flask.request.form.to_dict()
+    if student_data['department'] == 'student':
+        user = Student(
+            school_id = session['school_id'],
+            id_no = student_data['id_no'],
+            first_name = student_data['first_name'],
+            last_name = student_data['last_name'],
+            middle_name = student_data['middle_name'],
+            level = student_data['level'],
+            department = student_data['department'],
+            section = student_data['section'],
+            absences = 0,
+            lates = 0,
+            parent_contact = student_data['contact']
+            )
+    else:
+        user = Student(
+            school_id = session['school_id'],
+            id_no = student_data['id_no'],
+            first_name = student_data['first_name'],
+            last_name = student_data['last_name'],
+            middle_name = student_data['middle_name'],
+            department = student_data['department']
+            )
 
     db.session.add(user)
     db.session.commit()
@@ -901,7 +905,7 @@ def add_user():
 
     # prepare()
 
-    return flask.render_template('attendance.html', data=data, limit=0)
+    return flask.render_template('attendance.html', data=data, limit=0, view=student_data['department'])
 
 
 @app.route('/user/edit',methods=['GET','POST'])
@@ -1121,10 +1125,9 @@ def validate_id():
     id_no = flask.request.form.get('id_no')
     student = Student.query.filter_by(id_no=id_no).first()
     if student != None:
-        error = 1
+        return 'Duplicate ID Number'
     else:
-        error = 0
-    return flask.render_template('validate_id.html',error=error,id_no=id_no)
+        return ''
 
 
 @app.route('/favicon.ico',methods=['GET','POST'])
@@ -1160,6 +1163,55 @@ def sync_schedule():
 
     db.session.commit()
     return '',201
+
+
+@app.route('/db/faculty/add', methods=['GET', 'POST'])
+def add_faculty():
+    for i in range(500):
+        a = Student(
+            school_id=1234,
+            id_no=str(i),
+            first_name='Jasper'+str(i),
+            last_name='Barcelona',
+            middle_name='Estrada',
+            department='faculty',
+            parent_contact='639183339068'
+            )
+        db.session.add(a)
+        db.session.commit()
+
+    return 'done'
+
+@app.route('/db/school/add', methods=['GET', 'POST'])
+def add_school():
+    school = School(
+        id=432156,
+        api_key='ecc67d28db284a2fb351d58fe18965f3',
+        password='test',
+        name="Scuola Gesu Bambino",
+        address="10, Brgy Isabang",
+        city="Lucena City",
+        email="sgb.edu@gmail.com",
+        tel="555-8898",
+
+        primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
+        primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+        primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
+
+        junior_morning_start = str(now.replace(hour=8, minute=0, second=0))[11:16],
+        junior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+        junior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16],
+
+        senior_morning_start = str(now.replace(hour=9, minute=0, second=0))[11:16],
+        senior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        senior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+        senior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16]
+        )
+    db.session.add(school)
+    db.session.commit()
+    return 'okay'
 
 
 @app.route('/db/rebuild', methods=['GET', 'POST'])
