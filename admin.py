@@ -833,7 +833,7 @@ def add_log():
      
         return jsonify(status= '201',message='logged in',action='entered'), 201
 
-    time_out([data['id_no'],data['time'],data['school_id'])    
+    time_out(data['id_no'],data['time'],data['school_id'])    
 
     return jsonify(status='201',message='logged out',action='left'), 201
 
