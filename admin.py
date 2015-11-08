@@ -420,6 +420,7 @@ def record_as_late(school_id, id_no, name, level, section,
 
     db.session.add(late)
     db.session.commit()
+    db.session.close()
 
     student=Student.query.filter_by(id_no=id_no, school_id=school_id).one()
     student.lates=Late.query.filter_by(id_no=id_no, school_id=school_id).count()
@@ -826,21 +827,13 @@ def add_log():
 
     if not logged or logged.time_out != 'None':
 
-        log_thread = threading.Thread(
-            target=time_in,
-            args=[
-            data['school_id'],data['api_key'],
-            data['id_no'],data['name'],data['level'],
-            data['section'],data['date'],data['department'],
-            data['time'],data['timestamp']
-            ])
-
-        log_thread.start()     
-
+        time_in(data['school_id'],data['api_key'],data['id_no'],data['name'],
+                data['level'],data['section'],data['date'],data['department'],
+                data['time'],data['timestamp'])
+     
         return jsonify(status= '201',message='logged in',action='entered'), 201
 
-    log_thread = threading.Thread(target=time_out,args=[data['id_no'],data['time'],data['school_id']])
-    log_thread.start()      
+    time_out([data['id_no'],data['time'],data['school_id'])    
 
     return jsonify(status='201',message='logged out',action='left'), 201
 
