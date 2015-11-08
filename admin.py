@@ -532,7 +532,7 @@ def fetch_next(needed,limit):
         sort_by = 'timestamp'
         sort_type='.desc()'
 
-    result = eval(search_table+'.query.filter_by(school_id=session[\'school_id\'],department=session[\'department\']).order_by('+search_table+'.'+sort_by+sort_type+').slice(('+str(limit-100)+'),'+str(limit)+'])')
+    result = eval(search_table+'.query.filter_by(school_id=session[\'school_id\'],department=session[\'department\']).order_by('+search_table+'.'+sort_by+sort_type+').slice('+str(limit-100)+','+str(limit)+')')
 
 
     return flask.render_template(
