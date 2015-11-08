@@ -532,14 +532,13 @@ def fetch_next(needed,limit):
         sort_by = 'timestamp'
         sort_type='.desc()'
 
-    session[needed+'_limit'] += 100
-    result = eval(search_table+'.query.filter_by(school_id=session[\'school_id\'],department=session[\'department\']).order_by('+search_table+'.'+sort_by+sort_type+').slice((session[\''+needed+'_limit\']-100),session[\''+needed+'_limit\'])')
+    result = eval(search_table+'.query.filter_by(school_id=session[\'school_id\'],department=session[\'department\']).order_by('+search_table+'.'+sort_by+sort_type+').slice(('+limit-100+'),'+limit+'])')
 
 
     return flask.render_template(
         needed+'.html',
         data=result,
-        limit=limit,
+        limit=limit-100,
         view=session['department']
         )
 
@@ -714,17 +713,9 @@ def start_again():
 @app.route('/loadmore', methods=['GET', 'POST'])
 def load_more():
     needed = flask.request.form.get('data')
+    needed_limit = session[needed+'_limit']
 
-    if needed == 'logs':
-        return fetch_next(needed,session['logs_limit'])
-    elif needed == 'late':
-        return fetch_next(needed,session['late_limit'])
-        
-    elif needed == 'absent':
-        return fetch_next(needed,session['absent_limit'])
-
-    elif needed == 'attendance':
-        return fetch_next(needed,session['attendance_limit'])
+    return fetch_next(needed,needed_limit)
         
     # prepare()
 
