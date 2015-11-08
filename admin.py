@@ -713,9 +713,9 @@ def start_again():
 @app.route('/loadmore', methods=['GET', 'POST'])
 def load_more():
     needed = flask.request.form.get('data')
-    needed_limit = session[needed+'_limit']
+    session[needed+'_limit'] += 100
 
-    return fetch_next(needed,needed_limit)
+    return fetch_next(needed,session[needed+'_limit'])
         
     # prepare()
 
