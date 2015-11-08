@@ -10,6 +10,16 @@ if (tab == 'attendance'){
     $('#add-user-btn').hide();
   }
 
+function validate_student_form(status){
+  form_validated = status;
+  if ((form_validated == true) && (id_no_validated == true)){
+    $('#save-student').removeAttr('disabled');
+  }
+  else{
+    $('#save-student').attr('disabled',true);
+  }
+}
+
 function validate_user_form(status){
   form_validated = status;
   if ((form_validated == true) && (id_no_validated == true)){
@@ -20,8 +30,23 @@ function validate_user_form(status){
   }
 }
 
-function validate_id_no(){
-  if (($('#id-error').text().length == 0) && ($('#add_id_no').val().length == 10)){
+function validate_student_id_no(){
+  if (($('#student-id-error').text().length == 0) && ($('#add_student_id_no').val().length == 10)){
+    id_no_validated = true;
+  }
+  else{
+    id_no_validated = false;
+  }
+  if ((form_validated == true) && (id_no_validated == true)){
+    $('#save-student').removeAttr('disabled');
+  }
+  else{
+    $('#save-student').attr('disabled',true);
+  }
+}
+
+function validate_user_id_no(){
+  if (($('#user-id-error').text().length == 0) && ($('#add_user_id_no').val().length == 10)){
     id_no_validated = true;
   }
   else{
@@ -49,17 +74,31 @@ function change_tab(page){
     });
 }
 
-function validate_id(id_no){
-  $('#id-error').hide();
-  $('#id-loader').show();
+function validate_student_id(id_no){
+  $('#student-id-error').hide();
+  $('#student-id-loader').show();
   $.post('/id/validate',{
         id_no:id_no,
     },
     function(data){
-        $('#id-error').html(data);
-        $('#id-loader').hide();
-        $('#id-error').show();
-        validate_id_no();
+        $('#student-id-error').html(data);
+        $('#student-id-loader').hide();
+        $('#student-id-error').show();
+        validate_student_id_no();
+    });
+}
+
+function validate_user_id(id_no){
+  $('#user-id-error').hide();
+  $('#user-id-loader').show();
+  $.post('/id/validate',{
+        id_no:id_no,
+    },
+    function(data){
+        $('#user-id-error').html(data);
+        $('#user-id-loader').hide();
+        $('#user-id-error').show();
+        validate_user_id_no();
     });
 }
 
@@ -140,13 +179,7 @@ function initial_data(){
 }
 
 function clear_data(){
-    $('#add_last_name').val('');
-    $('#add_first_name').val('');
-    $('#add_middle_name').val('');
-    $('#add_level').val('');
-    $('#add_section').val('');
-    $('#add_contact').val('');
-    $('#add_id_no').val('');
+    $('.add-user-modal-body').find('.form-control').val('');
     $('#id-error').text('');
 }
 
@@ -425,15 +458,41 @@ function save_sched(){
     });
 }
 
-function save_user(last_name, first_name, middle_name, level, section, contact, id_no){ 
-  $.post('/user/add',{
+function save_student(last_name, first_name, middle_name, level, section, contact, id_no){
+  department = 'student'
+  $.post('/user/new',{
       last_name:last_name,
       first_name:first_name,
       middle_name:middle_name,
       level:level,
       section:section,
       contact:contact,
-      id_no:id_no
+      id_no:id_no,
+      department:department
+  },
+  function(data){
+      clear_data();
+      form_validated = false
+      id_no_validated = false
+      $('#attendance').html(data);
+      $('#save-student').css({'background-image':'none'});
+      $('#save-student span').show();
+      $('.add-user-footer-left').fadeIn();
+      setTimeout(function() {
+          $('.add-user-footer-left').fadeOut();
+      }, 2000);
+      
+  });
+}
+
+function save_user(last_name, first_name, middle_name, id_no){
+  department = 'faculty'
+  $.post('/user/new',{
+      last_name:last_name,
+      first_name:first_name,
+      middle_name:middle_name,
+      id_no:id_no,
+      department:department
   },
   function(data){
       clear_data();
@@ -485,6 +544,13 @@ function edit_user(last_name, first_name, middle_name, level, section, contact, 
         setTimeout(function() {
           $('#snackbar').fadeOut();
       }, 2000);
+    });
+}
+
+function populate_calendar(){
+  $.post('/calendar/data/get',
+    function(data){
+        $('#calendar-container table tbody').html(data);
     });
 }
 

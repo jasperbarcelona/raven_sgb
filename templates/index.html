@@ -2,7 +2,7 @@
 {% block content %}
 <div id="table-container">
 	<div class="tab-content">
-		{% if tab == 'logs' or view=='faculty' %}
+		{% if tab == 'logs'%}
 		<div class="tab-pane active" id="logs-tab">
 		{% else %}
 		<div class="tab-pane" id="logs-tab">
@@ -54,6 +54,9 @@
 						</td>
 						<td class="short"></td>
 						<td class="short"></td>
+						{% else %}
+						<td class="short"></td>
+						<td class="short"></td>
 						{% endif %}
 					</tr>
 				</thead>
@@ -85,7 +88,7 @@
 			</table>
 		</div>
 
-		{% if view=='student' %}
+		
 		{% if tab == 'attendance' %}
 		<div class="tab-pane active" id="attendance-tab">
 		{% else %}
@@ -97,20 +100,23 @@
 					<tr>
 						<th class="xs"></th>
 						<th class="short" id="id_no">ID Number</th>
-						<th class="long" id="last_name">Last Name</th>
+						<th class="short" id="last_name">Last Name</th>
 						<th class="short" id="first_name">First Name</th>
 						<th class="short" id="middle_name">Middle Name</th>
+						{% if view=='student' %}
 						<th class="short" id="level">Grade/Level</th>
 						<th class="short" id="section">Section</th>	
 						<th class="attendance-count" id="absences">A</th>
 						<th class="attendance-count" id="lates">L</th>
+						{% endif %}
 					</tr>
 					<tr class="search-panel">
 						<td class="xs"></td>
 						<td class="short"><input id="attendance_search_id_no" type="text" class="form-control search-text search-attendance"></td>
-						<td class="long"><input id="attendance_search_last_name" type="text" class="form-control search-text search-attendance"></td>
+						<td class="short"><input id="attendance_search_last_name" type="text" class="form-control search-text search-attendance"></td>
 						<td class="short"><input id="attendance_search_first_name" type="text" class="form-control search-text search-attendance"></td>
 						<td class="short"><input id="attendance_search_middle_name" type="text" class="form-control search-text search-attendance"></td>
+						{% if view=='student' %}
 						<td class="short">
 							<select class="form-control search-text search-attendance" id="attendance_search_level">
 							        <option value="">All</option>
@@ -138,6 +144,7 @@
 						</td>
 						<td class="attendance-count"><input id="search_absences" type="text" class="form-control search-text search-attendance"></td>
 						<td class="attendance-count"><input id="search_lates" type="text" class="form-control search-text search-attendance"></td>
+						{% endif %}
 					</tr>
 				</thead>
 				<tbody id="attendance">
@@ -146,13 +153,15 @@
 					<tr id="{{index.id}}" class="rows" data-toggle="modal" data-target="#edit-user-modal" onclick="supply_data(this.id)">
 						<td class="xs">{{loop.index}}</td>	
 						<td class="short">{{index.id_no}}</td>	
-						<td class="long">{{index.last_name}}</td>	
+						<td class="short">{{index.last_name}}</td>	
 						<td class="short">{{index.first_name}}</td>	
 						<td class="short">{{index.middle_name}}</td>
+						{% if view=='student' %}
 						<td class="short">{{index.level}}</td>
 						<td class="short">{{index.section}}</td>				
 						<td class="attendance-count">{{index.absences}}</td>
 						<td class="attendance-count">{{index.lates}}</td>
+						{% endif %}
 					</tr>
 					{% endfor %}
 
@@ -165,6 +174,7 @@
 			</table>
 		</div>
 
+		{% if view=='student' %}
 		{% if tab == 'absent' %}
 		<div class="tab-pane active" id="absent-tab">
 		{% else %}
@@ -307,6 +317,7 @@
 			</table>
 		</div>
 		{% endif %}	
+
 	</div>
 </div>
 {% endblock %}

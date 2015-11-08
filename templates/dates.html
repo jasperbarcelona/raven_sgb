@@ -1,0 +1,25 @@
+{% for week in dates %}
+<tr>
+	{% for date in week %}
+		{% if date.month == month %}
+			{% if date.day == today %}
+				{% if date.day in events %}
+			    <td class="current-month current-day event">
+			    {% else %}
+			    <td class="current-month current-day">
+			    {% endif %}
+			    {% else %}
+			    {% if date.day in events %}
+			    <td class="current-month event">
+			    {% else %}
+			    <td class="current-month">
+			    {% endif %}
+		    {% endif %}
+		    {% else %}
+		    <td class="prev-month">
+	    {% endif %}
+	    	{{date.day}}
+	    </td>
+    {% endfor %}
+</tr>
+{% endfor %}

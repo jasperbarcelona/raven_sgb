@@ -18,9 +18,11 @@ from functools import wraps
 import threading
 from threading import Timer
 from multiprocessing.pool import ThreadPool
+from calendar import Calendar
 from time import sleep
 import requests
 import datetime
+from datetime import date
 import time
 import json
 import uuid
@@ -38,6 +40,7 @@ CLIENT_ID = 'ef8cf56d44f93b6ee6165a0caa3fe0d1ebeee9b20546998931907edbb266eb72'
 SECRET_KEY = 'c4c461cc5aa5f9f89b701bc016a73e9981713be1bf7bb057c875dbfacff86e1d'
 SHORT_CODE = '29290420420'
 CONNECT_TIMEOUT = 5.0
+CALENDAR_URL = 'http://127.0.0.1:8000/events/get'
 
 PRIMARY = ['1st Grade', '2nd Grade', '3rd Grade', '4th Grade', '5th Grade', '6th Grade']
 JUNIOR_HIGH = ['7th Grade', '8th Grade', '9th Grade', '10th Grade']
@@ -78,7 +81,7 @@ def SWJsonify(*args, **kwargs):
 
 class School(db.Model, Serializer):
     __public__= ['id','api_key','password','id_no','name','address','city','email','tel']
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(32),primary_key=True)
     api_key = db.Column(db.String(32))
     password = db.Column(db.String(20))
     name = db.Column(db.String(50))
@@ -110,7 +113,7 @@ class School(db.Model, Serializer):
 
 class Section(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    school_id = db.Column(db.Integer)
+    school_id = db.Column(db.String(32))
     name = db.Column(db.String(30))
 
 
@@ -118,7 +121,7 @@ class Log(db.Model, Serializer):
     __public__ = ['id','school_id','date','id_no','name','level',
                   'department','section','time_in','time_out','timestamp']
     id = db.Column(db.Integer, primary_key=True)
-    school_id = db.Column(db.Integer)
+    school_id = db.Column(db.String(32))
     date = db.Column(db.String(20))
     id_no = db.Column(db.String(20))
     name = db.Column(db.String(60))
@@ -134,7 +137,7 @@ class Student(db.Model, Serializer):
     __public__ = ['id','school_id','id_no','first_name','last_name','middle_name',
                   'level','department','section','absences','lates','parent_contact']
     id = db.Column(db.Integer, primary_key=True)
-    school_id = db.Column(db.Integer)
+    school_id = db.Column(db.String(32))
     id_no = db.Column(db.String(20))
     first_name = db.Column(db.String(30))
     last_name = db.Column(db.String(30))
@@ -149,7 +152,7 @@ class Student(db.Model, Serializer):
 
 class Late(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    school_id = db.Column(db.Integer)
+    school_id = db.Column(db.String(32))
     date = db.Column(db.String(20))
     id_no = db.Column(db.String(20))
     name = db.Column(db.String(60))
@@ -162,7 +165,7 @@ class Late(db.Model):
 
 class Absent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    school_id = db.Column(db.Integer)
+    school_id = db.Column(db.String(32))
     date = db.Column(db.String(20))
     id_no = db.Column(db.String(20))
     name = db.Column(db.String(60))
@@ -528,7 +531,7 @@ def fetch_next(needed,limit):
 
 
 def search_logs(*args, **kwargs):
-    query = 'Log.query.filter(Log.department.ilike("'+session['department']+'"),Log.school_id.ilike('+session['school_id']+'),'
+    query = 'Log.query.filter(Log.department.ilike("'+session['department']+'"),Log.school_id.ilike("'+session['school_id']+'"),'
     for arg_name in kwargs:
         if kwargs[arg_name]:
             query += 'Log.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
@@ -539,7 +542,7 @@ def search_logs(*args, **kwargs):
 
 
 def search_attendance(*args, **kwargs):
-    query = 'Student.query.filter(Student.department.ilike("'+session['department']+'"),Student.school_id.ilike('+session['school_id']+'),'
+    query = 'Student.query.filter(Student.department.ilike("'+session['department']+'"),Student.school_id.ilike("'+session['school_id']+'"),'
     for arg_name in kwargs:
         if kwargs[arg_name]:
             query += 'Student.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
@@ -549,7 +552,7 @@ def search_attendance(*args, **kwargs):
 
 
 def search_absent(*args, **kwargs):
-    query = 'Absent.query.filter(Absent.school_id.ilike('+session['school_id']+'),'
+    query = 'Absent.query.filter(Absent.school_id.ilike("'+session['school_id']+'"),'
     for arg_name in kwargs:
         if kwargs[arg_name]:
             query += 'Absent.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
@@ -559,7 +562,7 @@ def search_absent(*args, **kwargs):
 
 
 def search_late(*args, **kwargs):
-    query = 'Late.query.filter(Late.school_id.ilike('+session['school_id']+'),'
+    query = 'Late.query.filter(Late.school_id.ilike("'+session['school_id']+'"),'
     for arg_name in kwargs:
         if kwargs[arg_name]:
             query += 'Late.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
@@ -1130,6 +1133,29 @@ def validate_id():
         return ''
 
 
+@app.route('/calendar/data/get',methods=['GET','POST'])
+def populate_calendar():
+    cal = Calendar(6)
+    year = date.today().year
+    month = date.today().month
+    day = date.today().day
+    dates = cal.monthdatescalendar(year, month)
+
+    calendar_params = {
+        'api_key':session['api_key'],
+        'month':month,
+        'year':year
+    }
+
+    try:
+        get_events = requests.get(CALENDAR_URL,params=calendar_params)
+        events = get_events.json()['days']
+        return flask.render_template('dates.html', dates=dates, year=year, month=month, today=day, events=events)
+
+    except requests.exceptions.ConnectionError as e:
+        return flask.render_template('dates.html', dates=dates, year=year, month=month, today=day) #return diff template??
+
+
 @app.route('/favicon.ico',methods=['GET','POST'])
 def est():
     return '',204
@@ -1220,7 +1246,7 @@ def rebuild_database():
     db.create_all()
 
     school = School(
-        id=1234,
+        id='1234',
         api_key='ecc67d28db284a2fb351d58fe18965f9',
         password='test',
         name="Scuola Gesu Bambino",
@@ -1247,7 +1273,7 @@ def rebuild_database():
     db.session.add(school)
 
     school1 = School(
-        id=4321,
+        id='4321',
         api_key='ecc67d28db284a2fb351d58fe18965f0',
         password='test',
         name="Sacred Heart College",
@@ -1274,7 +1300,7 @@ def rebuild_database():
     db.session.add(school1)
 
     a = Student(
-        school_id=1234,
+        school_id='1234',
         id_no='2011334281',
         first_name='Jasper',
         last_name='Barcelona',
@@ -1287,7 +1313,7 @@ def rebuild_database():
         parent_contact='639183339068'
         )
     b = Student(
-        school_id=1234,
+        school_id='1234',
         id_no='2011334282',
         first_name='Janno',
         last_name='Armamento',
@@ -1301,7 +1327,7 @@ def rebuild_database():
         )
 
     c = Student(
-        school_id=1234,
+        school_id='1234',
         id_no='2011334283',
         first_name='Bear',
         last_name='Delos Reyes',
@@ -1315,17 +1341,17 @@ def rebuild_database():
         )
 
     d = Section(
-        school_id=1234,
+        school_id='1234',
         name='Charity'
         )
 
     e = Section(
-        school_id=1234,
+        school_id='1234',
         name='Fidelity'
         )
 
     f = Section(
-        school_id=1234,
+        school_id='1234',
         name='Peace'
         )
 

@@ -4,6 +4,12 @@
 		src:url('../fonts/OpenSans-Regular.ttf');
 	}
 
+@font-face
+	{
+		font-family: Lato;
+		src:url('../fonts/lato.woff2');
+	}
+
 
 html{
 	height: 100%;
@@ -13,7 +19,7 @@ body{
 	height: 100%;
 	width: 100%;
 	color: #494949 !important;
-	font-family: OpenSans, sans-serif;
+	font-family: Lato, sans-serif;
 	background-color: #242424;
 	-webkit-user-select: none;  /* Chrome all / Safari all */
   	-moz-user-select: none;     /* Firefox all */
@@ -64,7 +70,7 @@ textarea:focus{
 }
 
 .md-28{
-	font-size: 42px !important;
+	font-size: 30px !important;
 }
 
 .md-30{
@@ -143,8 +149,8 @@ textarea:focus{
 	color: #FFFFFF;
 	display: -webkit-flex;
 	display: flex;
-	-webkit-flex-direction: column;
-	flex-direction: column;
+	-webkit-flex-direction: row;
+	flex-direction: row;
 	-webkit-align-items: center;
 	align-items: center;
 	-webkit-justify-content: center;
@@ -152,6 +158,7 @@ textarea:focus{
 }
 
 .snackbar-status-message{
+	font-weight: bold;
 	font-size: 16px;
 }
 
@@ -188,6 +195,19 @@ textarea:focus{
 	padding-bottom: 0px;
 }
 
+.calendar-modal-body{
+	height: 500px;
+	width: 100%;
+	padding-left: 0px;
+	padding-right: 0px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
+.calendar-modal-dialog{
+	width: 700px;
+}
+
 .message-modal-header{
 	padding-left: 10px !important;
 }
@@ -204,6 +224,11 @@ textarea:focus{
 
 .message-modal-title{
 	margin-top: -8px !important;
+}
+
+.calendar-modal-title{
+	margin-top: -8px !important;
+	text-align: center;
 }
 
 .close{
@@ -533,6 +558,7 @@ textarea:focus{
 	overflow: hidden;
 	overflow-x:hidden;
 	background-color: #F5F5F5;
+	overflow-y: scroll;
 }
 
 .table thead{
@@ -595,6 +621,7 @@ textarea:focus{
 }
 
 .search-panel{
+	height: 70px;
 	background-color: #F1F1F1;
 }
 
@@ -646,8 +673,8 @@ h3{
 }
 
 .table td{
-	border-left: 1px solid #DDDDDD;
-	border-right: 1px solid #DDDDDD;
+	/*border-left: 1px solid #DDDDDD;
+	border-right: 1px solid #DDDDDD;*/
 }
 
 .rows:hover{
@@ -679,13 +706,102 @@ table.table thead tr th, table.table tfoot tr th {
 .nav-tabs > li.active > a,
 .nav-tabs > li.active > a:hover,
 .nav-tabs > li.active > a:focus{
-          color: #FFFFFF;
-          cursor: default;
-          background-color: #494949;	
-          border: 1px solid #dddddd;
-          border-bottom-color: transparent;
-          outline: none;
+	color: #FFFFFF;
+	cursor: default;
+	background-color: #494949;	
+	border: 1px solid #dddddd;
+	border-bottom-color: transparent;
+	outline: none;
 } 
+
+#calendar-container{
+	width: 100%;
+	height: 100%;
+	padding: 10px;
+}
+
+#calendar-container table{
+	font-size: 14px;
+	text-transform: uppercase;
+	height: 100%;
+	width: 100%;
+}
+
+#calendar-container table .month{
+	height: 60px;
+	font-size: 18px;
+	height: 20px;
+	opacity: 0;
+}
+
+#calendar-container table tr th.sun,
+#calendar-container table tr th.mon,
+#calendar-container table tr th.tue,
+#calendar-container table tr th.wed,
+#calendar-container table tr th.thu,
+#calendar-container table tr th.fri,
+#calendar-container table tr th.sat{
+	height: 30px;
+	color: #4485F5;
+	font-weight: bold;
+	text-align: center;
+}
+
+#calendar-container table td{
+	text-align: center;
+	width: 100px;
+	cursor: pointer;
+	color: #494949;
+}
+
+.prev-month{
+	opacity: .3;
+}
+
+#calendar-container table td:hover{
+	background-color: #DCDBDB;
+}
+
+.current-day:hover{
+	background-color: #4485F5 !important;
+}
+
+.current-day {
+	background-color: #4485F5;
+	color: #FFFFFF !important;
+}
+
+.event {
+	cursor: pointer;
+	position: relative;
+}
+
+.event:after {
+	background: #4485F5 !important;
+	display: block !important;
+	content: '' !important;
+	height: 3px !important;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	width: 20px !important;
+}
+
+.event.current-day:after {
+	background: #FFFFFF !important;
+	display: block !important;
+	content: '' !important;
+	height: 3px !important;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	width: 20px !important;
+}
+
+
+
 
 /*table.table thead tr .headerSortUp {
 	background-image: url('../images/asc.gif');
