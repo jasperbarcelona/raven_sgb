@@ -716,15 +716,15 @@ def load_more():
     needed = flask.request.form.get('data')
 
     if needed == 'logs':
-        return data = fetch_next(needed,session['logs_limit'])
+        return fetch_next(needed,session['logs_limit'])
     elif needed == 'late':
-        return data = fetch_next(needed,session['late_limit'])
+        return fetch_next(needed,session['late_limit'])
         
     elif needed == 'absent':
-        return data = fetch_next(needed,session['absent_limit'])
+        return fetch_next(needed,session['absent_limit'])
 
     elif needed == 'attendance':
-        return data = fetch_next(needed,session['attendance_limit'])
+        return fetch_next(needed,session['attendance_limit'])
         
     # prepare()
 
