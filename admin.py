@@ -40,7 +40,8 @@ CLIENT_ID = 'ef8cf56d44f93b6ee6165a0caa3fe0d1ebeee9b20546998931907edbb266eb72'
 SECRET_KEY = 'c4c461cc5aa5f9f89b701bc016a73e9981713be1bf7bb057c875dbfacff86e1d'
 SHORT_CODE = '29290420420'
 CONNECT_TIMEOUT = 5.0
-CALENDAR_URL = 'http://127.0.0.1:8000/events/get'
+CALENDAR_URL = 'http://ravenclock.herokuapp.com/events/get'
+SCHEDULE_URL = 'http://ravenclock.herokuapp.com/schedule/regular/update'
 
 PRIMARY = ['1st Grade', '2nd Grade', '3rd Grade', '4th Grade', '5th Grade', '6th Grade']
 JUNIOR_HIGH = ['7th Grade', '8th Grade', '9th Grade', '10th Grade']
@@ -1118,7 +1119,7 @@ def change_sched():
     while not sent:
         try:
             r = requests.post(
-                'http://127.0.0.1:8000/schedule/regular/update',
+                SCHEDULE_URL,
                 sched_data         
             )
             sent =True
