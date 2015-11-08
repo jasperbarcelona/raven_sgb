@@ -307,6 +307,7 @@ def mark_morning_absent(school_id,api_key):
 
             student.absences=Absent.query.filter_by(id_no=student.id_no, school_id=school_id).count()
             db.session.commit()
+            db.session.close()
 
 
 def mark_afternoon_absent(school_id,api_key):
@@ -334,6 +335,7 @@ def mark_afternoon_absent(school_id,api_key):
 
             student.absences=Absent.query.filter_by(id_no=student.id_no, school_id=school_id).count()
             db.session.commit()
+            db.session.close()
 
 def mark_specific_absent(school_id,id_no,time_of_day):
     student = Student.query.filter_by(school_id=school_id,id_no=id_no).first()
@@ -355,6 +357,7 @@ def mark_specific_absent(school_id,id_no,time_of_day):
 
     student.absences=Absent.query.filter_by(id_no=id_no, school_id=school_id).count()
     db.session.commit()
+    db.session.close()
 
 
 def check_if_late(school_id,api_key,id_no,name,level,
@@ -420,6 +423,7 @@ def record_as_late(school_id, id_no, name, level, section,
     student=Student.query.filter_by(id_no=id_no, school_id=school_id).one()
     student.lates=Late.query.filter_by(id_no=id_no, school_id=school_id).count()
     db.session.commit()
+    db.session.close()
 
 
 def time_in(school_id,api_key,id_no,name,level,section,
@@ -434,6 +438,7 @@ def time_in(school_id,api_key,id_no,name,level,section,
 
     db.session.add(add_this)
     db.session.commit()
+    db.session.close()
 
     if department != 'faculty':
         return check_if_late(school_id, api_key, id_no,name,level,
@@ -464,6 +469,7 @@ def time_out(id_no, time, school_id):
     a = Log.query.filter_by(id_no=id_no,school_id=school_id).order_by(Log.timestamp.desc()).first()
     a.time_out=time  
     db.session.commit()
+    db.session.close()
 
     return '', 201
 
@@ -899,6 +905,7 @@ def add_user():
 
     db.session.add(user)
     db.session.commit()
+    db.session.close()
 
     session['attendance_limit'] = 0
     
@@ -933,6 +940,7 @@ def edit_user():
     user.id_no = id_no
 
     db.session.commit()
+    db.session.close()
 
     session['attendance_limit'] = 0
     
@@ -1088,6 +1096,7 @@ def change_sched():
     school.senior_afternoon_end = senior_afternoon_end
 
     db.session.commit()
+    db.session.close()
 
     sched_data = {
         'school_id': session['school_id'],
@@ -1188,6 +1197,7 @@ def sync_schedule():
     school.senior_afternoon_end = data['senior_afternoon_end']
 
     db.session.commit()
+    db.session.close()
     return '',201
 
 
@@ -1205,6 +1215,7 @@ def add_faculty():
             )
         db.session.add(a)
         db.session.commit()
+        db.session.close()
 
     return 'done'
 
@@ -1237,6 +1248,7 @@ def add_school():
         )
     db.session.add(school)
     db.session.commit()
+    db.session.close()
     return 'okay'
 
 
@@ -1362,6 +1374,7 @@ def rebuild_database():
     db.session.add(e)
     db.session.add(f)
     db.session.commit()
+    db.session.close()
     return SWJsonify({'status': 'Database Rebuild Success'})
 
 # @app.route('/db/rebuild', methods=['GET', 'POST'])
