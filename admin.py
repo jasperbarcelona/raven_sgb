@@ -535,7 +535,13 @@ def fetch_next(needed,limit):
     session[needed+'_limit'] += 100
     result = eval(search_table+'.query.filter_by(school_id=session[\'school_id\'],department=session[\'department\']).order_by('+search_table+'.'+sort_by+sort_type+').slice((session[\''+needed+'_limit\']-100),session[\''+needed+'_limit\'])')
 
-    return result
+
+    return flask.render_template(
+        needed+'.html',
+        data=result,
+        limit=limit,
+        view=session['department']
+        )
 
 
 def search_logs(*args, **kwargs):
@@ -710,32 +716,17 @@ def load_more():
     needed = flask.request.form.get('data')
 
     if needed == 'logs':
-        data = fetch_next(needed,session['logs_limit'])
-        page = 'logs.html'
-        limit = session['logs_limit']-100
+        return data = fetch_next(needed,session['logs_limit'])
     elif needed == 'late':
-        data = fetch_next(needed,session['late_limit'])
-        page = 'late.html'
-        limit = session['late_limit']-100
+        return data = fetch_next(needed,session['late_limit'])
         
     elif needed == 'absent':
-        data = fetch_next(needed,session['absent_limit'])
-        page = 'absent.html'
-        limit = session['absent_limit']-100
+        return data = fetch_next(needed,session['absent_limit'])
 
     elif needed == 'attendance':
-        data = fetch_next(needed,session['attendance_limit'])
-        page = 'attendance.html'
-        limit = session['attendance_limit']-100
+        return data = fetch_next(needed,session['attendance_limit'])
         
     # prepare()
-
-    return flask.render_template(
-        page,
-        data=data,
-        limit=limit,
-        view=session['department']
-        )
 
 
 @app.route('/view', methods=['GET', 'POST'])
