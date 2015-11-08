@@ -540,7 +540,7 @@ def fetch_next(needed):
     return flask.render_template(
         needed+'.html',
         data=result,
-        limit=limit-100,
+        limit=session[needed+'_limit']-100,
         view=session['department']
         )
 
