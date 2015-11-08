@@ -22,11 +22,12 @@ $('tbody').scroll(function () {
         $this.data('activated', true);
         setTimeout(function() {
             $this.data('activated', false)
-        }, 500); // Freeze for 500ms
+        }, 1000); // Freeze for 500ms
         if($(this).scrollTop() + $(this).height() > (this.scrollHeight * .7))  {
             if(isPreviousEventComplete){
                 if(searchStatus == 'off'){
                     load_next(String(this.getAttribute('id')));
+                    console.log('loading next');
                 }
                 else{
                     eval(String(this.getAttribute('id'))+'_next_search()');
