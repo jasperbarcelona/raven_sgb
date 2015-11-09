@@ -32,7 +32,7 @@ import os
 
 app = flask.Flask(__name__)
 db = SQLAlchemy(app)
-app.secret_key = '234234rfascasascqweqscasefsdvqwefe2323234dvsv'
+app.secret_key = '0129383hfldcndidvs98r9t9438953894534k545lkn3kfnac98'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 
 API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
@@ -642,7 +642,7 @@ def get_schedule():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if not session:
+    if not flask.session:
         return redirect('/loginpage')
     session['logs_limit'] = 100
     session['late_limit'] = 100
@@ -780,7 +780,7 @@ def login_page():
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
-    session.clear()
+    flask.session.clear()
     return redirect('/')
 
 
