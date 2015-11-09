@@ -32,7 +32,7 @@ import os
 
 app = flask.Flask(__name__)
 db = SQLAlchemy(app)
-app.secret_key = '0129383hfldcndidvs98r9t9438953894534k545lkn3kfnac98'
+app.secret_key = '0129383hfldcndidvs98r9t94389538945ascasc34k545lkn3kfnac98'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 
 API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
@@ -635,7 +635,7 @@ def get_schedule():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if not session:
+    if not session['school_id']:
         return redirect('/loginpage')
     session['logs_limit'] = 100
     session['late_limit'] = 100
@@ -748,7 +748,7 @@ def mark_absent_afternoon():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if session:
+    if session['school_id']:
         return redirect('/')
     
     school_id = flask.request.form.get('school_id')
@@ -766,7 +766,7 @@ def login():
 
 @app.route('/loginpage', methods=['GET', 'POST'])
 def login_page():
-    if session:
+    if session['school_id']:
         return redirect('/')
     return flask.render_template('login.html')
 
