@@ -18,6 +18,7 @@ from functools import wraps
 import threading
 from threading import Timer
 from multiprocessing.pool import ThreadPool
+import calendar
 from calendar import Calendar
 from time import sleep
 import requests
@@ -1136,7 +1137,7 @@ def populate_calendar():
     try:
         get_events = requests.get(CALENDAR_URL,params=calendar_params)
         events = get_events.json()['days']
-        return flask.render_template('dates.html', dates=dates, year=year, month=month, today=day, events=events)
+        return flask.render_template('dates.html', dates=dates, year=year, month=month, today=day, events=events, month_name=calendar.month_name[month])
 
     except requests.exceptions.ConnectionError as e:
         return flask.render_template('dates.html', dates=dates, year=year, month=month, today=day) #return diff template??
