@@ -635,7 +635,7 @@ def get_schedule():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if not session['school_id']:
+    if session['school_id']=='':
         return redirect('/loginpage')
     session['logs_limit'] = 100
     session['late_limit'] = 100
@@ -773,7 +773,9 @@ def login_page():
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
-    session.clear()
+    session['school_id']=''
+    print 'xxxxxxxxxxxxxxxxxxxxx'
+    print 'CLEARED'
     return redirect('/')
 
 
