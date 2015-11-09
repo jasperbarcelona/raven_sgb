@@ -635,7 +635,7 @@ def get_schedule():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if not flask.session:
+    if not session:
         return redirect('/loginpage')
     session['logs_limit'] = 100
     session['late_limit'] = 100
@@ -773,7 +773,7 @@ def login_page():
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
-    flask.session.clear()
+    session.clear()
     return redirect('/')
 
 
