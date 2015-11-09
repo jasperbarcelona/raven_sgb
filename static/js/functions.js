@@ -550,7 +550,7 @@ function edit_user(last_name, first_name, middle_name, level, section, contact, 
 function populate_calendar(){
   $.post('/calendar/data/get',
     function(data){
-        $('#calendar-container table tbody').html(data);
+        $('#calendar-container table').html(data);
     });
 }
 

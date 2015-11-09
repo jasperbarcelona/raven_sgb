@@ -30,10 +30,6 @@ span:hover{
 	cursor: pointer;
 }
 
-th:hover{
-	cursor: pointer;
-}
-
 textarea{
 	width: 100%;
 	height: 100%;
@@ -228,11 +224,10 @@ textarea:focus{
 
 .calendar-modal-title{
 	margin-top: -8px !important;
-	text-align: center;
 }
 
 .close{
-	margin-top: -5px !important;
+	margin-top: -6px !important;
 }
 
 .schedule-modal-dialog,
@@ -716,11 +711,21 @@ table.table thead tr th, table.table tfoot tr th {
 	width: 100%;
 }
 
+.calendar-nav-left{
+	text-align: right;
+	font-size: 32px;
+}
+
+.calendar-nav-right{
+	text-align: left;
+	font-size: 32px;
+}
+
 #calendar-container table .month{
-	height: 60px;
-	font-size: 18px;
-	height: 20px;
-	opacity: 0;
+	height: 50px;
+	font-size: 16px;
+	text-align: center;
+	color: #4485F5;
 }
 
 #calendar-container table tr th.sun,
@@ -739,8 +744,11 @@ table.table thead tr th, table.table tfoot tr th {
 #calendar-container table td{
 	text-align: center;
 	width: 100px;
-	cursor: pointer;
 	color: #494949;
+}
+
+.day{
+	cursor: pointer;
 }
 
 .prev-month{
@@ -761,7 +769,6 @@ table.table thead tr th, table.table tfoot tr th {
 }
 
 .event {
-	cursor: pointer;
 	position: relative;
 }
 

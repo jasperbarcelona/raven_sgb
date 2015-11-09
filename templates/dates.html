@@ -1,25 +1,41 @@
-{% for week in dates %}
-<tr>
-	{% for date in week %}
-		{% if date.month == month %}
-			{% if date.day == today %}
-				{% if date.day in events %}
-			    <td class="current-month current-day event">
-			    {% else %}
-			    <td class="current-month current-day">
+<thead>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<tr>
+        <th colspan="2" class="calendar-nav-left"><span class="material-icons">&#xE314;</span></th>
+        <th colspan="3" class="month">{{month_name}} {{year}}</th>
+		<th colspan="2" class="calendar-nav-right"><span class="material-icons">&#xE315;</span></th>
+	</tr>
+	<tr>
+        <th class="sun">Sun</th><th class="mon">Mon</th>
+        <th class="tue">Tue</th><th class="wed">Wed</th>
+        <th class="thu">Thu</th><th class="fri">Fri</th>
+        <th class="sat">Sat</th>
+	</tr>
+</thead>
+<tbody>
+	{% for week in dates %}
+	<tr>
+		{% for date in week %}
+			{% if date.month == month %}
+				{% if date.day == today %}
+					{% if date.day in events %}
+				    <td class="day current-month current-day event">
+				    {% else %}
+				    <td class="day current-month current-day">
+				    {% endif %}
+				    {% else %}
+				    {% if date.day in events %}
+				    <td class="day current-month event">
+				    {% else %}
+				    <td class="day current-month">
+				    {% endif %}
 			    {% endif %}
 			    {% else %}
-			    {% if date.day in events %}
-			    <td class="current-month event">
-			    {% else %}
-			    <td class="current-month">
-			    {% endif %}
+			    <td class="day prev-month">
 		    {% endif %}
-		    {% else %}
-		    <td class="prev-month">
-	    {% endif %}
-	    	{{date.day}}
-	    </td>
-    {% endfor %}
-</tr>
-{% endfor %}
+		    	{{date.day}}
+		    </td>
+	    {% endfor %}
+	</tr>
+	{% endfor %}
+</tbody>
