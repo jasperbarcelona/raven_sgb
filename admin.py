@@ -775,8 +775,8 @@ def login_page():
 def logout():
     session['school_id']=''
     print 'xxxxxxxxxxxxxxxxxxxxx'
-    print 'CLEARED'
-    return redirect('/')
+    print
+    return redirect('/loginpage')
 
 
 @app.route('/student/info/get', methods=['GET', 'POST'])
