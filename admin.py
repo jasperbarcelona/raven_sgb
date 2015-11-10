@@ -633,7 +633,7 @@ def get_schedule():
     return get_latest_schedule(api_key)
 
 
-@app.route('/domain/test',subdomain="<variable>", methods=['GET', 'POST'])
+@app.route('/domain/test/<variable>', methods=['GET', 'POST'])
 def domain_test(variable):
     return variable
 
