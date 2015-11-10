@@ -639,7 +639,7 @@ def domain_test(variable):
 
 
 @app.route('/domain/redirect/test', methods=['GET', 'POST'])
-def redirect_test(variable):
+def redirect_test():
     return redirect('/domain/test/jasperbarcelona')
 
 
