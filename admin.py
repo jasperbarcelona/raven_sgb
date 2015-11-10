@@ -638,6 +638,11 @@ def domain_test(variable):
     return variable
 
 
+@app.route('/domain/redirect/test', methods=['GET', 'POST'])
+def redirect_test(variable):
+    return redirect('/domain/test/jasperbarcelona')
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if not session:
