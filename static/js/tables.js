@@ -19,8 +19,7 @@ $('tbody').scroll(function () {
         var $this = jQuery(this);
         if ($this.data('activated')) return false;  // Pending, return
 
-        if($(this).scrollTop() + $(this).height() > (this.scrollHeight * .7))  {
-            alert('active')
+        if(($(this).scrollTop() + $(this).height() > (this.scrollHeight * .7)) && ($(this).scrollTop() + $(this).height() < (this.scrollHeight * .71))) {
             if(isPreviousEventComplete){
                 if(searchStatus == 'off'){
                     load_next(String(this.getAttribute('id')));

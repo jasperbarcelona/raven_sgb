@@ -1158,6 +1158,11 @@ def sync_schedule():
     return '',201
 
 
+@app.route('/favicon.ico',methods=['GET','POST'])
+def favicon():
+    return '',200
+
+
 @app.route('/db/faculty/add', methods=['GET', 'POST'])
 def add_faculty():
     for i in range(500):
@@ -1338,4 +1343,4 @@ if __name__ == '__main__':
     app.debug = True
     app.run(port=int(os.environ['PORT']), host='0.0.0.0',threaded=True)
 
-    # port=int(os.environ['PORT']), host='0.0.0.0',
+    # port=int(os.environ['PORT']), host='0.0.0.0'
