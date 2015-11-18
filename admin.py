@@ -10,11 +10,10 @@ from flask.ext.admin.contrib.sqla import ModelView
 from flask.ext.admin import Admin, BaseView, expose
 from dateutil.parser import parse as parse_date
 from flask import render_template, request
-from functools import update_wrapper
 from flask import session, redirect
 from datetime import timedelta
 from datetime import datetime
-from functools import wraps
+from functools import wraps, update_wrapper
 import threading
 from threading import Timer
 from multiprocessing.pool import ThreadPool
@@ -87,6 +86,7 @@ class School(db.Model, Serializer):
     api_key = db.Column(db.String(32))
     password = db.Column(db.String(20))
     name = db.Column(db.String(50))
+    url = db.Column(db.String(50))
     address = db.Column(db.String(120))
     city = db.Column(db.String(30))
     email = db.Column(db.String(60))
@@ -633,20 +633,24 @@ def get_schedule():
     return get_latest_schedule(api_key)
 
 
-@app.route('/domain/test/<variable>', methods=['GET', 'POST'])
-def domain_test(variable):
-    return variable
-
-
-@app.route('/domain/redirect/test', methods=['GET', 'POST'])
-def redirect_test():
-    return redirect('/domain/test/jasperbarcelona')
+def nocache(view):
+    @wraps(view)
+    def no_cache(*args, **kwargs):
+        response = make_response(view(*args, **kwargs))
+        response.headers['Last-Modified'] = datetime.datetime.now()
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '-1'
+        return response
+        
+    return update_wrapper(no_cache, view)
 
 
 @app.route('/', methods=['GET', 'POST'])
+@nocache
 def index():
     if not session:
-        return redirect('/loginpage')
+        return redirect('/signin')
     session['logs_limit'] = 100
     session['late_limit'] = 100
     session['attendance_limit'] = 100
@@ -690,39 +694,46 @@ def index():
         )
 
 
-@app.route('/rollback', methods=['GET', 'POST'])
-def rollback():
-    db.session.rollback()
-    return 'ok'
+@app.route('/signin', methods=['GET', 'POST'])
+@nocache
+def login_page():
+    if session:
+        return redirect('/')
+    return flask.render_template('login.html')
 
 
-@app.route('/mock/redirect', methods=['GET', 'POST'])
-def redirect_uri():
-    return request.args['code']
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if session:
+        return redirect('/')
+    
+    login_data = flask.request.form.to_dict()
+
+    if not authenticate_user(login_data['school_id'], login_data['password']):
+        return redirect('/signin')
+
+    school = School.query.filter_by(id=login_data['school_id']).first()
+
+    session['school_id'] = school.id
+    session['api_key'] = school.api_key
+    session['department'] = 'student'
+    session['tab'] = 'logs'
+    return redirect('/')
 
 
 @app.route('/home', methods=['GET', 'POST'])
 def start_again():
     needed = flask.request.form.get('tab') 
-
     session[needed+'_limit'] = 0
-    
     session[needed+'_search_limit'] = 100
-
-    data = fetch_next(needed,0)
-
-    # prepare()
-
+    data = fetch_next(needed)
     return flask.render_template(needed+'.html', data=data, limit=0, view=session['department'])
 
 
 @app.route('/loadmore', methods=['GET', 'POST'])
 def load_more():
     needed = flask.request.form.get('data')
-
     return fetch_next(needed)
-        
-    # prepare()
 
 
 @app.route('/view', methods=['GET', 'POST'])
@@ -756,35 +767,10 @@ def mark_absent_afternoon():
     return '',201
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if session:
-        return redirect('/')
-    
-    school_id = flask.request.form.get('school_id')
-    password = flask.request.form.get('password')
-
-    if not authenticate_user(school_id, password):
-        return redirect('/loginpage')
-
-    session['school_id'] = school_id
-    session['api_key'] = School.query.filter_by(id=school_id).first().api_key
-    session['department'] = 'student'
-    session['tab'] = 'logs'
-    return redirect('/')
-
-
-@app.route('/loginpage', methods=['GET', 'POST'])
-def login_page():
-    if session:
-        return redirect('/')
-    return flask.render_template('login.html')
-
-
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     session.clear()
-    return redirect('/')
+    return redirect('/signin')
 
 
 @app.route('/student/info/get', methods=['GET', 'POST'])
@@ -1143,11 +1129,6 @@ def populate_calendar():
         return flask.render_template('dates.html', dates=dates, year=year, month=month, today=day) #return diff template??
 
 
-@app.route('/favicon.ico',methods=['GET','POST'])
-def est():
-    return '',204
-
-
 @app.route('/schedule/sync',methods=['GET','POST'])
 def sync_schedule():
     data = flask.request.form.to_dict()
@@ -1192,8 +1173,8 @@ def add_faculty():
             )
         db.session.add(a)
         db.session.commit()
-
     return 'done'
+
 
 @app.route('/db/school/add', methods=['GET', 'POST'])
 def add_school():
@@ -1237,6 +1218,7 @@ def rebuild_database():
         api_key='ecc67d28db284a2fb351d58fe18965f9',
         password='test',
         name="Scuola Gesu Bambino",
+        url='scuolagesubambino',
         address="10, Brgy Isabang",
         city="Lucena City",
         email="sgb.edu@gmail.com",
@@ -1264,6 +1246,7 @@ def rebuild_database():
         api_key='ecc67d28db284a2fb351d58fe18965f0',
         password='test',
         name="Sacred Heart College",
+        url='sacredheartcollege',
         address="10, Brgy Isabang",
         city="Lucena City",
         email="sgb.edu@gmail.com",
@@ -1351,92 +1334,9 @@ def rebuild_database():
     db.session.commit()
     return SWJsonify({'status': 'Database Rebuild Success'})
 
-# @app.route('/db/rebuild', methods=['GET', 'POST'])
-# def rebuild_database():
-#     db.drop_all()
-#     db.create_all()
-
-#     school = School(
-#         id=1234,
-#         api_key='ecc67d28db284a2fb351d58fe18965f9',
-#         password='test',
-#         name="Scuola Gesu Bambino",
-#         address="10, Brgy Isabang",
-#         city="Lucena City",
-#         email="sgb.edu@gmail.com",
-#         tel="555-8898",
-
-#         primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
-#         primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-#         primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-#         primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
-
-#         junior_morning_start = str(now.replace(hour=8, minute=0, second=0))[11:16],
-#         junior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-#         junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-#         junior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16],
-
-#         senior_morning_start = str(now.replace(hour=9, minute=0, second=0))[11:16],
-#         senior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-#         senior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-#         senior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16]
-#         )
-#     db.session.add(school)
-
-#     for i in range(400):
-
-#         a = Student(
-#             school_id=1234,
-#             id_no='2011334281',
-#             first_name='Jasper',
-#             last_name='Barcelona',
-#             middle_name='Estrada',
-#             level='2nd Grade',
-#             department='student',
-#             section='Charity',
-#             absences='0',
-#             lates='0',
-#             parent_contact='09183339068'
-#             )
-
-#         b = Log(
-#             school_id=1234,
-#             date='1234',
-#             id_no='2011334281',
-#             name='Jasper',
-#             level='2nd Grade',
-#             department='student',
-#             section='Charity',
-#             time_in='0',
-#             )
-
-#         db.session.add(a)
-#         db.session.add(b)
-
-#     d = Section(
-#         school_id=1234,
-#         name='Charity'
-#         )
-
-#     e = Section(
-#         school_id=1234,
-#         name='Fidelity'
-#         )
-
-#     f = Section(
-#         school_id=1234,
-#         name='Peace'
-#         )
-
-#     db.session.add(d)
-#     db.session.add(e)
-#     db.session.add(f)
-#     db.session.commit()
-#     return SWJsonify({'status': 'Database Rebuild Success'})
-
 
 if __name__ == '__main__':
     app.debug = True
     app.run(port=int(os.environ['PORT']), host='0.0.0.0',threaded=True)
 
-    # port=int(os.environ['PORT']), host='0.0.0.0'
+    # port=int(os.environ['PORT']), host='0.0.0.0',
