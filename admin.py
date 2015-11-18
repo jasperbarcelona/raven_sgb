@@ -726,8 +726,7 @@ def start_again():
     needed = flask.request.form.get('tab') 
     session[needed+'_limit'] = 0
     session[needed+'_search_limit'] = 100
-    data = fetch_next(needed)
-    return flask.render_template(needed+'.html', data=data, limit=0, view=session['department'])
+    return fetch_next(needed)
 
 
 @app.route('/loadmore', methods=['GET', 'POST'])
