@@ -299,7 +299,7 @@ function search_logs(){
   });
 }
 
-function logs_next_search(){
+function logs_next_search(elem){
   var date = $('#log_search_date').val();
   var id_no = $('#log_search_id_no').val();
   var name = $('#log_search_name').val();
@@ -318,6 +318,7 @@ function logs_next_search(){
     },
     function(data){
         $('#'+tab).append(data);
+        $('tbody').data('activated', false)
     });
 }
 
@@ -415,13 +416,14 @@ function late_next_search(){
     });
 }
 
-function load_next(tab){
+function load_next(tab,elem){
     isPreviousEventComplete = false;
     var data = tab
     $.post('/loadmore',{data:data},
     function(data){
         $('#'+tab).append(data);
         isPreviousEventComplete = true;
+        $('tbody').data('activated', false)
     });
 }
 

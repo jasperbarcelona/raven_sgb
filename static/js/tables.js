@@ -19,18 +19,17 @@ $('tbody').scroll(function () {
         var $this = jQuery(this);
         if ($this.data('activated')) return false;  // Pending, return
 
-        $this.data('activated', true);
-        setTimeout(function() {
-            $this.data('activated', false)
-        }, 1000); // Freeze for 500ms
         if($(this).scrollTop() + $(this).height() > (this.scrollHeight * .7))  {
+            alert('active')
             if(isPreviousEventComplete){
                 if(searchStatus == 'off'){
                     load_next(String(this.getAttribute('id')));
                     console.log('loading next');
+                    $this.data('activated', true);
                 }
                 else{
                     eval(String(this.getAttribute('id'))+'_next_search()');
+                    $this.data('activated', true);
                 }
             }
         }
