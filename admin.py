@@ -1315,17 +1315,17 @@ def rebuild_database():
         )
 
     d = Section(
-        school_id='1234',
+        school_id='123456789',
         name='Charity'
         )
 
     e = Section(
-        school_id='1234',
+        school_id='123456789',
         name='Fidelity'
         )
 
     f = Section(
-        school_id='1234',
+        school_id='123456789',
         name='Peace'
         )
 
