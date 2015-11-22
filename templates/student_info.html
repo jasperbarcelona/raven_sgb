@@ -59,8 +59,8 @@ $('.edit-user-modal-footer .done-btn').attr('disabled',true);
 
 $('.edit-user-modal-body .form-control').on('change', function () {
 var re = /[A-Za-z]+$/;
-if (($('#edit_last_name').val() != "") && ($('#edit_first_name').val() != "") && ($('#edit_middle_name').val() != "") && 
-(re.test($('#edit_last_name').val())) && (re.test($('#edit_first_name').val())) && (re.test($('#edit_middle_name').val()))&& 
+if (($('#edit_last_name').val() != "") && ($('#edit_first_name').val() != "") &&
+(re.test($('#edit_last_name').val())) && (re.test($('#edit_first_name').val())) &&  
 ($('#edit_level').val() != null) && ($('#edit_section').val() != null) && ($('#edit_contact').val() != null) &&
 (!isNaN($('#edit_contact').val())) &&  ($('#edit_contact').val().length == 11) ){
 $('.edit-user-modal-footer .done-btn').removeAttr('disabled'); 
