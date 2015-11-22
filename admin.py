@@ -876,7 +876,7 @@ def add_user():
     
     session['attendance_search_limit'] = 100
 
-    data = fetch_next('attendance',0)
+    data = fetch_next('attendance')
 
     # prepare()
 
