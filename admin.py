@@ -290,13 +290,14 @@ def mark_morning_absent(school_id,api_key):
     for student in all_students:
         logged = Log.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no).order_by(Log.timestamp.desc()).first()
         if logged == None or logged.time_out != 'None':
+            student_name = student.last_name+', '+student.first_name
+            if student.middle_name:
+                student_name += ' '+student.middle_name[:1]+'.'
             absent = Absent(
             school_id=school_id,
             date=time.strftime("%B %d, %Y"),
             id_no=student.id_no,
-            name=student.last_name+', '+\
-                         student.first_name+' '+\
-                         student.middle_name[:1]+'.',
+            name=student_name,
             level=student.level,
             section=student.section,
             department=student.department,
@@ -317,13 +318,14 @@ def mark_afternoon_absent(school_id,api_key):
     for student in all_students:
         logged = Log.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no).order_by(Log.timestamp.desc()).first()
         if not logged or logged.time_out != 'None':
+            student_name = student.last_name+', '+student.first_name
+            if student.middle_name:
+                student_name += ' '+student.middle_name[:1]+'.'
             absent = Absent(
             school_id=school_id,
             date=time.strftime("%B %d, %Y"),
             id_no=student.id_no,
-            name=student.last_name+', '+\
-                         student.first_name+' '+\
-                         student.middle_name[:1]+'.',
+            name=student_name,
             level=student.level,
             section=student.section,
             department=student.department,
@@ -339,13 +341,14 @@ def mark_afternoon_absent(school_id,api_key):
 
 def mark_specific_absent(school_id,id_no,time_of_day):
     student = Student.query.filter_by(school_id=school_id,id_no=id_no).first()
+    student_name = student.last_name+', '+student.first_name
+            if student.middle_name:
+                student_name += ' '+student.middle_name[:1]+'.'
     absent = Absent(
             school_id=school_id,
             date=time.strftime("%B %d, %Y"),
             id_no=id_no,
-            name=student.last_name+', '+\
-                         student.first_name+' '+\
-                         student.middle_name[:1]+'.',
+            name=student_name,
             level=student.level,
             section=student.section,
             department=student.department,
