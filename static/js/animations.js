@@ -108,7 +108,7 @@ $('#save-sched').on('click', function(){
 
 $('#add-student-modal .add-user-modal-body .form-control').on('change', function () {
     var re = /[A-Za-z]+$/;
-    if (($('#add_student_last_name').val() != "") && ($('#add_student_first_name').val() != "") && ($('#add_student_middle_name').val() != "") && 
+    if (($('#add_student_last_name').val() != "") && ($('#add_student_first_name').val() != "") && 
         (re.test($('#add_student_last_name').val())) && (re.test($('#add_student_first_name').val())) && (re.test($('#add_student_middle_name').val())) && 
         ($('#add_student_level').val() != null) && ($('#add_student_section').val() != null) && ($('#add_student_contact').val() != null) &&
         (!isNaN($('#add_student_contact').val())) && ($('#add_student_contact').val().length == 11) && ($('#student-id-error').text().length == 0)  &&
@@ -123,8 +123,8 @@ $('#add-student-modal .add-user-modal-body .form-control').on('change', function
 $('#add-user-modal .add-user-modal-body .form-control').on('change', function () {
     var re = /[A-Za-z]+$/;
     if (($('#add_user_last_name').val() != "") && ($('#add_user_first_name').val() != "") && 
-        ($('#add_user_middle_name').val() != "") && (re.test($('#add_user_last_name').val())) && 
-        (re.test($('#add_user_first_name').val())) && (re.test($('#add_user_middle_name').val())) &&
+        (re.test($('#add_user_last_name').val())) && 
+        (re.test($('#add_user_first_name').val())) &&
         ($('#user-id-error').text().length == 0) && ($('#add_user_id_no').val().length == 10)){
         $('#save-user').removeAttr('disabled'); 
     }
@@ -135,8 +135,8 @@ $('#add-user-modal .add-user-modal-body .form-control').on('change', function ()
 
 $('#add-student-modal .add-user-modal-body .form-control').donetyping(function(){
     var re = /[A-Za-z]+$/;
-    if (($('#add_student_last_name').val() != "") && ($('#add_student_first_name').val() != "") && ($('#add_student_middle_name').val() != "") && 
-        (re.test($('#add_student_last_name').val())) && (re.test($('#add_student_first_name').val())) && (re.test($('#add_student_middle_name').val())) && 
+    if (($('#add_student_last_name').val() != "") && ($('#add_student_first_name').val() != "") && 
+        (re.test($('#add_student_last_name').val())) && (re.test($('#add_student_first_name').val())) && 
         ($('#add_student_level').val() != null) && ($('#add_student_section').val() != null) && ($('#add_student_contact').val() != null) &&
         (!isNaN($('#add_student_contact').val())) && ($('#add_student_contact').val().length == 11)){
         validate_student_form(true);
@@ -148,8 +148,8 @@ $('#add-student-modal .add-user-modal-body .form-control').donetyping(function()
 
 $('#add-user-modal .add-user-modal-body .form-control').donetyping(function(){
     var re = /[A-Za-z]+$/;
-    if (($('#add_user_last_name').val() != "") && ($('#add_user_first_name').val() != "") && ($('#add_user_middle_name').val() != "") && 
-        (re.test($('#add_user_last_name').val())) && (re.test($('#add_user_first_name').val())) && (re.test($('#add_user_middle_name').val()))){
+    if (($('#add_user_last_name').val() != "") && ($('#add_user_first_name').val() != "") && 
+        (re.test($('#add_user_last_name').val())) && (re.test($('#add_user_first_name').val()))){
         validate_user_form(true);
     }
     else{
