@@ -876,11 +876,9 @@ def add_user():
     
     session['attendance_search_limit'] = 100
 
-    data = fetch_next('attendance')
+    return fetch_next('attendance')
 
     # prepare()
-
-    return flask.render_template('attendance.html', data=data, limit=0, view=student_data['department'])
 
 
 @app.route('/user/edit',methods=['GET','POST'])
