@@ -1218,7 +1218,7 @@ def rebuild_database():
     db.create_all()
 
     school = School(
-        id='1234',
+        id='123456789',
         api_key='ecc67d28db284a2fb351d58fe18965f9',
         password='test',
         name="Scuola Gesu Bambino",
@@ -1271,7 +1271,7 @@ def rebuild_database():
         senior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
         senior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16]
         )
-    db.session.add(school1)
+    # db.session.add(school1)
 
     a = Student(
         school_id='1234',
@@ -1329,9 +1329,9 @@ def rebuild_database():
         name='Peace'
         )
 
-    db.session.add(a)
-    db.session.add(b)
-    db.session.add(c)
+    # db.session.add(a)
+    # db.session.add(b)
+    # db.session.add(c)
     db.session.add(d)
     db.session.add(e)
     db.session.add(f)
