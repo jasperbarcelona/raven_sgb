@@ -174,8 +174,6 @@ $('#save-student').on('click', function(){
 
 $('#save-user').on('click', function(){
     $('#save-user').attr('disabled',true);
-    $('#save-user span').css({'display':'none'});
-    $('#save-user').css({'background-image':'url(../static/images/assets/white.GIF)','background-repeat': 'no-repeat','background-position': 'center'});
 
     var last_name = $('#add_user_last_name').val();
     var first_name = $('#add_user_first_name').val();
