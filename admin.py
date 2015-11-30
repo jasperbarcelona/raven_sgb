@@ -911,7 +911,7 @@ def edit_user():
     
     session['attendance_search_limit'] = 100
 
-    return fetch_next('attendance',0)
+    return fetch_next('attendance')
 
     # prepare()
 
