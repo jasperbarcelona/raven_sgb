@@ -82,20 +82,7 @@ $('#search-btn').on('click', function () {
             $this.data('activated', false)
         }, 500); // Freeze for 500ms
         
-    if ((typeof searchStatus === 'undefined') || (searchStatus == 'off')){
-        $('.search-panel').show();
-        $('#search-loading').show();
-        resize_tbody($(window).height()-49,110);
-        searchStatus = 'on'
-    }
-    else{
-        $('.search-panel').hide();
-        $('#search-loading').hide();
-        resize_tbody($(window).height()-49,40);
-        $(".search-text").val('');
-        searchStatus = 'off'
-        back_home()
-    }
+    toggle_search()
     
 });
 

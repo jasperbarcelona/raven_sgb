@@ -3,6 +3,16 @@ is_done = true;
 form_validated = false
 id_no_validated = false
 
+logsSearchStatus = 'off'
+attendanceSearchStatus = 'off'
+absentSearchStatus = 'off'
+lateSearchStatus = 'off'
+
+logs_result = false;
+attendance_result = false;
+absent_result = false;
+late_result = false;
+
 if (tab == 'attendance'){
     $('#add-user-btn').show();
   }
@@ -69,6 +79,13 @@ function change_tab(page){
     $('#add-user-btn').hide();
   }
 
+  if ((eval(tab+'SearchStatus') == 'on') && (eval(tab+'_result') == false)){
+    $('#search-loading').show();
+  }
+  else{
+    $('#search-loading').hide();
+  }
+
   $.post('/tab/change',{
       tab:tab,
     });
@@ -113,8 +130,7 @@ function supply_data(studentId){
 }
 
 function resize_tbody(height,subtrahend){
-  $("#main-content").css("height",height);
-  $("tbody").css("height",height-subtrahend);
+  $('#'+tab).css("height",height-subtrahend);
 }
 
 function textCounter(field,field2,maxlimit){
@@ -239,7 +255,8 @@ function search_attendance(){
       $('#'+tab).html(data);
       $('#search-loading').hide();
       $('#search-loading img').hide();
-      is_done = true
+      attendance_result = true;
+      is_done = true;
   });
 }
 
@@ -296,6 +313,7 @@ function search_logs(){
       $('#'+tab).html(data);
       $('#search-loading').hide();
       $('#search-loading img').hide();
+      logs_result = true;
       is_done = true
       isPreviousEventComplete = true
   });
@@ -346,6 +364,7 @@ function search_absent(){
       $('#'+tab).html(data);
       $('#search-loading').hide();
       $('#search-loading img').hide();
+      absent_result = true;
       is_done = true
   });
 }
@@ -394,6 +413,7 @@ function search_late(){
       $('#'+tab).html(data);
       $('#search-loading').hide();
       $('#search-loading img').hide();
+      late_result = true;
       is_done = true
   });
 }
@@ -562,10 +582,27 @@ function populate_calendar(){
 
 function show_search_load(){
   if (is_done == true){
-  console.log('showing');
   $('#search-loading img').show();
   is_done = false
   }
+}
+
+function toggle_search(){
+  if ((typeof eval(tab+'SearchStatus') === 'undefined') || (eval(tab+'SearchStatus') == 'off')){
+        $('#'+tab+'-search-panel').show();
+        $('#search-loading').show();
+        resize_tbody($(window).height()-49,108);
+        window[tab+'SearchStatus'] = 'on';
+    }
+    else{
+        $('#'+tab+'-search-panel').hide();
+        $('#search-loading').hide();
+        resize_tbody($(window).height()-49,38);
+        $('#'+tab+'-search-panel .search-text').val('');
+        window[tab+'SearchStatus'] = 'off';
+        window[tab+'_result'] = false;
+        back_home();
+    }
 }
 
 
