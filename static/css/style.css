@@ -345,9 +345,11 @@ textarea:focus{
 }
 
 .container{
+	position: relative;
 	width: 95%;
 	min-width: 800px;
 	padding: 0 !important;
+	height: 100vh !important;
 }
 
 .button-container{
@@ -461,8 +463,8 @@ textarea:focus{
 	right: 0;
 	margin-left: auto;
 	margin-right: auto;
-	background-color: #F5F5F5;
-	width: 95%;
+	background-color: rgba(241,241,241,.8);
+	width: calc(95% - 1px);
 	display: -webkit-flex;
 	display: flex;
 	-webkit-flex-direction: row;
@@ -536,6 +538,7 @@ textarea:focus{
 }
 
 .table tbody{
+	height: 100%;
 	display:block;
 	overflow: hidden;
 	overflow-x:hidden;
@@ -617,10 +620,12 @@ textarea:focus{
 }
 
 #main-content{
+	position: relative;
 	overflow: hidden;
 	overflow-x: hidden; 
 	/*background-color: rgba(255,255,255,1);*/
 	background-color: transparent;
+	height: calc(100% - 50px);
 }
 
 #copyright{
@@ -636,7 +641,7 @@ textarea:focus{
 }
 
 #table-container{
-	height: 100%;
+	height: calc(100% - 38px);
 	width: 100%;
 	background-color: transparent;
 }
@@ -646,6 +651,8 @@ textarea:focus{
 }
 
 .table{
+	height: 100%;
+	position: relative !important;
 	margin-bottom: 0 !important;
 	border-bottom: none !important;
 }

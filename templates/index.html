@@ -28,7 +28,7 @@
 						<td class="long"><input type="text" id="log_search_name" class="form-control search-text search-logs"></td>
 						{% if view=='student' %}					
 						<td class="short">
-							<select id="log_search_level" class="form-control search-text search-logs">
+							<select id="log_search_level" class="form-control search-option search-logs-options">
 							        <option value="">All</option>
 							        <option value="1st Grade">1st Grade</option>
 							        <option value="2nd Grade">2nd Grade</option>
@@ -45,7 +45,7 @@
 							</select>
 						</td>
 						<td class="short">
-							<select id="log_search_section" class="form-control search-text search-logs">
+							<select id="log_search_section" class="form-control search-option search-logs-options">
 							        <option value="">All</option>
 							        {% for section in sections %}
 							        <option  value="{{section.name}}">{{section.name}}</option>
@@ -84,7 +84,6 @@
 					</tr>
 					{% endif %}
 				</tbody>
-				
 			</table>
 		</div>
 
@@ -118,7 +117,7 @@
 						<td class="short"><input id="attendance_search_middle_name" type="text" class="form-control search-text search-attendance"></td>
 						{% if view=='student' %}
 						<td class="short">
-							<select class="form-control search-text search-attendance" id="attendance_search_level">
+							<select class="form-control search-option search-attendance-options" id="attendance_search_level">
 							        <option value="">All</option>
 							        <option value="1st Grade">1st Grade</option>
 							        <option value="2nd Grade">2nd Grade</option>
@@ -135,7 +134,7 @@
 							</select>
 						</td>
 						<td class="short">
-							<select class="form-control search-text search-attendance" id="attendance_search_section">
+							<select class="form-control search-option search-attendance-options" id="attendance_search_section">
 							        <option value="">All</option>
 							        {% for section in sections %}
 							        <option  value="{{section.name}}">{{section.name}}</option>
@@ -197,7 +196,7 @@
 						<td class="short"><input type="text" id="absent_search_id_no" class="form-control search-text search-absent"></td>	
 						<td class="long"><input type="text" id="absent_search_name" class="form-control search-text search-absent"></td>
 						<td class="short">
-							<select class="form-control search-text search-absent" id="absent_search_level">
+							<select class="form-control search-option search-absent-options" id="absent_search_level">
 							        <option value="">All</option>
 							        <option value="1st Grade">1st Grade</option>
 							        <option value="2nd Grade">2nd Grade</option>
@@ -213,7 +212,7 @@
 							        <option value="12th Grade">12th Grade</option>
 						</td>
 						<td class="short">
-							<select class="form-control search-text search-absent" id="absent_search_section">
+							<select class="form-control search-option search-absent-options" id="absent_search_section">
 							        <option value="">All</option>
 							        {% for section in sections %}
 							        <option  value="{{section.name}}">{{section.name}}</option>
@@ -267,7 +266,7 @@
 						<td class="short"><input type="text" id="late_search_id_no" class="form-control search-text search-late"></td>	
 						<td class="long"><input type="text" id="late_search_name" class="form-control search-text search-late"></td>
 						<td class="short">
-							<select class="form-control search-text search-late" id="late_search_level">
+							<select class="form-control search-option search-late-options" id="late_search_level">
 							        <option value="">All</option>
 							        <option value="1st Grade">1st Grade</option>
 							        <option value="2nd Grade">2nd Grade</option>
@@ -284,7 +283,7 @@
 							</select>
 						</td>
 						<td class="short">
-							<select class="form-control search-text search-late" id="late_search_section">
+							<select class="form-control search-option search-late-options" id="late_search_section">
 							        <option value="">All</option>
 							        {% for section in sections %}
 							        <option  value="{{section.name}}">{{section.name}}</option>

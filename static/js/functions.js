@@ -238,6 +238,7 @@ function search_attendance(){
   function(data){
       $('#'+tab).html(data);
       $('#search-loading').hide();
+      $('#search-loading img').hide();
       is_done = true
   });
 }
@@ -294,6 +295,7 @@ function search_logs(){
   function(data){
       $('#'+tab).html(data);
       $('#search-loading').hide();
+      $('#search-loading img').hide();
       is_done = true
       isPreviousEventComplete = true
   });
@@ -343,6 +345,7 @@ function search_absent(){
   function(data){
       $('#'+tab).html(data);
       $('#search-loading').hide();
+      $('#search-loading img').hide();
       is_done = true
   });
 }
@@ -390,6 +393,7 @@ function search_late(){
   function(data){
       $('#'+tab).html(data);
       $('#search-loading').hide();
+      $('#search-loading img').hide();
       is_done = true
   });
 }
@@ -559,7 +563,7 @@ function populate_calendar(){
 function show_search_load(){
   if (is_done == true){
   console.log('showing');
-  $('#search-loading').show();
+  $('#search-loading img').show();
   is_done = false
   }
 }

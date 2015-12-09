@@ -4,6 +4,7 @@ initial_data();
 searchStatus = 'off'
 
 $('.loading').hide();
+$('#search-loading img').hide();
 $('.add-user-footer-left').hide();
 $('#snackbar').hide();
 $('.id-loader').hide();
@@ -29,12 +30,6 @@ $('.clockpicker-top').clockpicker({
 });
 
 $('#confirm-send').attr('disabled',true);
-
-resize_tbody($(window).height()-49,40);
-
-$(window).resize(function(){
-    resize_tbody($(window).height()-49,40);
-});
 
 $('#message').on('keyup', function(){
     if (!$.trim($(this).val())) {
@@ -89,11 +84,13 @@ $('#search-btn').on('click', function () {
         
     if ((typeof searchStatus === 'undefined') || (searchStatus == 'off')){
         $('.search-panel').show();
+        $('#search-loading').show();
         resize_tbody($(window).height()-49,110);
         searchStatus = 'on'
     }
     else{
         $('.search-panel').hide();
+        $('#search-loading').hide();
         resize_tbody($(window).height()-49,40);
         $(".search-text").val('');
         searchStatus = 'off'
@@ -182,41 +179,51 @@ $('#save-user').on('click', function(){
     save_user(last_name, first_name, middle_name, id_no);
 });
 
-$('.search-text').keypress(function(e) {
-    if ((e.which !== 0) && (e.which != 13)) {
+
+$('.search-attendance').keypress(function(e){
+    if (e.which == 13) {
         show_search_load();
+        search_attendance()
     }
 });
 
-$('.search-attendance').donetyping(function(){
+$('.search-attendance-options').on('change', function(){
+    show_search_load();
     search_attendance()
 });
 
-$('.search-attendance').on('change', function(){
-    search_attendance()
+$('.search-logs').keypress(function(e){
+    if (e.which == 13) {
+        show_search_load();
+        search_logs()
+    }
 });
 
-$('.search-logs').donetyping(function(){
+$('.search-logs-options').on('change', function(){
+    show_search_load();
     search_logs()
 });
 
-$('.search-logs').on('change', function(){
-    search_logs()
+$('.search-absent').keypress(function(e){
+    if (e.which == 13) {
+        show_search_load();
+        search_absent()
+    }
 });
 
-$('.search-absent').donetyping(function(){
+$('.search-absent-options').on('change', function(){
+    show_search_load();
     search_absent()
 });
 
-$('.search-absent').on('change', function(){
-    search_absent()
+$('.search-late').keypress(function(e){
+    if (e.which == 13) {
+        show_search_load();
+        search_late()
+    }
 });
 
-$('.search-late').donetyping(function(){
-    search_late()
-});
-
-$('.search-late').on('change', function(){
+$('.search-late-options').on('change', function(){
     search_late()
 });
 

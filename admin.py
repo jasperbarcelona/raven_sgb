@@ -43,6 +43,7 @@ CONNECT_TIMEOUT = 5.0
 CALENDAR_URL = 'http://ravenclock.herokuapp.com/events/get'
 SCHEDULE_URL = 'http://ravenclock.herokuapp.com/schedule/regular/update'
 
+KINDERGARTEN = ['Junior Kinder', 'Senior Kinder']
 PRIMARY = ['1st Grade', '2nd Grade', '3rd Grade', '4th Grade', '5th Grade', '6th Grade']
 JUNIOR_HIGH = ['7th Grade', '8th Grade', '9th Grade', '10th Grade']
 SENIOR_HIGH = ['11th Grade', '12th Grade']
@@ -662,6 +663,7 @@ def index():
     session['attendance_search_limit'] = 100
     session['late_search_limit'] = 100
     session['absent_search_limit'] = 100
+    session['attendance_search_status'] = False
 
     school = School.query.filter_by(api_key=session['api_key']).one()
     sections = Section.query.filter_by(school_id=session['school_id']).all()
@@ -726,6 +728,7 @@ def login():
 
 @app.route('/home', methods=['GET', 'POST'])
 def start_again():
+    session['attendance_search_status'] = False
     needed = flask.request.form.get('tab') 
     session[needed+'_limit'] = 0
     session[needed+'_search_limit'] = 100
@@ -911,6 +914,16 @@ def edit_user():
     
     session['attendance_search_limit'] = 100
 
+    if session['attendance_search_status']:
+        result = search_attendance(session['attendance_search_limit'],last_name=session['attendance_data']['last_name'], first_name=session['attendance_data']['first_name'],
+                middle_name=session['attendance_data']['middle_name'], id_no=session['attendance_data']['id_no'], level=session['attendance_data']['level'], section=session['attendance_data']['section'])
+        return flask.render_template(
+        session['attendance_data']['needed']+'.html',
+        data=result,
+        view=session['department'],
+        limit=session['attendance_search_limit']-100
+        )
+
     return fetch_next('attendance')
 
     # prepare()
@@ -918,26 +931,20 @@ def edit_user():
 
 @app.route('/search/logs',methods=['GET','POST'])
 def search_student_logs():
-    needed = flask.request.form.get('needed')
-    date = flask.request.form.get('date')
-    id_no = flask.request.form.get('id_no')
-    name = flask.request.form.get('name')
-    level = flask.request.form.get('level')
-    section = flask.request.form.get('section')
-    reset = flask.request.form.get('reset')
+    data = flask.request.form.to_dict()
 
-    if reset == 'yes':
+    if data['reset'] == 'yes':
         session['logs_search_limit']=100
     
     limit = session['logs_search_limit']-100
     
-    data = search_logs(session['logs_search_limit'],date=date, id_no=id_no,
-                       name=name, level=level,
-                       section=section)
+    result = search_logs(session['logs_search_limit'],date=data['date'], id_no=data['id_no'],
+                       name=data['name'], level=data['level'],
+                       section=data['section'])
 
     return flask.render_template(
-        needed+'.html',
-        data=data,
+        data['needed']+'.html',
+        data=result,
         view=session['department'],
         limit=limit
         )
@@ -945,29 +952,21 @@ def search_student_logs():
 
 @app.route('/search/attendance',methods=['GET','POST'])
 def search_student_attendance():
-    needed = flask.request.form.get('needed')
-    last_name = flask.request.form.get('last_name')
-    first_name = flask.request.form.get('first_name')
-    middle_name = flask.request.form.get('middle_name')
-    id_no = flask.request.form.get('id_no')
-    level = flask.request.form.get('level')
-    section = flask.request.form.get('section')
-    absences = flask.request.form.get('absences')
-    lates = flask.request.form.get('lates')
-    reset = flask.request.form.get('reset')
+    session['attendance_data'] = flask.request.form.to_dict()
+    session['attendance_search_status'] = True
 
-    if reset == 'yes':
+    if session['attendance_data']['reset'] == 'yes':
         session['attendance_search_limit']=100
     
     limit = session['attendance_search_limit']-100
     
-    data = search_attendance(session['attendance_search_limit'],last_name=last_name, first_name=first_name,
-                middle_name=middle_name, id_no=id_no, level=level, section=section,
-                absences=absences, lates=lates)
+    result = search_attendance(session['attendance_search_limit'],last_name=session['attendance_data']['last_name'], first_name=session['attendance_data']['first_name'],
+                middle_name=session['attendance_data']['middle_name'], id_no=session['attendance_data']['id_no'], level=session['attendance_data']['level'], section=session['attendance_data']['section'])
+
 
     return flask.render_template(
-        needed+'.html',
-        data=data,
+        session['attendance_data']['needed']+'.html',
+        data=result,
         view=session['department'],
         limit=limit
         )
@@ -975,26 +974,20 @@ def search_student_attendance():
 
 @app.route('/search/absent',methods=['GET','POST'])
 def search_student_absent():
-    needed = flask.request.form.get('needed')
-    date = flask.request.form.get('date')
-    id_no = flask.request.form.get('id_no')
-    name = flask.request.form.get('name')
-    level = flask.request.form.get('level')
-    section = flask.request.form.get('section')
-    reset = flask.request.form.get('reset')
+    data = flask.request.form.to_dict()
 
-    if reset == 'yes':
+    if data['reset'] == 'yes':
         session['absent_search_limit']=100
     
     limit = session['absent_search_limit']-100
     
-    data = search_absent(session['absent_search_limit'], date=date, id_no=id_no,
-                       name=name, level=level,
-                       section=section)
+    result = search_absent(session['absent_search_limit'], date=data['date'], id_no=data['id_no'],
+                       name=data['name'], level=data['level'],
+                       section=data['section'])
 
     return flask.render_template(
-        needed+'.html',
-        data=data,
+        data['needed']+'.html',
+        data=result,
         view=session['department'],
         limit=limit
         )
@@ -1002,26 +995,20 @@ def search_student_absent():
 
 @app.route('/search/late',methods=['GET','POST'])
 def search_student_late():
-    needed = flask.request.form.get('needed')
-    date = flask.request.form.get('date')
-    id_no = flask.request.form.get('id_no')
-    name = flask.request.form.get('name')
-    level = flask.request.form.get('level')
-    section = flask.request.form.get('section')
-    reset = flask.request.form.get('reset')
+    data = flask.request.form.to_dict()
 
-    if reset == 'yes':
+    if data['reset'] == 'yes':
         session['late_search_limit']=100
     
     limit = session['late_search_limit']-100
     
-    data = search_late(session['late_search_limit'], date=date, id_no=id_no,
-                       name=name, level=level,
-                       section=section)
+    result = search_late(session['late_search_limit'], date=data['date'], id_no=data['id_no'],
+                       name=data['name'], level=data['level'],
+                       section=data['section'])
 
     return flask.render_template(
-        needed+'.html',
-        data=data,
+        data['needed']+'.html',
+        data=result,
         view=session['department'],
         limit=limit
         )
@@ -1213,7 +1200,6 @@ def add_school():
 
 @app.route('/db/rebuild', methods=['GET', 'POST'])
 def rebuild_database():
-    db.drop_all()
     db.create_all()
 
     school = School(
