@@ -40,7 +40,7 @@ CLIENT_ID = 'ef8cf56d44f93b6ee6165a0caa3fe0d1ebeee9b20546998931907edbb266eb72'
 SECRET_KEY = 'c4c461cc5aa5f9f89b701bc016a73e9981713be1bf7bb057c875dbfacff86e1d'
 SHORT_CODE = '29290420420'
 CONNECT_TIMEOUT = 5.0
-CALENDAR_URL = 'http://ravenclock.herokuapp.com/events/get'
+CALENDAR_URL = 'http://ravenclock.herokuapp.com%s'
 SCHEDULE_URL = 'http://ravenclock.herokuapp.com/schedule/regular/update'
 
 KINDERGARTEN = ['Junior Kinder', 'Senior Kinder']
@@ -1094,24 +1094,74 @@ def validate_id():
 @app.route('/calendar/data/get',methods=['GET','POST'])
 def populate_calendar():
     cal = Calendar(6)
-    year = date.today().year
-    month = date.today().month
+    session['year'] = date.today().year
+    session['month'] = date.today().month
     day = date.today().day
-    dates = cal.monthdatescalendar(year, month)
+    dates = cal.monthdatescalendar(session['year'], session['month'])
 
     calendar_params = {
         'api_key':session['api_key'],
-        'month':month,
-        'year':year
+        'month':session['month'],
+        'year':session['year']
     }
 
     try:
-        get_events = requests.get(CALENDAR_URL,params=calendar_params)
+        get_events = requests.get(CALENDAR_URL%'/events/get',params=calendar_params)
         events = get_events.json()['days']
-        return flask.render_template('dates.html', dates=dates, year=year, month=month, today=day, events=events, month_name=calendar.month_name[month])
+        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today=day, events=events, month_name=calendar.month_name[session['month']])
 
     except requests.exceptions.ConnectionError as e:
-        return flask.render_template('dates.html', dates=dates, year=year, month=month, today=day) #return diff template??
+        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today=day) #return diff template??
+
+
+@app.route('/calendar/next/get',methods=['GET','POST'])
+def next_month():
+    cal = Calendar(6)
+    if session['month'] == 12:
+        session['year'] += 1
+        session['month'] = 1
+    else:
+        session['month'] += 1
+    dates = cal.monthdatescalendar(session['year'], session['month'])
+
+    calendar_params = {
+        'api_key':session['api_key'],
+        'month':session['month'],
+        'year':session['year']
+    }
+
+    try:
+        get_events = requests.get(CALENDAR_URL%'/events/get',params=calendar_params)
+        events = get_events.json()['days']
+        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today='', events=events, month_name=calendar.month_name[session['month']])
+
+    except requests.exceptions.ConnectionError as e:
+        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today='')
+
+
+@app.route('/calendar/prev/get',methods=['GET','POST'])
+def prev_month():
+    cal = Calendar(6)
+    if session['month'] == 1:
+        session['year'] -= 1
+        session['month'] = 12
+    else:
+        session['month'] -= 1
+    dates = cal.monthdatescalendar(session['year'], session['month'])
+
+    calendar_params = {
+        'api_key':session['api_key'],
+        'month':session['month'],
+        'year':session['year']
+    }
+
+    try:
+        get_events = requests.get(CALENDAR_URL%'/events/get',params=calendar_params)
+        events = get_events.json()['days']
+        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today='', events=events, month_name=calendar.month_name[session['month']])
+
+    except requests.exceptions.ConnectionError as e:
+        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today='')
 
 
 @app.route('/schedule/sync',methods=['GET','POST'])

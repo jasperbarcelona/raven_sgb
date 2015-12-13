@@ -580,6 +580,20 @@ function populate_calendar(){
     });
 }
 
+function next_month(){
+  $.post('/calendar/next/get',
+    function(data){
+        $('#calendar-container table').html(data);
+    });
+}
+
+function prev_month(){
+  $.post('/calendar/prev/get',
+    function(data){
+        $('#calendar-container table').html(data);
+    });
+}
+
 function show_search_load(){
   if (is_done == true){
   $('#search-loading img').show();
