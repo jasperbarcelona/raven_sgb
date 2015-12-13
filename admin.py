@@ -694,10 +694,18 @@ def index():
         senior_morning_end=school.senior_morning_end,
         senior_afternoon_start=school.senior_afternoon_start,
         senior_afternoon_end=school.senior_afternoon_end,
-        tab=session['tab'],
-        path='../images/watermark.png',
-        test = os.environ['DATABASE_URL']
+        tab=session['tab']
         )
+
+
+@app.route('/attendance/reset', methods=['GET', 'POST'])
+def reset_attendance():
+    students = Student.query.all()
+    for student in students:
+        student.absences = 0
+        student.lates = 0
+    db.session.commit()
+    return jsonify(status='Success'),200
 
 
 @app.route('/signin', methods=['GET', 'POST'])
