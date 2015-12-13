@@ -695,7 +695,8 @@ def index():
         senior_afternoon_start=school.senior_afternoon_start,
         senior_afternoon_end=school.senior_afternoon_end,
         tab=session['tab'],
-        path='../images/watermark.png'
+        path='../images/watermark.png',
+        test = os.environ['DATABASE_URL']
         )
 
 
