@@ -18,7 +18,7 @@ html{
 body{
 	height: 100%;
 	width: 100%;
-	color: #494949 !important;
+	color: #373A3C !important;
 	font-family: Lato, sans-serif;
 	background-color: #242424;
 	-webkit-user-select: none;  /* Chrome all / Safari all */
@@ -364,7 +364,7 @@ textarea:focus{
 .buttons{
 	margin-top: 2px;
 	color: #FFFFFF !important;
-	background-color: #494949 !important;
+	background-color: #373A3C !important;
 	border-radius: 0px;
 	height: 30px;
 	width: 70px;	
@@ -399,7 +399,7 @@ textarea:focus{
 }
 
 #search-btn{
-	background-color: #F4F4F4;
+	background-color: #373A3C;
 	color: #6D6D6D;
 	margin-right: 1px;
 }
@@ -409,7 +409,7 @@ textarea:focus{
 }
 
 #refresh-btn{
-	background-color: #F4F4F4;
+	background-color: #373A3C;
 	color: #6D6D6D;
 }
 
@@ -444,7 +444,7 @@ textarea:focus{
 }
 
 #settings-btn{
-	background-color: #F4F4F4;
+	background-color: #373A3C;
 	color: #6D6D6D;
 }
 
@@ -538,8 +538,9 @@ textarea:focus{
 }
 
 .table tbody{
-	height: 100%;
-	display:block;
+	position: absolute;
+	height: calc(100% - 38px) !important;
+	width: 100%;
 	overflow: hidden;
 	overflow-x:hidden;
 	background-color: #F5F5F5;
@@ -553,7 +554,7 @@ textarea:focus{
 
 .table tbody tr {
     display:table;
-    width: calc(100% + 13px);
+    width: calc(100% + 14px);
     background-color: #F1F1F1;
 }
 
@@ -569,6 +570,7 @@ textarea:focus{
 }
 
 .tab-content{
+	position: relative;
 	height: 100%;
 	width: 100%;
 }
@@ -641,7 +643,8 @@ textarea:focus{
 }
 
 #table-container{
-	height: calc(100% - 38px);
+	position: relative;
+	height: 100%;
 	width: 100%;
 	background-color: transparent;
 }
@@ -651,20 +654,20 @@ textarea:focus{
 }
 
 .table{
-	height: 100%;
+	height: 100% !important;
 	position: relative !important;
 	margin-bottom: 0 !important;
-	border-bottom: none !important;
+	/*border-bottom: none !important;*/
 }
 
 h3{
 	display: inline;
 }
 
-.table td{
-	/*border-left: 1px solid #DDDDDD;
-	border-right: 1px solid #DDDDDD;*/
-}
+/*.table td{
+	border-left: 1px solid #DDDDDD;
+	border-right: 1px solid #DDDDDD;
+}*/
 
 .rows:hover{
 	cursor: pointer;
@@ -672,7 +675,7 @@ h3{
 }
 
 table.table thead tr th, table.table tfoot tr th {
-	background: #494949;	
+	background: #373A3C;	
 	color: #ffffff;
 }
 
@@ -689,7 +692,7 @@ table.table thead tr th, table.table tfoot tr th {
 }
 
 .nav-tabs li .tab-item:hover{
-	background-color: #6D6D6D;
+	background-color: #373A3C;
 }
 
 .nav-tabs > li.active > a,
@@ -697,7 +700,7 @@ table.table thead tr th, table.table tfoot tr th {
 .nav-tabs > li.active > a:focus{
 	color: #FFFFFF;
 	cursor: default;
-	background-color: #494949;	
+	background-color: #373A3C;	
 	border: 1px solid #dddddd;
 	border-bottom-color: transparent;
 	outline: none;
@@ -749,7 +752,7 @@ table.table thead tr th, table.table tfoot tr th {
 #calendar-container table td{
 	text-align: center;
 	width: 100px;
-	color: #494949;
+	color: #373A3C;
 }
 
 .day{

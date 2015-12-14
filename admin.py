@@ -1026,59 +1026,45 @@ def search_student_late():
 @app.route('/sched',methods=['GET','POST'])
 def change_sched():
 
-    primary_morning_start = flask.request.form.get('primary_morning_start')
-    primary_morning_end = flask.request.form.get('primary_morning_end')
-    junior_morning_start = flask.request.form.get('junior_morning_start')
-    junior_morning_end = flask.request.form.get('junior_morning_end')
-    senior_morning_start = flask.request.form.get('senior_morning_start')
-    senior_morning_end = flask.request.form.get('senior_morning_end')
-    primary_afternoon_start = flask.request.form.get('primary_afternoon_start')
-    primary_afternoon_end = flask.request.form.get('primary_afternoon_end')
-    junior_afternoon_start = flask.request.form.get('junior_afternoon_start')
-    junior_afternoon_end = flask.request.form.get('junior_afternoon_end')
-    senior_afternoon_start = flask.request.form.get('senior_afternoon_start')
-    senior_afternoon_end = flask.request.form.get('senior_afternoon_end')
+    data = flask.request.form.to_dict()
 
     school = School.query.filter_by(id=session['school_id']).one()
 
-    school.primary_morning_start = primary_morning_start
-    school.primary_morning_end = primary_morning_end
-    school.junior_morning_start = junior_morning_start
-    school.junior_morning_end = junior_morning_end
-    school.senior_morning_start = senior_morning_start
-    school.senior_morning_end = senior_morning_end
-    school.primary_afternoon_start = primary_afternoon_start
-    school.primary_afternoon_end = primary_afternoon_end
-    school.junior_afternoon_start = junior_afternoon_start
-    school.junior_afternoon_end = junior_afternoon_end
-    school.senior_afternoon_start = senior_afternoon_start
-    school.senior_afternoon_end = senior_afternoon_end
+    school.primary_morning_start = data['primary_morning_start']
+    school.primary_morning_end = data['primary_morning_end']
+    school.junior_morning_start = data['junior_morning_start']
+    school.junior_morning_end = data['junior_morning_end']
+    school.senior_morning_start = data['senior_morning_start']
+    school.senior_morning_end = data['senior_morning_end']
+    school.primary_afternoon_start = data['primary_afternoon_start']
+    school.primary_afternoon_end = data['primary_afternoon_end']
+    school.junior_afternoon_start = data['junior_afternoon_start']
+    school.junior_afternoon_end = data['junior_afternoon_end']
+    school.senior_afternoon_start = data['senior_afternoon_start']
+    school.senior_afternoon_end = data['senior_afternoon_end']
 
     db.session.commit()
 
     sched_data = {
         'school_id': session['school_id'],
-        'primary_morning_start': primary_morning_start,
-        'primary_morning_end': primary_morning_end,
-        'junior_morning_start': junior_morning_start,
-        'junior_morning_end': junior_morning_end,
-        'senior_morning_start': senior_morning_start,
-        'senior_morning_end': senior_morning_end,
-        'primary_afternoon_start': primary_afternoon_start,
-        'primary_afternoon_end':primary_afternoon_end,
-        'junior_afternoon_start': junior_afternoon_start,
-        'junior_afternoon_end': junior_afternoon_end,
-        'senior_afternoon_start': senior_afternoon_start,
-        'senior_afternoon_end': senior_afternoon_end
+        'primary_morning_start': data['primary_morning_start'],
+        'primary_morning_end': data['primary_morning_end'],
+        'junior_morning_start': data['junior_morning_start'],
+        'junior_morning_end': data['junior_morning_end'],
+        'senior_morning_start': data['senior_morning_start'],
+        'senior_morning_end': data['senior_morning_end'],
+        'primary_afternoon_start': data['primary_afternoon_start'],
+        'primary_afternoon_end':data['primary_afternoon_end'],
+        'junior_afternoon_start': data['junior_afternoon_start'],
+        'junior_afternoon_end': data['junior_afternoon_end'],
+        'senior_afternoon_start': data['senior_afternoon_start'],
+        'senior_afternoon_end': data['senior_afternoon_end']
     }
 
     sent = False
     while not sent:
         try:
-            r = requests.post(
-                SCHEDULE_URL,
-                sched_data         
-            )
+            r = requests.post(SCHEDULE_URL,sched_data)
             sent =True
             print r.status_code #update log database (put 'sent' to status)
 
@@ -1228,7 +1214,7 @@ def add_faculty():
 @app.route('/db/school/add', methods=['GET', 'POST'])
 def add_school():
     school = School(
-        id=432156,
+        id=1234,
         api_key='ecc67d28db284a2fb351d58fe18965f3',
         password='test',
         name="Scuola Gesu Bambino",
@@ -1259,6 +1245,7 @@ def add_school():
 
 @app.route('/db/rebuild', methods=['GET', 'POST'])
 def rebuild_database():
+    db.drop_all()
     db.create_all()
 
     school = School(
