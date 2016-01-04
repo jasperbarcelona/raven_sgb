@@ -9,10 +9,10 @@
                 <link rel="stylesheet" href="../static/css/jquery-ui.theme.css">
                 <link rel="stylesheet" href="../static/css/jquery-ui.structure.css">
                 <link rel="stylesheet" href="../static/css/style.css">
-                <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+                <link rel="stylesheet" href="../static/css/icon.css" >
                 <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico" />
-                <script src="//fast.eager.io/sgP7QN5AJL.js"></script>
-                <script src="//fast.eager.io/nH76uFjaDI.js"></script>
+                <!-- <script src="//fast.eager.io/sgP7QN5AJL.js"></script>
+                <script src="//fast.eager.io/nH76uFjaDI.js"></script> -->
                 <title>Dashboard | Scuola Gesu Bambino</title>
         </head>
         <body>  
@@ -80,7 +80,7 @@
                                                 {% else %}
                                                 <button class="btn" id="add-user-btn" data-toggle="modal" data-target="#add-user-modal"><i class="material-icons md-30">add</i></button>
                                                 {% endif %}
-                                                <button id="compose-btn" class="buttons btn" data-toggle="modal" data-target="#message-modal"><span class="glyphicon glyphicon-envelope"></span></button>
+                                                <button id="messages-btn" class="buttons btn" data-toggle="modal" data-target="#message-modal" onclick="open_messages()"><span class="glyphicon glyphicon-envelope"></span></button>
                                                 <a href="#"><button id="search-btn" class="buttons btn"><span class="glyphicon glyphicon-search"></span></button></a>
                                                 <a><button id="refresh-btn" class="buttons btn" onclick="back_home()"><span class="glyphicon glyphicon-repeat"></span></button></a>
 
@@ -94,7 +94,7 @@
                                                                 <li onclick="change_tab('logs')"><a href="/view?view=faculty">Faculty{% if view=='faculty' %}<span class="glyphicon glyphicon-ok active-view"></span>{% endif %}</a></li>
                                                                 <li class="divider"></li>
                                                                 <li><a href="#" data-toggle="modal" data-target="#calendar-modal" onclick="populate_calendar()">A.Y. Calendar</a></li>
-                                                                <li><a href="#" data-toggle="modal" data-target="#schedule-modal">Regular Schedule</a></li>
+                                                                <li id="regular-schedule-btn"><a href="#" data-toggle="modal" data-target="#schedule-modal">Regular Schedule</a></li>
                                                                 <li class="divider"></li>
                                                                 <li><a href="/logout">Logout</a></li>
                                                         </ul>
@@ -115,6 +115,7 @@
                 <script src="../static/js/functions.js"></script>
                 <script src="../static/js/tables.js"></script>
                 <script src="../static/js/bootstrap.min.js"></script>
+                <script src="../static/js/floatlabels.min.js"></script>
                 <script src="../static/js/bootstrap-clockpicker.min.js"></script>
         </body>
 </html>

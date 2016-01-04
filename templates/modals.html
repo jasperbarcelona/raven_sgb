@@ -1,11 +1,31 @@
 <div class="modal fade" id="message-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog message-modal-dialog">
-                <div class="modal-content">
-                        <div class="modal-header message-modal-header">
+                <div id="message-modal-conent" class="modal-content">
+                        <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">Sent Messages</h4>
+                        </div>
+                        <div id="message-modal-body" class="modal-body">
+                                <div id="message-modal-preloader">
+                                        <img src="../static/images/assets/282.GIF">
+                                </div>
+                        </div>
+                        <div class="modal-footer">
+                                <button type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
+                                <button id="new-message-btn" type="button" class="btn btn-primary" data-toggle="modal" data-target="#compose-message-modal">New Message</button>
+                        </div>
+                </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="compose-message-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog new-message-modal-dialog">
+                <div id="compose-message-modal-conent" class="modal-content">
+                        <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                 <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">New Message</h4>
                         </div>
-                        <div class="modal-body message-modal-body">
+                        <div id="compose-message-modal-body" class="modal-body">
                                 <textarea oninput="textCounter(this,'counter',420);" id="message" placeholder="Write your message here..."></textarea>
                         </div>
                         <div class="modal-footer">
@@ -47,15 +67,19 @@
 <div class="modal fade add-modal" id="add-student-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog add-user-modal-dialog">
                 <div class="modal-content">
-                        <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">New Student</h4>
+                        <div class="modal-header user-modal-header">
+                                <h4 class="modal-title user-modal-title" id="gridSystemModalLabel">New Student</h4>
                         </div>
                         <div class="modal-body add-user-modal-body">
-                                <input type="text" class="form-control" id="add_student_last_name" placeholder="Last Name" /><br />
-                                <input type="text" class="form-control" id="add_student_first_name" placeholder="First Name" /><br />
-                                <input type="text" class="form-control" id="add_student_middle_name" placeholder="Middle Name" /><br />
-                                <select class="form-control select" id="add_student_level">
+                                <input type="text" class="form-control" id="add_student_id_no" placeholder="ID Number" data-class="input-label" oninput="validate_student_id(this.value)" />
+                                <input type="text" class="form-control" id="add_student_last_name" placeholder="Last Name" data-class="input-label" />
+                                <input type="text" class="form-control" id="add_student_first_name" placeholder="First Name" data-class="input-label" />
+                                <input type="text" class="form-control" id="add_student_middle_name" placeholder="Middle Name" data-class="input-label" />
+                                
+                                <input type="text" class="form-control" id="add_student_contact" placeholder="Parent Contact Number" data-class="input-label" />
+                                
+
+                                <select class="form-control select" id="add_student_level" placeholder="Grade/Level" required>
                                         <option value="" disabled selected>Grade/Level</option>
                                         <option>1st Grade</option>
                                         <option>2nd Grade</option>
@@ -69,22 +93,19 @@
                                         <option>10th Grade</option>
                                         <option>11th Grade</option>
                                         <option>12th Grade</option>
-                                </select><br />
-                                <select class="form-control select" id="add_student_section">
+                                </select>
+                                <select class="form-control select" id="add_student_section" required>
                                         <option value="" disabled selected>Section</option>
                                         {% for section in sections %}
                                         <option>{{section.name}}</option>
                                         {% endfor %}
-                                </select><br />
-                                <input type="text" class="form-control" id="add_student_contact" placeholder="Parent Contact Number" /><br />
-                                <input type="text" class="form-control" id="add_student_id_no" placeholder="ID Number" oninput="validate_student_id(this.value)" />
-                                <br />
+                                </select>
                                 <center>
                                         <span id="student-id-loader" class="id-loader"><img src="../static/images/assets/blue.GIF"></span>
                                         <span id="student-id-error"></span>
                                 </center>
                         </div>
-                        <div class="modal-footer add-user-modal-footer">
+                        <div class="modal-footer">
                                 <div class="add-user-footer-left">
                                         <i class="material-icons save-status-success md-28">done</i>
                                 </div>
@@ -99,23 +120,20 @@
 <div class="modal fade add-modal" id="add-user-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog add-user-modal-dialog">
                 <div class="modal-content">
-                        <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">New User</h4>
+                        <div class="modal-header user-modal-header">
+                                <span class="modal-title user-modal-title" id="gridSystemModalLabel">New User</span>
                         </div>
                         <div class="modal-body add-user-modal-body">
-                                <br />
-                                <input type="text" class="form-control" id="add_user_last_name" placeholder="Last Name" /><br />
-                                <input type="text" class="form-control" id="add_user_first_name" placeholder="First Name" /><br />
-                                <input type="text" class="form-control" id="add_user_middle_name" placeholder="Middle Name" /><br />
-                                <input type="text" class="form-control" id="add_user_id_no" placeholder="ID Number" oninput="validate_user_id(this.value)" />
-                                <br />
+                                <input type="text" class="form-control" id="add_user_last_name" placeholder="Last Name" data-class="input-label" />
+                                <input type="text" class="form-control" id="add_user_first_name" placeholder="First Name" data-class="input-label" />
+                                <input type="text" class="form-control" id="add_user_middle_name" placeholder="Middle Name" data-class="input-label" />
+                                <input type="text" class="form-control" id="add_user_id_no" placeholder="ID Number" oninput="validate_user_id(this.value)" data-class="input-label" />
                                 <center>
                                         <span id="student-id-loader" class="id-loader"><img src="../static/images/assets/blue.GIF"></span>
                                         <span id="user-id-error"></span>
                                 </center>
                         </div>
-                        <div class="modal-footer add-user-modal-footer">
+                        <div class="modal-footer">
                                 <div class="add-user-footer-left">
                                         <i class="material-icons save-status-success md-28">done</i>
                                 </div>
@@ -138,14 +156,60 @@
                 <div class="modal-content schedule-modal-content">
                         <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">Regular Class Schedule</h4>
+                                <h4 class="modal-title" id="schedule-modal-title">Regular Class Schedule</h4>
                         </div>
                         <div class="modal-body schedule-modal-body">
 
+                                <span class="sched-label">Kinder Garten</span>
+                                <div class="sched-group">
+                                        <div class="group-time-label morning">
+                                                <input id="kinder_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                <span class="time-label">Morning Classes</span>
+                                        </div>
+                                        <div id="kinder_morning_class_sched" class="sched">                   
+                                                <div class="input-group clockpicker schedule-text">
+                                                <input id="kinder_morning_start" type="text" disabled class="form-control time" value="{{kinder_morning_start}}">
+                                                <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-time"></span>
+                                                </span>
+                                                </div>
+                                                <span class="to">to</span>
+                                                <div class="input-group clockpicker schedule-text">
+                                                <input id="kinder_morning_end" type="text" disabled class="form-control time" value="{{kinder_morning_end}}">
+                                                <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-time"></span>
+                                                </span>
+                                                </div>
+                                        </div>
+                               
+                                        <div class="group-time-label afternoon">
+                                                <input id="kinder_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                <span class="time-label">Afternoon Classes</span>
+                                        </div>
+                                        <div id="kinder_afternoon_class_sched" class="sched">
+                                                <div class="input-group clockpicker schedule-text">
+                                                <input id="kinder_afternoon_start" type="text" disabled class="form-control time" value="{{kinder_afternoon_start}}">
+                                                <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-time"></span>
+                                                </span>
+                                                </div>
+                                                <span class="to">to</span>
+                                                <div class="input-group clockpicker schedule-text">
+                                                <input id="kinder_afternoon_end" type="text" disabled class="form-control time" value="{{kinder_afternoon_end}}">
+                                                <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-time"></span>
+                                                </span>
+                                                </div>
+                                        </div>
+                                </div>
+
                                 <span class="sched-label">Primary School</span>
                                 <div class="sched-group">
-                                        <span class="time-label afternoon">Morning Classes</span>
-                                        <div class="sched">                   
+                                        <div class="group-time-label morning">
+                                                <input id="primary_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                <span class="time-label">Morning Classes</span>
+                                        </div>
+                                        <div id="primary_morning_class_sched" class="sched">                   
                                                 <div class="input-group clockpicker schedule-text">
                                                 <input id="primary_morning_start" type="text" disabled class="form-control time" value="{{primary_morning_start}}">
                                                 <span class="input-group-addon">
@@ -161,8 +225,11 @@
                                                 </div>
                                         </div>
                                
-                                        <span class="time-label afternoon">Afternoon Classes</span>
-                                        <div class="sched">
+                                        <div class="group-time-label afternoon">
+                                                <input id="primary_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                <span class="time-label">Afternoon Classes</span>
+                                        </div>
+                                        <div id="primary_afternoon_class_sched" class="sched">
                                                 <div class="input-group clockpicker schedule-text">
                                                 <input id="primary_afternoon_start" type="text" disabled class="form-control time" value="{{primary_afternoon_start}}">
                                                 <span class="input-group-addon">
@@ -182,8 +249,11 @@
 
                                 <span class="sched-label">Junior High School</span>
                                 <div class="sched-group">
-                                        <span class="time-label afternoon">Morning Classes</span>
-                                        <div class="sched">                   
+                                        <div class="group-time-label morning">
+                                                <input id="junior_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                <span class="time-label">Morning Classes</span>
+                                        </div>
+                                        <div id="junior_morning_class_sched" class="sched">                   
                                                 <div class="input-group clockpicker schedule-text">
                                                 <input id="junior_morning_start" type="text" disabled disabled disabled disabled class="form-control time" value="{{junior_morning_start}}">
                                                 <span class="input-group-addon">
@@ -199,8 +269,11 @@
                                                 </div>
                                         </div>
                                
-                                        <span class="time-label afternoon">Afternoon Classes</span>
-                                        <div class="sched">
+                                        <div class="group-time-label afternoon">
+                                                <input id="junior_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                <span class="time-label">Afternoon Classes</span>
+                                        </div>
+                                        <div id="junior_afternoon_class_sched" class="sched">
                                                 <div class="input-group clockpicker schedule-text">
                                                 <input id="junior_afternoon_start" type="text" disabled disabled disabled class="form-control time" value="{{junior_afternoon_start}}">
                                                 <span class="input-group-addon">
@@ -219,8 +292,11 @@
 
                                 <span class="sched-label">Senior High School</span>
                                 <div class="sched-group">
-                                        <span class="time-label afternoon">Morning Classes</span>
-                                        <div class="sched">                   
+                                        <div class="group-time-label morning">
+                                                <input id="senior_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                <span class="time-label">Morning Classes</span>
+                                        </div>
+                                        <div id="senior_morning_class_sched" class="sched">                   
                                                 <div class="input-group clockpicker-top schedule-text">
                                                 <input id="senior_morning_start" type="text" disabled disabled class="form-control time" value="{{senior_morning_start}}">
                                                 <span class="input-group-addon">
@@ -236,8 +312,11 @@
                                                 </div>
                                         </div>
                                
-                                        <span class="time-label afternoon">Afternoon Classes</span>
-                                        <div class="sched">
+                                        <div class="group-time-label afternoon">
+                                                <input id="senior_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                <span class="time-label">Afternoon Classes</span>
+                                        </div>
+                                        <div id="senior_afternoon_class_sched" class="sched">
                                                 <div class="input-group clockpicker-top schedule-text">
                                                 <input id="senior_afternoon_start" type="text" disabled class="form-control time" value="{{senior_afternoon_start}}">
                                                 <span class="input-group-addon">
@@ -265,7 +344,7 @@
 <div class="modal fade" id="calendar-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog calendar-modal-dialog">
                 <div class="modal-content">
-                        <div class="modal-header message-modal-header">
+                        <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                 <h4 class="modal-title calendar-modal-title" id="gridSystemModalLabel">Academic Calendar</h4>
                         </div>

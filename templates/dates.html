@@ -19,15 +19,15 @@
 			{% if date.month == month %}
 				{% if date.day == today %}
 					{% if date.day in events %}
-				    <td class="day current-month current-day event">
+				    <td class="day current-month current-day event" data-toggle="modal" data-target="#schedule-modal" onclick="populate_irregular_schedule('{{month_name}} {{date.day}}, {{year}}',{{date.month}},{{date.day}},{{date.year}})">
 				    {% else %}
 				    <td class="day current-month current-day">
 				    {% endif %}
 				    {% else %}
 				    {% if date.day in events %}
-				    <td class="day current-month event">
+				    <td class="day current-month event" data-toggle="modal" data-target="#schedule-modal" onclick="populate_irregular_schedule('{{month_name}} {{date.day}}, {{year}}',{{date.month}},{{date.day}},{{date.year}})">
 				    {% else %}
-				    <td class="day current-month">
+				    <td class="day current-month" data-toggle="modal" data-target="#schedule-modal" onclick="populate_regular_schedule('{{month_name}} {{date.day}}, {{year}}')">
 				    {% endif %}
 			    {% endif %}
 			    {% else %}

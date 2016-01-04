@@ -20,6 +20,11 @@ if (tab == 'attendance'){
     $('#add-user-btn').hide();
   }
 
+function view_message(){
+  $('.message-modal-dialog').animate({'width':'900px'});
+  $('#message-modal-body').animate({'width':'340px'});
+}
+
 function validate_student_form(status){
   form_validated = status;
   if ((form_validated == true) && (id_no_validated == true)){
@@ -151,9 +156,12 @@ function blast_message(){
     $.post('/blast',{message:message,password:password},
     function(data){
       $('#status-modal-body').html(data);
+      $("#message").val('');
+      $('#confirm-modal').modal('hide');
+      $('#compose-message-modal').modal('hide');
+      $('#message-status-modal').modal('show');
     });
-    $('.modal').modal('hide');
-    $('#message-status-modal').modal('show');
+    
   }
   else if (navigator.onLine==false) {
     alert('You are offline!');
@@ -163,7 +171,18 @@ function blast_message(){
   }
 }
 
+function open_messages(){
+  console.log('openning messages')
+  $.post('/messages',
+  function(data){
+    $('#message-modal-body').html(data);
+    $('#message-modal-preloader').hide();
+  });
+}
+
 function reset_data(){
+    $('#kinder_morning_start').val(kinder_morning_start);
+    $('#kinder_morning_end').val(kinder_morning_end);
     $('#primary_morning_start').val(primary_morning_start);
     $('#primary_morning_end').val(primary_morning_end);
     $('#junior_morning_start').val(junior_morning_start);
@@ -171,21 +190,31 @@ function reset_data(){
     $('#senior_morning_start').val(senior_morning_start);
     $('#senior_morning_end').val(senior_morning_end);
 
+    $('#kinder_afternoon_start').val(kinder_afternoon_start);
+    $('#kinder_afternoon_end').val(kinder_afternoon_end);
     $('#primary_afternoon_start').val(primary_afternoon_start);
     $('#primary_afternoon_end').val(primary_afternoon_end);
     $('#junior_afternoon_start').val(junior_afternoon_start);
     $('#junior_afternoon_end').val(junior_afternoon_end);
     $('#senior_afternoon_start').val(senior_afternoon_start);
     $('#senior_afternoon_end').val(senior_afternoon_end);
+    $('.no-class-checkbox').prop('checked',true);
+    $('.no-class-checkbox').change();
+    $('.no-class-checkbox').hide();
 }
 
 function initial_data(){
+
+    kinder_morning_start = $('#kinder_morning_start').val();
+    kinder_morning_end = $('#kinder_morning_end').val();
     primary_morning_start = $('#primary_morning_start').val();
     primary_morning_end = $('#primary_morning_end').val();
     junior_morning_start = $('#junior_morning_start').val();
     junior_morning_end = $('#junior_morning_end').val();
     senior_morning_start = $('#senior_morning_start').val();
     senior_morning_end = $('#senior_morning_end').val();
+    kinder_afternoon_start = $('#kinder_afternoon_start').val();
+    kinder_afternoon_end = $('#kinder_afternoon_end').val();
     primary_afternoon_start = $('#primary_afternoon_start').val();
     primary_afternoon_end = $('#primary_afternoon_end').val();
     junior_afternoon_start = $('#junior_afternoon_start').val();
@@ -195,7 +224,9 @@ function initial_data(){
 }
 
 function clear_data(){
-    $('.add-user-modal-body').find('.form-control').val('');
+    input_fields = $('.add-user-modal-body').find('.form-control');
+    input_fields.val('');
+    input_fields.change();
     $('#id-error').text('');
 }
 
@@ -459,16 +490,21 @@ $(".tab-pane").css({'background-image':'url(../static/images/watermark.png)','ba
 }*/
 
 function save_sched(){
-  $('#save-sched span').css({'display':'none'});
+    $('#save-sched').attr('disabled',true);
+    $('#save-sched span').css({'display':'none'});
     $('#save-sched').css({'background-image':'url(../static/images/assets/white.GIF)','background-repeat': 'no-repeat','background-position': 'center'});
     initial_data()
     $.post('/sched',{
+        kinder_morning_start:kinder_morning_start,
+        kinder_morning_end:kinder_morning_end,
         primary_morning_start:primary_morning_start,
         primary_morning_end:primary_morning_end,
         junior_morning_start:junior_morning_start,
         junior_morning_end:junior_morning_end,
         senior_morning_start:senior_morning_start,
         senior_morning_end:senior_morning_end,
+        kinder_afternoon_start:kinder_afternoon_start,
+        kinder_afternoon_end:kinder_afternoon_end,
         primary_afternoon_start:primary_afternoon_start,
         primary_afternoon_end:primary_afternoon_end,
         junior_afternoon_start:junior_afternoon_start,
@@ -619,6 +655,92 @@ function toggle_search(){
     }
 }
 
+function populate_regular_schedule(date){
+  $('#schedule-modal-title').html(date);
+  $('.no-class-checkbox').show();
+  $('.no-class-checkbox').prop('checked',true);
+  $('.no-class-checkbox').change();
+}
 
+function populate_irregular_schedule(date,month,day,year){
+  $('#schedule-modal-title').html(date + ' (Irregular Schedule)');
+  $('.no-class-checkbox').show();
+  $.post('/schedule/irregular/get',{
+        month:month,
+        day:day,
+        year:year
+    },
+    function(data){
+      if (data['kinder_morning_class']){
+        $('#kinder_morning_class').prop('checked', true);
+      }
+      else{
+        $('#kinder_morning_class').prop('checked', false); 
+      }
+      if (data['kinder_afternoon_class']){
+        $('#kinder_afternoon_class').prop('checked', true);
+      }
+      else{
+        $('#kinder_afternoon_class').prop('checked', false); 
+      }
 
+      if (data['primary_morning_class']){
+        $('#primary_morning_class').prop('checked', true);
+      }
+      else{
+        $('#primary_morning_class').prop('checked', false); 
+      }
+      if (data['primary_afternoon_class']){
+        $('#primary_afternoon_class').prop('checked', true);
+      }
+      else{
+        $('#primary_afternoon_class').prop('checked', false); 
+      }
 
+      if (data['junior_morning_class']){
+        $('#junior_morning_class').prop('checked', true);
+      }
+      else{
+        $('#junior_morning_class').prop('checked', false); 
+      }
+      if (data['junior_afternoon_class']){
+        $('#junior_afternoon_class').prop('checked', true);
+      }
+      else{
+        $('#junior_afternoon_class').prop('checked', false); 
+      }
+
+      if (data['senior_morning_class']){
+        $('#senior_morning_class').prop('checked', true);
+      }
+      else{
+        $('#senior_morning_class').prop('checked', false); 
+      }
+      if (data['senior_afternoon_class']){
+        $('#senior_afternoon_class').prop('checked', true);
+      }
+      else{
+        $('#senior_afternoon_class').prop('checked', false); 
+      }
+
+      $('.no-class-checkbox').change();
+
+      $('#kinder_morning_start').val(data['kinder_morning_start']);
+      $('#kinder_morning_end').val(data['kinder_morning_end']);
+      $('#primary_morning_start').val(data['primary_morning_start']);
+      $('#primary_morning_end').val(data['primary_morning_end']);
+      $('#junior_morning_start').val(data['junior_morning_start']);
+      $('#junior_morning_end').val(data['junior_morning_end']);
+      $('#senior_morning_start').val(data['senior_morning_start']);
+      $('#senior_morning_end').val(data['senior_morning_end']);
+
+      $('#kinder_afternoon_start').val(data['kinder_afternoon_start']);
+      $('#kinder_afternoon_end').val(data['kinder_afternoon_end']);
+      $('#primary_afternoon_start').val(data['primary_afternoon_start']);
+      $('#primary_afternoon_end').val(data['primary_afternoon_end']);
+      $('#junior_afternoon_start').val(data['junior_afternoon_start']);
+      $('#junior_afternoon_end').val(data['junior_afternoon_end']);
+      $('#senior_afternoon_start').val(data['senior_afternoon_start']);
+      $('#senior_afternoon_end').val(data['senior_afternoon_end']);
+    });
+}

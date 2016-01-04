@@ -32,7 +32,7 @@ import os
 app = flask.Flask(__name__)
 db = SQLAlchemy(app)
 app.secret_key = '0129383hfldcndidvs98r9t9438953894534k545lkn3kfnac98'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local.db'
 
 API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
 SMS_URL = 'https://post.chikka.com/smsapi/request'
@@ -40,8 +40,7 @@ CLIENT_ID = 'ef8cf56d44f93b6ee6165a0caa3fe0d1ebeee9b20546998931907edbb266eb72'
 SECRET_KEY = 'c4c461cc5aa5f9f89b701bc016a73e9981713be1bf7bb057c875dbfacff86e1d'
 SHORT_CODE = '29290420420'
 CONNECT_TIMEOUT = 5.0
-CALENDAR_URL = 'http://ravenclock.herokuapp.com%s'
-SCHEDULE_URL = 'http://ravenclock.herokuapp.com/schedule/regular/update'
+CALENDAR_URL = 'http://127.0.0.1:3000%s'
 
 KINDERGARTEN = ['Junior Kinder', 'Senior Kinder']
 PRIMARY = ['1st Grade', '2nd Grade', '3rd Grade', '4th Grade', '5th Grade', '6th Grade']
@@ -93,6 +92,8 @@ class School(db.Model, Serializer):
     email = db.Column(db.String(60))
     tel = db.Column(db.String(15))
 
+    kinder_morning_class = db.Column(Boolean, unique=False)
+    kinder_afternoon_class = db.Column(Boolean, unique=False)
     primary_morning_class = db.Column(Boolean, unique=False)
     primary_afternoon_class = db.Column(Boolean, unique=False)
     junior_morning_class = db.Column(Boolean, unique=False)
@@ -100,6 +101,10 @@ class School(db.Model, Serializer):
     senior_morning_class = db.Column(Boolean, unique=False)
     senior_afternoon_class = db.Column(Boolean, unique=False)
 
+    kinder_morning_start = db.Column(db.String(30))
+    kinder_morning_end = db.Column(db.String(30))
+    kinder_afternoon_start = db.Column(db.String(30))
+    kinder_afternoon_end = db.Column(db.String(30))
     primary_morning_start = db.Column(db.String(30))
     primary_morning_end = db.Column(db.String(30))
     primary_afternoon_start = db.Column(db.String(30))
@@ -120,6 +125,14 @@ class Section(db.Model):
     name = db.Column(db.String(30))
 
 
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    school_id = db.Column(db.String(32))
+    date = db.Column(db.String(20))
+    time = db.Column(db.String(10))
+    content = db.Column(db.UnicodeText())
+
+
 class Log(db.Model, Serializer):
     __public__ = ['id','school_id','date','id_no','name','level',
                   'department','section','time_in','time_out','timestamp']
@@ -132,7 +145,7 @@ class Log(db.Model, Serializer):
     section = db.Column(db.String(30))
     department = db.Column(db.String(30))
     time_in = db.Column(db.String(10))
-    time_out = db.Column(db.String(10))
+    time_out = db.Column(db.String(10),default=None)
     timestamp = db.Column(db.String(50))
 
 
@@ -188,6 +201,7 @@ admin.add_view(IngAdmin(Log, db.session))
 admin.add_view(IngAdmin(Student, db.session))
 admin.add_view(IngAdmin(Late, db.session))
 admin.add_view(IngAdmin(Absent, db.session))
+admin.add_view(IngAdmin(Message, db.session))
 
 
 def crossdomain(origin=None, methods=None, headers=None,
@@ -290,7 +304,9 @@ def mark_morning_absent(school_id,api_key):
 
     for student in all_students:
         logged = Log.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no).order_by(Log.timestamp.desc()).first()
-        if logged == None or logged.time_out != 'None':
+        print 'xxxxxxxxxxxxxxxxxxxxx'
+        print student.id_no
+        if not logged or logged == None or logged.time_out != None:
             student_name = student.last_name+', '+student.first_name
             if student.middle_name:
                 student_name += ' '+student.middle_name[:1]+'.'
@@ -307,18 +323,20 @@ def mark_morning_absent(school_id,api_key):
             )
 
             db.session.add(absent)
-            db.session.commit()
-
             student.absences=Absent.query.filter_by(id_no=student.id_no, school_id=school_id).count()
             db.session.commit()
+            absent_count = Absent.query.filter_by(school_id=school_id,date=time.strftime("%B %d, %Y"),time_of_day='morning').count()
+    return jsonify(status='Success', absent_count=absent_count),201
 
 
 def mark_afternoon_absent(school_id,api_key):
     all_students = Student.query.filter_by(school_id=school_id).all()
 
     for student in all_students:
+        print 'xxxxxxxxxxxxxxxxxxxxx'
+        print student.id_no
         logged = Log.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no).order_by(Log.timestamp.desc()).first()
-        if not logged or logged.time_out != 'None':
+        if not logged or logged == None or logged.time_out != None:
             student_name = student.last_name+', '+student.first_name
             if student.middle_name:
                 student_name += ' '+student.middle_name[:1]+'.'
@@ -335,10 +353,10 @@ def mark_afternoon_absent(school_id,api_key):
             )
 
             db.session.add(absent)
-            db.session.commit()
-
             student.absences=Absent.query.filter_by(id_no=student.id_no, school_id=school_id).count()
             db.session.commit()
+            absent_count = Absent.query.filter_by(school_id=school_id,date=time.strftime("%B %d, %Y"),time_of_day='afternoon').count()
+    return jsonify(status='Success', absent_count=absent_count),201
 
 def mark_specific_absent(school_id,id_no,time_of_day):
     student = Student.query.filter_by(school_id=school_id,id_no=id_no).first()
@@ -368,8 +386,9 @@ def check_if_late(school_id,api_key,id_no,name,level,
 
     time_now = str(now.replace(hour=get_hour(time), minute=int(time[3:5])))[11:16]
     school = School.query.filter_by(api_key=api_key).first()
-
-    if level in PRIMARY:
+    if level in KINDERGARTEN:
+        educ = 'kinder'
+    elif level in PRIMARY:
         educ = 'primary'
     elif level in JUNIOR_HIGH:
         educ = 'junior'
@@ -432,10 +451,15 @@ def time_in(school_id,api_key,id_no,name,level,section,
             date,department,time,timestamp):
 
     add_this = Log(
-        school_id=school_id,date=date,id_no=id_no,
-        name=name,level=level,section=section,
-        department=department,time_in=time,
-        time_out='None',timestamp=timestamp
+        school_id=school_id,
+        date=date,
+        id_no=id_no,
+        name=name,
+        level=level,
+        section=section,
+        department=department,
+        time_in=time,
+        timestamp=timestamp
         )
 
     db.session.add(add_this)
@@ -592,10 +616,7 @@ def get_latest_schedule(api_key):
     school = School.query.filter_by(api_key=api_key).first()
 
     if school == None:
-        return {
-            'status': 'Failed',
-            'message': 'School not found',
-            }
+        return jsonify(status='Failed',error='School not found'),404
 
     primary_morning_start = school.primary_morning_start
     junior_morning_start = school.junior_morning_start
@@ -621,7 +642,7 @@ def get_latest_schedule(api_key):
         afternoon_time = senior_afternoon_start
 
     return jsonify(
-        status= 'success',
+        status= 'Success',
         morning_time= morning_time,
         afternoon_time= afternoon_time
         )
@@ -629,12 +650,6 @@ def get_latest_schedule(api_key):
 
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
-
-
-@app.route('/sched/get', methods=['GET', 'POST'])
-def get_schedule():
-    api_key = flask.request.args.get('api_key')
-    return get_latest_schedule(api_key)
 
 
 def nocache(view):
@@ -650,11 +665,17 @@ def nocache(view):
     return update_wrapper(no_cache, view)
 
 
+@app.route('/sched/get', methods=['GET', 'POST'])
+def get_schedule():
+    api_key = flask.request.args.get('api_key')
+    return get_latest_schedule(api_key)
+
+
 @app.route('/', methods=['GET', 'POST'])
 @nocache
 def index():
     if not session:
-        return redirect('/signin')
+        return redirect('http://127.0.0.1:9000/')
     session['logs_limit'] = 100
     session['late_limit'] = 100
     session['attendance_limit'] = 100
@@ -682,6 +703,10 @@ def index():
         absent=first_set['absent'], 
         view=session['department'],
         sections=sections,
+        kinder_morning_start=school.kinder_morning_start,
+        kinder_morning_end=school.kinder_morning_end,
+        kinder_afternoon_start=school.kinder_afternoon_start,
+        kinder_afternoon_end=school.kinder_afternoon_end,
         primary_morning_start=school.primary_morning_start,
         primary_morning_end=school.primary_morning_end,
         primary_afternoon_start=school.primary_afternoon_start,
@@ -706,6 +731,45 @@ def reset_attendance():
         student.lates = 0
     db.session.commit()
     return jsonify(status='Success'),200
+
+
+@app.route('/schedule/irregular/get', methods=['GET', 'POST'])
+def get_irregular_schedule():
+    data = flask.request.form.to_dict()
+    calendar_params = {
+        'api_key':session['api_key'],
+        'month':data['month'],
+        'day':data['day'],
+        'year':data['year']
+    }
+    get_events = requests.get(CALENDAR_URL%'/schedule/irregular/get',params=calendar_params)
+    schedule = get_events.json()
+    return jsonify(
+        kinder_morning_class=schedule['kinder_morning_class'],
+        kinder_afternoon_class=schedule['kinder_afternoon_class'],
+        primary_morning_class=schedule['primary_morning_class'],
+        primary_afternoon_class=schedule['primary_afternoon_class'],
+        junior_morning_class=schedule['junior_morning_class'],
+        junior_afternoon_class=schedule['junior_afternoon_class'],
+        senior_morning_class=schedule['senior_morning_class'],
+        senior_afternoon_class=schedule['senior_afternoon_class'],
+        kinder_morning_start=schedule['kinder_morning_start'],
+        kinder_morning_end=schedule['kinder_morning_end'],
+        kinder_afternoon_start=schedule['kinder_afternoon_start'],
+        kinder_afternoon_end=schedule['kinder_afternoon_end'],
+        primary_morning_start=schedule['primary_morning_start'],
+        primary_morning_end=schedule['primary_morning_end'],
+        primary_afternoon_start=schedule['primary_afternoon_start'],
+        primary_afternoon_end=schedule['primary_afternoon_end'],
+        junior_morning_start=schedule['junior_morning_start'],
+        junior_morning_end=schedule['junior_morning_end'],
+        junior_afternoon_start=schedule['junior_afternoon_start'],
+        junior_afternoon_end=schedule['junior_afternoon_end'],
+        senior_morning_start=schedule['senior_morning_start'],
+        senior_morning_end=schedule['senior_morning_end'],
+        senior_afternoon_start=schedule['senior_afternoon_start'],
+        senior_afternoon_end=schedule['senior_afternoon_end']
+        )
 
 
 @app.route('/signin', methods=['GET', 'POST'])
@@ -763,10 +827,9 @@ def mark_absent_morning():
     api_key = flask.request.form.get('api_key')
 
     if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
-        return primary_morning_start
+        return jsonify(status='Failed', error='School not found'),404
 
-    mark_morning_absent(school_id,api_key)
-    return '',201
+    return mark_morning_absent(school_id,api_key)
 
 
 @app.route('/absent/afternoon/mark', methods=['GET', 'POST'])
@@ -775,10 +838,9 @@ def mark_absent_afternoon():
     api_key = flask.request.form.get('api_key')
 
     if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
-        return primary_morning_start
+        return jsonify(status='Failed',error='School not found'),404
 
-    mark_afternoon_absent(school_id,api_key)
-    return '',201
+    return mark_afternoon_absent(school_id,api_key)
 
 
 @app.route('/logout', methods=['GET', 'POST'])
@@ -812,17 +874,17 @@ def add_log():
 
     logged = Log.query.filter_by(date=data['date'],school_id=data['school_id'],id_no=data['id_no']).order_by(Log.timestamp.desc()).first()
 
-    if not logged or logged.time_out != 'None':
+    if not logged or logged.time_out != None:
 
         time_in(data['school_id'],data['api_key'],data['id_no'],data['name'],
                 data['level'],data['section'],data['date'],data['department'],
                 data['time'],data['timestamp'])
      
-        return jsonify(status= '201',message='logged in',action='entered'), 201
+        return jsonify(status='Success',type='entry',action='entered'), 201
 
     time_out(data['id_no'],data['time'],data['school_id'])    
 
-    return jsonify(status='201',message='logged out',action='left'), 201
+    return jsonify(status='Success',type='exit',action='left'), 201
 
 
 @app.route('/blast',methods=['GET','POST'])
@@ -853,7 +915,7 @@ def blast_message():
 def sync_database():
     school_id = flask.request.args.get('school_id')
     return SWJsonify({
-        'Records': Student.query.filter_by(school_id=school_id,department='student').all()
+        'Records': Student.query.filter_by(school_id=school_id).all()
         }), 201
 
 
@@ -1030,16 +1092,20 @@ def change_sched():
 
     school = School.query.filter_by(id=session['school_id']).one()
 
+    school.kinder_morning_start = data['kinder_morning_start']
+    school.kinder_morning_end = data['kinder_morning_end']
+    school.kinder_afternoon_start = data['kinder_afternoon_start']
+    school.kinder_afternoon_end = data['kinder_afternoon_end']
     school.primary_morning_start = data['primary_morning_start']
     school.primary_morning_end = data['primary_morning_end']
-    school.junior_morning_start = data['junior_morning_start']
-    school.junior_morning_end = data['junior_morning_end']
-    school.senior_morning_start = data['senior_morning_start']
-    school.senior_morning_end = data['senior_morning_end']
     school.primary_afternoon_start = data['primary_afternoon_start']
     school.primary_afternoon_end = data['primary_afternoon_end']
+    school.junior_morning_start = data['junior_morning_start']
+    school.junior_morning_end = data['junior_morning_end']
     school.junior_afternoon_start = data['junior_afternoon_start']
     school.junior_afternoon_end = data['junior_afternoon_end']
+    school.senior_morning_start = data['senior_morning_start']
+    school.senior_morning_end = data['senior_morning_end']
     school.senior_afternoon_start = data['senior_afternoon_start']
     school.senior_afternoon_end = data['senior_afternoon_end']
 
@@ -1047,31 +1113,30 @@ def change_sched():
 
     sched_data = {
         'school_id': session['school_id'],
+        'kinder_morning_start': data['kinder_morning_start'],
+        'kinder_morning_end': data['kinder_morning_end'],
+        'kinder_afternoon_start': data['kinder_afternoon_start'],
+        'kinder_afternoon_end':data['kinder_afternoon_end'],
         'primary_morning_start': data['primary_morning_start'],
         'primary_morning_end': data['primary_morning_end'],
-        'junior_morning_start': data['junior_morning_start'],
-        'junior_morning_end': data['junior_morning_end'],
-        'senior_morning_start': data['senior_morning_start'],
-        'senior_morning_end': data['senior_morning_end'],
         'primary_afternoon_start': data['primary_afternoon_start'],
         'primary_afternoon_end':data['primary_afternoon_end'],
+        'junior_morning_start': data['junior_morning_start'],
+        'junior_morning_end': data['junior_morning_end'],
         'junior_afternoon_start': data['junior_afternoon_start'],
         'junior_afternoon_end': data['junior_afternoon_end'],
+        'senior_morning_start': data['senior_morning_start'],
+        'senior_morning_end': data['senior_morning_end'],
         'senior_afternoon_start': data['senior_afternoon_start'],
         'senior_afternoon_end': data['senior_afternoon_end']
     }
 
-    sent = False
-    while not sent:
-        try:
-            r = requests.post(SCHEDULE_URL,sched_data)
-            sent =True
-            print r.status_code #update log database (put 'sent' to status)
+    try:
+        r = requests.post(CALENDAR_URL%'/schedule/regular/update',sched_data)
+        print r.status_code #update log database (put 'sent' to status)
 
-        except requests.exceptions.ConnectionError as e:
-            sleep(5)
-            print "Disconnected!"
-            pass
+    except requests.exceptions.ConnectionError as e:
+        print "Disconnected!"
 
     return redirect('/')
 
@@ -1194,6 +1259,17 @@ def favicon():
     return '',200
 
 
+@app.route('/messages',methods=['GET','POST'])
+def fetch_sent_messages():
+    messages = Message.query.filter_by(school_id=session['school_id']).all()
+    return flask.render_template('sent_messages.html',messages=messages)
+
+
+@app.route('/messages/new',methods=['GET','POST'])
+def compose_new_message():
+    return flask.render_template('new_message.html')
+
+
 @app.route('/db/faculty/add', methods=['GET', 'POST'])
 def add_faculty():
     for i in range(500):
@@ -1222,6 +1298,11 @@ def add_school():
         city="Lucena City",
         email="sgb.edu@gmail.com",
         tel="555-8898",
+
+        kinder_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
+        kinder_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        kinder_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+        kinder_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
 
         primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
         primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
@@ -1259,53 +1340,68 @@ def rebuild_database():
         email="sgb.edu@gmail.com",
         tel="555-8898",
 
+        kinder_morning_class = True,
+        kinder_afternoon_class = True,
+        primary_morning_class = True,
+        primary_afternoon_class = True,
+        junior_morning_class = True,
+        junior_afternoon_class = True,
+        senior_morning_class = True,
+        senior_afternoon_class = True,
+
+        kinder_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
+        kinder_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        kinder_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+        kinder_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
+
         primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
         primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
         primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
         primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
 
-        junior_morning_start = str(now.replace(hour=8, minute=0, second=0))[11:16],
-        junior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        junior_morning_start = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        junior_morning_end = str(now.replace(hour=13, minute=0, second=0))[11:16],
         junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-        junior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16],
+        junior_afternoon_end = str(now.replace(hour=13, minute=30, second=0))[11:16],
 
-        senior_morning_start = str(now.replace(hour=9, minute=0, second=0))[11:16],
-        senior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-        senior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-        senior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16]
+        senior_morning_start = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        senior_morning_end = str(now.replace(hour=13, minute=0, second=0))[11:16],
+        senior_afternoon_start = str(now.replace(hour=12, minute=30, second=0))[11:16],
+        senior_afternoon_end = str(now.replace(hour=13, minute=30, second=0))[11:16]
         )
     db.session.add(school)
+    db.session.commit()
 
-    school1 = School(
-        id='4321',
-        api_key='ecc67d28db284a2fb351d58fe18965f0',
-        password='test',
-        name="Sacred Heart College",
-        url='sacredheartcollege',
-        address="10, Brgy Isabang",
-        city="Lucena City",
-        email="sgb.edu@gmail.com",
-        tel="555-8898",
+    # school1 = School(
+    #     id='4321',
+    #     api_key='ecc67d28db284a2fb351d58fe18965f0',
+    #     password='test',
+    #     name="Sacred Heart College",
+    #     url='sacredheartcollege',
+    #     address="10, Brgy Isabang",
+    #     city="Lucena City",
+    #     email="sgb.edu@gmail.com",
+    #     tel="555-8898",
 
-        primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
-        primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-        primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-        primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
+    #     primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
+    #     primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+    #     primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+    #     primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
 
-        junior_morning_start = str(now.replace(hour=8, minute=0, second=0))[11:16],
-        junior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-        junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-        junior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16],
+    #     junior_morning_start = str(now.replace(hour=8, minute=0, second=0))[11:16],
+    #     junior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+    #     junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+    #     junior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16],
 
-        senior_morning_start = str(now.replace(hour=9, minute=0, second=0))[11:16],
-        senior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-        senior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-        senior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16]
-        )
-    # db.session.add(school1)
+    #     senior_morning_start = str(now.replace(hour=9, minute=0, second=0))[11:16],
+    #     senior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+    #     senior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+    #     senior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16]
+    #     )
+    # # db.session.add(school1)
 
     a = Student(
-        school_id='1234',
+        school_id='123456789',
         id_no='2011334281',
         first_name='Jasper',
         last_name='Barcelona',
@@ -1315,34 +1411,34 @@ def rebuild_database():
         section='Charity',
         absences='0',
         lates='0',
-        parent_contact='639183339068'
+        parent_contact='09183339068'
         )
     b = Student(
-        school_id='1234',
+        school_id='123456789',
         id_no='2011334282',
         first_name='Janno',
         last_name='Armamento',
-        middle_name='Estrada',
-        level='8th Grade',
+        middle_name='Nicolas',
+        level='1st Grade',
         department='student',
         section='Fidelity',
         absences='0',
         lates='0',
-        parent_contact='639183339068'
+        parent_contact='09183339068'
         )
 
     c = Student(
-        school_id='1234',
+        school_id='123456789',
         id_no='2011334283',
-        first_name='Bear',
-        last_name='Delos Reyes',
-        middle_name='Estrada',
-        level='12th Grade',
+        first_name='Joseph',
+        last_name='Sallao',
+        middle_name='Bear',
+        level='2nd Grade',
         department='student',
         section='Fidelity',
         absences='0',
         lates='0',
-        parent_contact='639183339068'
+        parent_contact='09183339068'
         )
 
     d = Section(
@@ -1360,18 +1456,122 @@ def rebuild_database():
         name='Peace'
         )
 
-    # db.session.add(a)
-    # db.session.add(b)
-    # db.session.add(c)
+    message = Message(
+        school_id='123456789',
+        date=time.strftime("%B %d, %Y"),
+        time=time.strftime("%I:%M %p"),
+        content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
+                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
+                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
+                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
+                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
+                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+        )
+
+    message1 = Message(
+        school_id='123456789',
+        date=time.strftime("%B %d, %Y"),
+        time=time.strftime("%I:%M %p"),
+        content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
+                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
+                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
+                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
+                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
+                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+        )
+
+    message2 = Message(
+        school_id='123456789',
+        date=time.strftime("%B %d, %Y"),
+        time=time.strftime("%I:%M %p"),
+        content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
+                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
+                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
+                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
+                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
+                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+        )
+
+    message3 = Message(
+        school_id='123456789',
+        date=time.strftime("%B %d, %Y"),
+        time=time.strftime("%I:%M %p"),
+        content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
+                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
+                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
+                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
+                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
+                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+        )
+
+    message4 = Message(
+        school_id='123456789',
+        date=time.strftime("%B %d, %Y"),
+        time=time.strftime("%I:%M %p"),
+        content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
+                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
+                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
+                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
+                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
+                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+        )
+
+    message5 = Message(
+        school_id='123456789',
+        date=time.strftime("%B %d, %Y"),
+        time=time.strftime("%I:%M %p"),
+        content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
+                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
+                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
+                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
+                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
+                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+        )
+
+    message6 = Message(
+        school_id='123456789',
+        date=time.strftime("%B %d, %Y"),
+        time=time.strftime("%I:%M %p"),
+        content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
+                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
+                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
+                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
+                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
+                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+        )
+
+    message7 = Message(
+        school_id='123456789',
+        date=time.strftime("%B %d, %Y"),
+        time=time.strftime("%I:%M %p"),
+        content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
+                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
+                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
+                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
+                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
+                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+        )
+
+    db.session.add(a)
+    db.session.add(b)
+    db.session.add(c)
     db.session.add(d)
     db.session.add(e)
     db.session.add(f)
+    db.session.add(message)
+    db.session.add(message1)
+    db.session.add(message2)
+    db.session.add(message3)
+    db.session.add(message4)
+    db.session.add(message5)
+    db.session.add(message6)
+    db.session.add(message7)
     db.session.commit()
-    return SWJsonify({'status': 'Database Rebuild Success'})
+    return jsonify(status='Success'),201
 
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(port=int(os.environ['PORT']), host='0.0.0.0',threaded=True)
+    app.run(threaded=True)
 
     # port=int(os.environ['PORT']), host='0.0.0.0'

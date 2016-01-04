@@ -1,0 +1,6 @@
+{% for message in messages %}
+<div class="message-row" onclick="view_message()">
+        <span class="message-date">{{message.date}} | {{message.time}}</span><br />
+        <span class="message-content-preview">{{message.content}}</span>
+</div>
+{% endfor %}

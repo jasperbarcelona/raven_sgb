@@ -14,14 +14,18 @@ $(window).load(function() {
     $('#intro').fadeOut();
 });
 
-$( ".datepicker " ).datepicker({
-  dateFormat: "MM dd, yy"
+$(".datepicker").datepicker({
+    dateFormat: "MM dd, yy"
+});
+
+$('.add-user-modal-body .form-control').floatlabel({
+    labelEndTop:'-2px'
 });
 
 $('.search-panel').hide();
 
 $('.clockpicker').clockpicker({
-    autoclose: true,
+    autoclose: true
 });
 
 $('.clockpicker-top').clockpicker({
@@ -45,6 +49,9 @@ $('#confirm-modal').on('hidden.bs.modal', function () {
     $('#confirm-send').attr('disabled',true);
 });
 
+$('#message-status-modal').on('hidden.bs.modal', function () {
+    open_messages();
+});
 
 $('#message-confirm-password').on('keyup', function(){
     if (!$.trim($(this).val())) {
@@ -68,6 +75,23 @@ $('.add-modal').on('hidden.bs.modal', function () {
     clear_data();
     $('.save-btn').attr('disabled',true);
 });
+
+$('#compose-message-modal').on('shown.bs.modal', function () {
+    $('#message').focus();
+});
+
+$('#confirm-modal').on('shown.bs.modal', function () {
+    $('#message-confirm-password').focus();
+});
+
+$('#add-student-modal').on('shown.bs.modal', function () {
+    $('#add_student_id_no').focus();
+});
+
+$('#add-user-modal').on('shown.bs.modal', function () {
+    $('#add_user_id_no').focus();
+});
+
 
 $('#sched-cancel').on('click', function () {
     reset_data();
@@ -213,5 +237,16 @@ $('.search-late').keypress(function(e){
 $('.search-late-options').on('change', function(){
     search_late()
 });
+
+$('.no-class-checkbox').change(function() {
+        if($(this).is(":checked")) {
+            $('#'+$(this).attr('id')+'_sched').find('.input-group-addon').css('background-color','#4485F5');
+            $('#'+$(this).attr('id')+'_sched .schedule-text').removeClass('unbind');
+        }
+        else{
+            $('#'+$(this).attr('id')+'_sched').find('.input-group-addon').css('background-color','#999');
+            $('#'+$(this).attr('id')+'_sched .schedule-text').addClass('unbind');
+        }    
+    });
 
 });

@@ -35,14 +35,48 @@ textarea{
 	height: 100%;
 	padding: 11px;
 	resize: none;
-	border-top: 1px solid #DDDDDD;
-	border-bottom: 1px solid #DDDDDD;
-	border-left: none;
-	border-right: none;
+	border: none !important;
+	margin: 0 !important;
 }
 
 textarea:focus{
 	outline: none;
+}
+
+select:required:invalid {
+  color: #999;
+}
+option[value=""][disabled] {
+  display: none;
+}
+option {
+  color: black;
+}
+
+.input-label{
+	font-family: Lato, sans-serif !important;
+	font-weight: normal !important;
+	padding-left: 4px;
+	font-size: 12px !important;
+}
+
+.ui-datepicker{
+	z-index: 9000 !important;
+}
+
+.form-control{
+	border-radius: 0 !important;
+}
+
+.add-user-modal-body .form-control, .edit-user-modal-body .form-control{
+	outline: none !important;
+	height: 45px !important;
+	margin-bottom: 10px;
+	border-top: 0 !important;
+	border-left: 0 !important;
+	border-right: 0 !important;
+	border-bottom: 1px solid #999 !important;
+	box-shadow: none !important;
 }
 
 .select{
@@ -82,7 +116,8 @@ textarea:focus{
 }
 
 #add-user-btn:focus{
-	outline: none;
+	outline: none !important;
+	box-shadow: none !important;
 }
 
 .xs{
@@ -182,7 +217,18 @@ textarea:focus{
 	font-size: 16px;
 }
 
-.message-modal-body{
+#message-modal-body{
+	height: 400px;
+	width: 100%;
+	padding-left: 0px;
+	padding-right: 0px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+
+#compose-message-modal-body{
 	height: 200px;
 	width: 100%;
 	padding-left: 0px;
@@ -204,11 +250,17 @@ textarea:focus{
 	width: 700px;
 }
 
-.message-modal-header{
-	padding-left: 10px !important;
+#calendar-modal{
+	z-index: 1000 !important;
 }
 
 .modal-header{
+	background-color: #4485F5;
+	color: #FFFFFF;
+	font-size: 18px;
+}
+
+/*.modal-header{
 	height: 40px;
 	background-color: #4485F5;
 	border-top-left-radius: 5px;
@@ -216,24 +268,29 @@ textarea:focus{
 	border-bottom-right-radius: 0px;
 	border-bottom-left-radius: 0px;
 	color: #FFFFFF;
-}
+}*/
 
-.message-modal-title{
+/*.message-modal-title{
 	margin-top: -8px !important;
 }
 
 .calendar-modal-title{
 	margin-top: -8px !important;
-}
+}*/
 
-.close{
+/*.close{
 	margin-top: -6px !important;
+}*/
+
+.clockpicker-popover{
+	z-index: 9000 !important;
 }
 
 .schedule-modal-dialog,
 .schedule-modal-content {
     /* 80% of window height */
-	    height: 90%;
+    	position: absolute;
+	    height: 95%;
 	    width: 500px;
 	    position: fixed;
 	    left: 0;
@@ -242,10 +299,16 @@ textarea:focus{
 	    margin-right: auto;
 }
 
+
+#schedule-modal{
+	z-index: 5000 !important;
+}
+
 .schedule-modal-body{
-	height: calc(100% - 100px) !important;
+	height: calc(100% - 120px) !important;
 	overflow: scroll;
 	overflow-x: hidden; 
+	z-index: 9000 !important;
 }
 
 
@@ -287,14 +350,38 @@ textarea:focus{
 	margin-bottom: 0px;
 }
 
-
-
 .time-label{
-	margin-bottom: 5px;
+	font-size: 16px;
+}
+
+.group-time-label{
+	position: relative;
+	margin-bottom: 10px;
+	text-align: center;
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+.unbind{
+	pointer-events:none;
+}
+
+.group-time-label .no-class-checkbox{
+	position: absolute;
+	left: 0;
+	height: 15px;
+}
+
+.no-class-checkbox{
+	display: none;
+}
+
+.morning{
+	margin-top: 10px;
 }
 
 .afternoon{
-	margin-top: 10px;
+	margin-top: 20px;
 }
 
 .sched-label{
@@ -322,6 +409,10 @@ textarea:focus{
 }
 
 .message-modal-dialog{
+	width: 600px;
+}
+
+.new-message-modal-dialog{
 	width: 500px;
 }
 
@@ -350,6 +441,11 @@ textarea:focus{
 	min-width: 800px;
 	padding: 0 !important;
 	height: 100vh !important;
+}
+
+#new-message-btn:focus{
+	outline: none !important;
+	box-shadow: none !important;
 }
 
 .button-container{
@@ -394,8 +490,53 @@ textarea:focus{
 	outline: none !important;
 }
 
-#compose-btn:focus{
+#messages-btn:focus{
 	outline: none;
+}
+
+#message-modal-preloader{
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	z-index: 5000;
+	background-color: #FFFFFF;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: column;
+	flex-direction: column;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+}
+
+.message-row{
+	position: relative;
+	width: 100%;
+	height: 70px;
+	padding: 10px;
+	border-top: 0 !important;
+	border-left: 0 !important;
+	border-right: 0 !important;
+	border-bottom: 1px solid #999 !important;
+	cursor: pointer;
+}
+
+.message-row:hover{
+	background-color: #DCDBDB!important;
+}
+
+.message-date{
+	font-size: 14px;
+}
+
+.message-content-preview{
+	font-size: 12px;
+	width: 100%;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	display:inline-block;
 }
 
 #search-btn{
@@ -435,7 +576,7 @@ textarea:focus{
 	margin-left: 40px;
 }
 
-#compose-btn{
+#messages-btn{
 	background-color: #4485F5 !important;
 	height: 30px;
 	font-size: 21px !important;
