@@ -1326,7 +1326,93 @@ def add_school():
 
 @app.route('/db/rebuild', methods=['GET', 'POST'])
 def rebuild_database():
+
     db.create_all()
+    db.session.commit()
+
+    # school = School(
+    #     id='123456789',
+    #     api_key='ecc67d28db284a2fb351d58fe18965f9',
+    #     password='test',
+    #     name="Scuola Gesu Bambino",
+    #     url='scuolagesubambino',
+    #     address="10, Brgy Isabang",
+    #     city="Lucena City",
+    #     email="sgb.edu@gmail.com",
+    #     tel="555-8898",
+
+    #     kinder_morning_class = True,
+    #     kinder_afternoon_class = True,
+    #     primary_morning_class = True,
+    #     primary_afternoon_class = True,
+    #     junior_morning_class = True,
+    #     junior_afternoon_class = True,
+    #     senior_morning_class = True,
+    #     senior_afternoon_class = True,
+
+    #     kinder_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
+    #     kinder_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+    #     kinder_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+    #     kinder_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
+
+    #     primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
+    #     primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+    #     primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+    #     primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
+
+    #     junior_morning_start = str(now.replace(hour=12, minute=0, second=0))[11:16],
+    #     junior_morning_end = str(now.replace(hour=13, minute=0, second=0))[11:16],
+    #     junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+    #     junior_afternoon_end = str(now.replace(hour=13, minute=30, second=0))[11:16],
+
+    #     senior_morning_start = str(now.replace(hour=12, minute=0, second=0))[11:16],
+    #     senior_morning_end = str(now.replace(hour=13, minute=0, second=0))[11:16],
+    #     senior_afternoon_start = str(now.replace(hour=12, minute=30, second=0))[11:16],
+    #     senior_afternoon_end = str(now.replace(hour=13, minute=30, second=0))[11:16]
+    #     )
+    # db.session.add(school)
+    # db.session.commit()
+
+    # for section in sections:
+    #     sec = Section(
+    #     school_id=section.school_id,
+    #     name=section.name
+    #     )
+
+    #     db.session.add(sec)
+    #     db.session.commit()
+
+    # for student in students:
+    #     if student.middle_name or student.middle_name != None:
+    #         std = Student(
+    #         school_id=student.school_id,
+    #         id_no=student.id_no,
+    #         first_name=student.first_name,
+    #         last_name=student.last_name,
+    #         middle_name=student.middle_name,
+    #         level=student.level,
+    #         department=student.department,
+    #         section=student.section,
+    #         absences=student.absences,
+    #         lates=student.lates,
+    #         parent_contact=student.parent_contact
+    #         )
+    #     else:
+    #         std = Student(
+    #         school_id=student.school_id,
+    #         id_no=student.id_no,
+    #         first_name=student.first_name,
+    #         last_name=student.last_name,
+    #         level=student.level,
+    #         department=student.department,
+    #         section=student.section,
+    #         absences=student.absences,
+    #         lates=student.lates,
+    #         parent_contact=student.parent_contact
+    #         )
+
+    #     db.session.add(std)
+    #     db.session.commit()
 
     # school = School(
     #     id='123456789',
@@ -1565,7 +1651,7 @@ def rebuild_database():
     # db.session.add(message5)
     # db.session.add(message6)
     # db.session.add(message7)
-    db.session.commit()
+    # db.session.commit()
     return jsonify(status='Success'),201
 
 
