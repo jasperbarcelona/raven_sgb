@@ -1565,7 +1565,7 @@ def rebuild_database():
     # db.session.add(message5)
     # db.session.add(message6)
     # db.session.add(message7)
-    # db.session.commit()
+    db.session.commit()
     return jsonify(status='Success'),201
 
 
