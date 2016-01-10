@@ -1327,51 +1327,51 @@ def add_school():
 @app.route('/db/rebuild', methods=['GET', 'POST'])
 def rebuild_database():
 
-    db.create_all()
+    db.drop_all()
     db.session.commit()
 
-    # school = School(
-    #     id='123456789',
-    #     api_key='ecc67d28db284a2fb351d58fe18965f9',
-    #     password='test',
-    #     name="Scuola Gesu Bambino",
-    #     url='scuolagesubambino',
-    #     address="10, Brgy Isabang",
-    #     city="Lucena City",
-    #     email="sgb.edu@gmail.com",
-    #     tel="555-8898",
+    school = School(
+        id='123456789',
+        api_key='ecc67d28db284a2fb351d58fe18965f9',
+        password='test',
+        name="Scuola Gesu Bambino",
+        url='scuolagesubambino',
+        address="10, Brgy Isabang",
+        city="Lucena City",
+        email="sgb.edu@gmail.com",
+        tel="555-8898",
 
-    #     kinder_morning_class = True,
-    #     kinder_afternoon_class = True,
-    #     primary_morning_class = True,
-    #     primary_afternoon_class = True,
-    #     junior_morning_class = True,
-    #     junior_afternoon_class = True,
-    #     senior_morning_class = True,
-    #     senior_afternoon_class = True,
+        kinder_morning_class = True,
+        kinder_afternoon_class = True,
+        primary_morning_class = True,
+        primary_afternoon_class = True,
+        junior_morning_class = True,
+        junior_afternoon_class = True,
+        senior_morning_class = True,
+        senior_afternoon_class = True,
 
-    #     kinder_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
-    #     kinder_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-    #     kinder_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-    #     kinder_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
+        kinder_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
+        kinder_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        kinder_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+        kinder_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
 
-    #     primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
-    #     primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-    #     primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-    #     primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
+        primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
+        primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+        primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
 
-    #     junior_morning_start = str(now.replace(hour=12, minute=0, second=0))[11:16],
-    #     junior_morning_end = str(now.replace(hour=13, minute=0, second=0))[11:16],
-    #     junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-    #     junior_afternoon_end = str(now.replace(hour=13, minute=30, second=0))[11:16],
+        junior_morning_start = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        junior_morning_end = str(now.replace(hour=13, minute=0, second=0))[11:16],
+        junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+        junior_afternoon_end = str(now.replace(hour=13, minute=30, second=0))[11:16],
 
-    #     senior_morning_start = str(now.replace(hour=12, minute=0, second=0))[11:16],
-    #     senior_morning_end = str(now.replace(hour=13, minute=0, second=0))[11:16],
-    #     senior_afternoon_start = str(now.replace(hour=12, minute=30, second=0))[11:16],
-    #     senior_afternoon_end = str(now.replace(hour=13, minute=30, second=0))[11:16]
-    #     )
-    # db.session.add(school)
-    # db.session.commit()
+        senior_morning_start = str(now.replace(hour=12, minute=0, second=0))[11:16],
+        senior_morning_end = str(now.replace(hour=13, minute=0, second=0))[11:16],
+        senior_afternoon_start = str(now.replace(hour=12, minute=30, second=0))[11:16],
+        senior_afternoon_end = str(now.replace(hour=13, minute=30, second=0))[11:16]
+        )
+    db.session.add(school)
+    db.session.commit()
 
     # for section in sections:
     #     sec = Section(
