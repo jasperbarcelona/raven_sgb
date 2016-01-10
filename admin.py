@@ -1328,7 +1328,7 @@ def add_school():
 def rebuild_database():
 
     db.drop_all()
-    db.session.commit()
+    db.create_all()
 
     school = School(
         id='123456789',
@@ -1372,47 +1372,6 @@ def rebuild_database():
         )
     db.session.add(school)
     db.session.commit()
-
-    # for section in sections:
-    #     sec = Section(
-    #     school_id=section.school_id,
-    #     name=section.name
-    #     )
-
-    #     db.session.add(sec)
-    #     db.session.commit()
-
-    # for student in students:
-    #     if student.middle_name or student.middle_name != None:
-    #         std = Student(
-    #         school_id=student.school_id,
-    #         id_no=student.id_no,
-    #         first_name=student.first_name,
-    #         last_name=student.last_name,
-    #         middle_name=student.middle_name,
-    #         level=student.level,
-    #         department=student.department,
-    #         section=student.section,
-    #         absences=student.absences,
-    #         lates=student.lates,
-    #         parent_contact=student.parent_contact
-    #         )
-    #     else:
-    #         std = Student(
-    #         school_id=student.school_id,
-    #         id_no=student.id_no,
-    #         first_name=student.first_name,
-    #         last_name=student.last_name,
-    #         level=student.level,
-    #         department=student.department,
-    #         section=student.section,
-    #         absences=student.absences,
-    #         lates=student.lates,
-    #         parent_contact=student.parent_contact
-    #         )
-
-    #     db.session.add(std)
-    #     db.session.commit()
 
     # school = School(
     #     id='123456789',
