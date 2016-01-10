@@ -21,7 +21,7 @@
 					{% if date.day in events %}
 				    <td class="day current-month current-day event" data-toggle="modal" data-target="#schedule-modal" onclick="populate_irregular_schedule('{{month_name}} {{date.day}}, {{year}}',{{date.month}},{{date.day}},{{date.year}})">
 				    {% else %}
-				    <td class="day current-month current-day">
+				    <td class="day current-month current-day" data-toggle="modal" data-target="#schedule-modal" onclick="populate_regular_schedule('{{month_name}} {{date.day}}, {{year}}')">
 				    {% endif %}
 				    {% else %}
 				    {% if date.day in events %}

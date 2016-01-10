@@ -32,7 +32,7 @@ import os
 app = flask.Flask(__name__)
 db = SQLAlchemy(app)
 app.secret_key = '0129383hfldcndidvs98r9t9438953894534k545lkn3kfnac98'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 
 API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
 SMS_URL = 'https://post.chikka.com/smsapi/request'
@@ -40,7 +40,7 @@ CLIENT_ID = 'ef8cf56d44f93b6ee6165a0caa3fe0d1ebeee9b20546998931907edbb266eb72'
 SECRET_KEY = 'c4c461cc5aa5f9f89b701bc016a73e9981713be1bf7bb057c875dbfacff86e1d'
 SHORT_CODE = '29290420420'
 CONNECT_TIMEOUT = 5.0
-CALENDAR_URL = 'http://127.0.0.1:3000%s'
+CALENDAR_URL = 'http://ravenclock.herokuapp.com%s'
 
 KINDERGARTEN = ['Junior Kinder', 'Senior Kinder']
 PRIMARY = ['1st Grade', '2nd Grade', '3rd Grade', '4th Grade', '5th Grade', '6th Grade']
@@ -1326,252 +1326,251 @@ def add_school():
 
 @app.route('/db/rebuild', methods=['GET', 'POST'])
 def rebuild_database():
-    db.drop_all()
     db.create_all()
 
-    school = School(
-        id='123456789',
-        api_key='ecc67d28db284a2fb351d58fe18965f9',
-        password='test',
-        name="Scuola Gesu Bambino",
-        url='scuolagesubambino',
-        address="10, Brgy Isabang",
-        city="Lucena City",
-        email="sgb.edu@gmail.com",
-        tel="555-8898",
-
-        kinder_morning_class = True,
-        kinder_afternoon_class = True,
-        primary_morning_class = True,
-        primary_afternoon_class = True,
-        junior_morning_class = True,
-        junior_afternoon_class = True,
-        senior_morning_class = True,
-        senior_afternoon_class = True,
-
-        kinder_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
-        kinder_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-        kinder_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-        kinder_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
-
-        primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
-        primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-        primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-        primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
-
-        junior_morning_start = str(now.replace(hour=12, minute=0, second=0))[11:16],
-        junior_morning_end = str(now.replace(hour=13, minute=0, second=0))[11:16],
-        junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-        junior_afternoon_end = str(now.replace(hour=13, minute=30, second=0))[11:16],
-
-        senior_morning_start = str(now.replace(hour=12, minute=0, second=0))[11:16],
-        senior_morning_end = str(now.replace(hour=13, minute=0, second=0))[11:16],
-        senior_afternoon_start = str(now.replace(hour=12, minute=30, second=0))[11:16],
-        senior_afternoon_end = str(now.replace(hour=13, minute=30, second=0))[11:16]
-        )
-    db.session.add(school)
-    db.session.commit()
-
-    # school1 = School(
-    #     id='4321',
-    #     api_key='ecc67d28db284a2fb351d58fe18965f0',
+    # school = School(
+    #     id='123456789',
+    #     api_key='ecc67d28db284a2fb351d58fe18965f9',
     #     password='test',
-    #     name="Sacred Heart College",
-    #     url='sacredheartcollege',
+    #     name="Scuola Gesu Bambino",
+    #     url='scuolagesubambino',
     #     address="10, Brgy Isabang",
     #     city="Lucena City",
     #     email="sgb.edu@gmail.com",
     #     tel="555-8898",
+
+    #     kinder_morning_class = True,
+    #     kinder_afternoon_class = True,
+    #     primary_morning_class = True,
+    #     primary_afternoon_class = True,
+    #     junior_morning_class = True,
+    #     junior_afternoon_class = True,
+    #     senior_morning_class = True,
+    #     senior_afternoon_class = True,
+
+    #     kinder_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
+    #     kinder_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+    #     kinder_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+    #     kinder_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
 
     #     primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
     #     primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
     #     primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
     #     primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
 
-    #     junior_morning_start = str(now.replace(hour=8, minute=0, second=0))[11:16],
-    #     junior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+    #     junior_morning_start = str(now.replace(hour=12, minute=0, second=0))[11:16],
+    #     junior_morning_end = str(now.replace(hour=13, minute=0, second=0))[11:16],
     #     junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-    #     junior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16],
+    #     junior_afternoon_end = str(now.replace(hour=13, minute=30, second=0))[11:16],
 
-    #     senior_morning_start = str(now.replace(hour=9, minute=0, second=0))[11:16],
-    #     senior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-    #     senior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-    #     senior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16]
+    #     senior_morning_start = str(now.replace(hour=12, minute=0, second=0))[11:16],
+    #     senior_morning_end = str(now.replace(hour=13, minute=0, second=0))[11:16],
+    #     senior_afternoon_start = str(now.replace(hour=12, minute=30, second=0))[11:16],
+    #     senior_afternoon_end = str(now.replace(hour=13, minute=30, second=0))[11:16]
     #     )
-    # # db.session.add(school1)
+    # db.session.add(school)
+    # db.session.commit()
 
-    a = Student(
-        school_id='123456789',
-        id_no='2011334281',
-        first_name='Jasper',
-        last_name='Barcelona',
-        middle_name='Estrada',
-        level='2nd Grade',
-        department='student',
-        section='Charity',
-        absences='0',
-        lates='0',
-        parent_contact='09183339068'
-        )
-    b = Student(
-        school_id='123456789',
-        id_no='2011334282',
-        first_name='Janno',
-        last_name='Armamento',
-        middle_name='Nicolas',
-        level='1st Grade',
-        department='student',
-        section='Fidelity',
-        absences='0',
-        lates='0',
-        parent_contact='09183339068'
-        )
+    # # school1 = School(
+    # #     id='4321',
+    # #     api_key='ecc67d28db284a2fb351d58fe18965f0',
+    # #     password='test',
+    # #     name="Sacred Heart College",
+    # #     url='sacredheartcollege',
+    # #     address="10, Brgy Isabang",
+    # #     city="Lucena City",
+    # #     email="sgb.edu@gmail.com",
+    # #     tel="555-8898",
 
-    c = Student(
-        school_id='123456789',
-        id_no='2011334283',
-        first_name='Joseph',
-        last_name='Sallao',
-        middle_name='Bear',
-        level='2nd Grade',
-        department='student',
-        section='Fidelity',
-        absences='0',
-        lates='0',
-        parent_contact='09183339068'
-        )
+    # #     primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
+    # #     primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+    # #     primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+    # #     primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
 
-    d = Section(
-        school_id='123456789',
-        name='Charity'
-        )
+    # #     junior_morning_start = str(now.replace(hour=8, minute=0, second=0))[11:16],
+    # #     junior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+    # #     junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+    # #     junior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16],
 
-    e = Section(
-        school_id='123456789',
-        name='Fidelity'
-        )
+    # #     senior_morning_start = str(now.replace(hour=9, minute=0, second=0))[11:16],
+    # #     senior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
+    # #     senior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
+    # #     senior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16]
+    # #     )
+    # # # db.session.add(school1)
 
-    f = Section(
-        school_id='123456789',
-        name='Peace'
-        )
+    # a = Student(
+    #     school_id='123456789',
+    #     id_no='2011334281',
+    #     first_name='Jasper',
+    #     last_name='Barcelona',
+    #     middle_name='Estrada',
+    #     level='2nd Grade',
+    #     department='student',
+    #     section='Charity',
+    #     absences='0',
+    #     lates='0',
+    #     parent_contact='09183339068'
+    #     )
+    # b = Student(
+    #     school_id='123456789',
+    #     id_no='2011334282',
+    #     first_name='Janno',
+    #     last_name='Armamento',
+    #     middle_name='Nicolas',
+    #     level='1st Grade',
+    #     department='student',
+    #     section='Fidelity',
+    #     absences='0',
+    #     lates='0',
+    #     parent_contact='09183339068'
+    #     )
 
-    message = Message(
-        school_id='123456789',
-        date=time.strftime("%B %d, %Y"),
-        time=time.strftime("%I:%M %p"),
-        content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
-                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
-                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
-                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
-                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
-                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-        )
+    # c = Student(
+    #     school_id='123456789',
+    #     id_no='2011334283',
+    #     first_name='Joseph',
+    #     last_name='Sallao',
+    #     middle_name='Bear',
+    #     level='2nd Grade',
+    #     department='student',
+    #     section='Fidelity',
+    #     absences='0',
+    #     lates='0',
+    #     parent_contact='09183339068'
+    #     )
 
-    message1 = Message(
-        school_id='123456789',
-        date=time.strftime("%B %d, %Y"),
-        time=time.strftime("%I:%M %p"),
-        content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
-                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
-                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
-                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
-                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
-                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-        )
+    # d = Section(
+    #     school_id='123456789',
+    #     name='Charity'
+    #     )
 
-    message2 = Message(
-        school_id='123456789',
-        date=time.strftime("%B %d, %Y"),
-        time=time.strftime("%I:%M %p"),
-        content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
-                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
-                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
-                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
-                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
-                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-        )
+    # e = Section(
+    #     school_id='123456789',
+    #     name='Fidelity'
+    #     )
 
-    message3 = Message(
-        school_id='123456789',
-        date=time.strftime("%B %d, %Y"),
-        time=time.strftime("%I:%M %p"),
-        content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
-                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
-                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
-                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
-                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
-                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-        )
+    # f = Section(
+    #     school_id='123456789',
+    #     name='Peace'
+    #     )
 
-    message4 = Message(
-        school_id='123456789',
-        date=time.strftime("%B %d, %Y"),
-        time=time.strftime("%I:%M %p"),
-        content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
-                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
-                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
-                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
-                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
-                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-        )
+    # message = Message(
+    #     school_id='123456789',
+    #     date=time.strftime("%B %d, %Y"),
+    #     time=time.strftime("%I:%M %p"),
+    #     content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
+    #             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
+    #             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
+    #             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
+    #             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
+    #             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+    #     )
 
-    message5 = Message(
-        school_id='123456789',
-        date=time.strftime("%B %d, %Y"),
-        time=time.strftime("%I:%M %p"),
-        content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
-                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
-                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
-                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
-                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
-                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-        )
+    # message1 = Message(
+    #     school_id='123456789',
+    #     date=time.strftime("%B %d, %Y"),
+    #     time=time.strftime("%I:%M %p"),
+    #     content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
+    #             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
+    #             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
+    #             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
+    #             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
+    #             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+    #     )
 
-    message6 = Message(
-        school_id='123456789',
-        date=time.strftime("%B %d, %Y"),
-        time=time.strftime("%I:%M %p"),
-        content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
-                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
-                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
-                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
-                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
-                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-        )
+    # message2 = Message(
+    #     school_id='123456789',
+    #     date=time.strftime("%B %d, %Y"),
+    #     time=time.strftime("%I:%M %p"),
+    #     content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
+    #             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
+    #             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
+    #             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
+    #             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
+    #             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+    #     )
 
-    message7 = Message(
-        school_id='123456789',
-        date=time.strftime("%B %d, %Y"),
-        time=time.strftime("%I:%M %p"),
-        content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
-                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
-                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
-                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
-                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
-                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-        )
+    # message3 = Message(
+    #     school_id='123456789',
+    #     date=time.strftime("%B %d, %Y"),
+    #     time=time.strftime("%I:%M %p"),
+    #     content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
+    #             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
+    #             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
+    #             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
+    #             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
+    #             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+    #     )
 
-    db.session.add(a)
-    db.session.add(b)
-    db.session.add(c)
-    db.session.add(d)
-    db.session.add(e)
-    db.session.add(f)
-    db.session.add(message)
-    db.session.add(message1)
-    db.session.add(message2)
-    db.session.add(message3)
-    db.session.add(message4)
-    db.session.add(message5)
-    db.session.add(message6)
-    db.session.add(message7)
-    db.session.commit()
+    # message4 = Message(
+    #     school_id='123456789',
+    #     date=time.strftime("%B %d, %Y"),
+    #     time=time.strftime("%I:%M %p"),
+    #     content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
+    #             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
+    #             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
+    #             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
+    #             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
+    #             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+    #     )
+
+    # message5 = Message(
+    #     school_id='123456789',
+    #     date=time.strftime("%B %d, %Y"),
+    #     time=time.strftime("%I:%M %p"),
+    #     content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
+    #             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
+    #             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
+    #             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
+    #             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
+    #             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+    #     )
+
+    # message6 = Message(
+    #     school_id='123456789',
+    #     date=time.strftime("%B %d, %Y"),
+    #     time=time.strftime("%I:%M %p"),
+    #     content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
+    #             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
+    #             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
+    #             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
+    #             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
+    #             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+    #     )
+
+    # message7 = Message(
+    #     school_id='123456789',
+    #     date=time.strftime("%B %d, %Y"),
+    #     time=time.strftime("%I:%M %p"),
+    #     content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
+    #             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
+    #             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
+    #             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
+    #             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
+    #             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+    #     )
+
+    # db.session.add(a)
+    # db.session.add(b)
+    # db.session.add(c)
+    # db.session.add(d)
+    # db.session.add(e)
+    # db.session.add(f)
+    # db.session.add(message)
+    # db.session.add(message1)
+    # db.session.add(message2)
+    # db.session.add(message3)
+    # db.session.add(message4)
+    # db.session.add(message5)
+    # db.session.add(message6)
+    # db.session.add(message7)
+    # db.session.commit()
     return jsonify(status='Success'),201
 
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(threaded=True)
+    app.run(port=int(os.environ['PORT']), host='0.0.0.0',threaded=True)
 
     # port=int(os.environ['PORT']), host='0.0.0.0'
