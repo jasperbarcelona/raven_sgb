@@ -927,7 +927,7 @@ def receive_records():
             a = Student(
             school_id=student.shcool_id,
             id_no=student.id_no,
-            first_name=student.,
+            first_name=student.first_name,
             last_name=student.last_name,
             middle_name=student.middle_name,
             level=student.level,
@@ -941,7 +941,7 @@ def receive_records():
             a = Student(
             school_id=student.shcool_id,
             id_no=student.id_no,
-            first_name=student.,
+            first_name=student.first_name,
             last_name=student.last_name,
             level=student.level,
             department=student.department,
