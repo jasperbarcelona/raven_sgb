@@ -925,9 +925,9 @@ def receive_records():
     print 'zxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
     print students
     for student in students:
-        if student.middle_name or student.middle_name != None or student.middle_name != '':
+        if student.middle_name:
             a = Student(
-            school_id=student.shcool_id,
+            school_id=student.school_id,
             id_no=student.id_no,
             first_name=student.first_name,
             last_name=student.last_name,
