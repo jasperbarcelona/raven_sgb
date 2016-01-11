@@ -921,7 +921,7 @@ def sync_database():
 
 @app.route('/data/receive',methods=['GET','POST'])
 def receive_records():
-    student = flask.request.form.to_dict()
+    data = flask.request.form.to_dict()
     print 'zxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
     print student['first_name']
     if data['middle_name']:
