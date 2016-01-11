@@ -1,41 +1,47 @@
-<thead>
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-	<tr>
-        <th colspan="2" id="calendar-prev" class="calendar-nav-left" onclick="prev_month()"><span class="material-icons">&#xE314;</span></th>
-        <th colspan="3" class="month">{{month_name}} {{year}}</th>
-		<th colspan="2" id="calendar-next" class="calendar-nav-right" onclick="next_month()"><span class="material-icons">&#xE315;</span></th>
-	</tr>
-	<tr>
-        <th class="sun">Sun</th><th class="mon">Mon</th>
-        <th class="tue">Tue</th><th class="wed">Wed</th>
-        <th class="thu">Thu</th><th class="fri">Fri</th>
-        <th class="sat">Sat</th>
-	</tr>
-</thead>
-<tbody>
-	{% for week in dates %}
-	<tr>
-		{% for date in week %}
-			{% if date.month == month %}
-				{% if date.day == today %}
-					{% if date.day in events %}
-				    <td class="day current-month current-day event" data-toggle="modal" data-target="#schedule-modal" onclick="populate_irregular_schedule('{{month_name}} {{date.day}}, {{year}}',{{date.month}},{{date.day}},{{date.year}})">
-				    {% else %}
-				    <td class="day current-month current-day" data-toggle="modal" data-target="#schedule-modal" onclick="populate_regular_schedule('{{month_name}} {{date.day}}, {{year}}')">
-				    {% endif %}
-				    {% else %}
-				    {% if date.day in events %}
-				    <td class="day current-month event" data-toggle="modal" data-target="#schedule-modal" onclick="populate_irregular_schedule('{{month_name}} {{date.day}}, {{year}}',{{date.month}},{{date.day}},{{date.year}})">
-				    {% else %}
-				    <td class="day current-month" data-toggle="modal" data-target="#schedule-modal" onclick="populate_regular_schedule('{{month_name}} {{date.day}}, {{year}}')">
-				    {% endif %}
-			    {% endif %}
-			    {% else %}
-			    <td class="day prev-month">
-		    {% endif %}
-		    	{{date.day}}
-		    </td>
-	    {% endfor %}
-	</tr>
-	{% endfor %}
-</tbody>
+<div id="calendar-modal-header" class="modal-header">
+        <div id="calendar-prev" class="calendar-nav-left" onclick="prev_month()"><span class="material-icons">&#xE314;</span></div>
+        <div class="month">{{month_name}} {{year}}</div>
+        <div id="calendar-next" class="calendar-nav-right" onclick="next_month()"><span class="material-icons">&#xE315;</span></div>
+</div>
+<div class="modal-body calendar-modal-body">
+        <div id='calendar-container'>
+                <table border="0" cellpadding="0" cellspacing="0" class="month">
+	                <thead>
+						<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+						<tr>
+					        <th class="sun">Sun</th><th class="mon">Mon</th>
+					        <th class="tue">Tue</th><th class="wed">Wed</th>
+					        <th class="thu">Thu</th><th class="fri">Fri</th>
+					        <th class="sat">Sat</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for week in dates %}
+						<tr>
+							{% for date in week %}
+								{% if date.month == month %}
+									{% if date.day == today %}
+										{% if date.day in events %}
+									    <td class="day current-month current-day event" data-toggle="modal" data-target="#schedule-modal" onclick="populate_irregular_schedule('{{month_name}} {{date.day}}, {{year}}',{{date.month}},{{date.day}},{{date.year}})">
+									    {% else %}
+									    <td class="day current-month current-day" data-toggle="modal" data-target="#schedule-modal" onclick="populate_regular_schedule('{{month_name}} {{date.day}}, {{year}}')">
+									    {% endif %}
+									    {% else %}
+									    {% if date.day in events %}
+									    <td class="day current-month event" data-toggle="modal" data-target="#schedule-modal" onclick="populate_irregular_schedule('{{month_name}} {{date.day}}, {{year}}',{{date.month}},{{date.day}},{{date.year}})">
+									    {% else %}
+									    <td class="day current-month" data-toggle="modal" data-target="#schedule-modal" onclick="populate_regular_schedule('{{month_name}} {{date.day}}, {{year}}')">
+									    {% endif %}
+								    {% endif %}
+								    {% else %}
+								    <td class="day prev-month">
+							    {% endif %}
+							    	{{date.day}}
+							    </td>
+						    {% endfor %}
+						</tr>
+						{% endfor %}
+					</tbody>
+                </table>
+        </div>
+</div>

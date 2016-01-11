@@ -919,6 +919,42 @@ def sync_database():
         }), 201
 
 
+@app.route('/data/receive',methods=['GET','POST'])
+def receive_records():
+    students = flask.request.form.get('students')
+    for student in students:
+        if student.middle_name or student.middle_name != None:
+            a = Student(
+            school_id=student.shcool_id,
+            id_no=student.id_no,
+            first_name=student.,
+            last_name=student.last_name,
+            middle_name=student.middle_name,
+            level=student.level,
+            department=student.department,
+            section=student.section,
+            absences=student.absences,
+            lates=student.lates,
+            parent_contact=student.parent_contact
+            )
+        else:
+            a = Student(
+            school_id=student.shcool_id,
+            id_no=student.id_no,
+            first_name=student.,
+            last_name=student.last_name,
+            level=student.level,
+            department=student.department,
+            section=student.section,
+            absences=student.absences,
+            lates=student.lates,
+            parent_contact=student.parent_contact
+            )
+        db.session.add(student)
+        db.session.commit()
+    return jsonify(status='success'),201
+
+
 @app.route('/user/new',methods=['GET','POST'])
 def add_user():
     student_data = flask.request.form.to_dict()

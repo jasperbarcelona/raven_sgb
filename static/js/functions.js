@@ -612,21 +612,21 @@ function edit_user(last_name, first_name, middle_name, level, section, contact, 
 function populate_calendar(){
   $.post('/calendar/data/get',
     function(data){
-        $('#calendar-container table').html(data);
+        $('#calendar-modal-content').html(data);
     });
 }
 
 function next_month(){
   $.post('/calendar/next/get',
     function(data){
-        $('#calendar-container table').html(data);
+        $('#calendar-modal-content').html(data);
     });
 }
 
 function prev_month(){
   $.post('/calendar/prev/get',
     function(data){
-        $('#calendar-container table').html(data);
+        $('#calendar-modal-content').html(data);
     });
 }
 

@@ -246,6 +246,18 @@ option {
 	padding-bottom: 0px;
 }
 
+#calendar-modal-header{
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+	padding: 0 !important;
+}
+
 .calendar-modal-dialog{
 	width: 700px;
 }
@@ -655,6 +667,15 @@ option {
 	/*display: none;*/
 }
 
+.ui-datepicker-next,.ui-datepicker-prev{
+	background-color: #FFFFFF !important;
+	color: #4485F5 !important;
+}
+
+.ui-datepicker-next:hover,.ui-datepicker-prev:hover{
+	background-color: #4485F5 !important;
+}
+
 #intro-mask{
 	position: absolute;
 	bottom: 0;
@@ -863,18 +884,15 @@ table.table thead tr th, table.table tfoot tr th {
 .calendar-nav-left{
 	text-align: right;
 	font-size: 32px;
+	width: 50px;
+	text-align: center;
 }
 
 .calendar-nav-right{
 	text-align: left;
 	font-size: 32px;
-}
-
-#calendar-container table .month{
-	height: 50px;
-	font-size: 16px;
+	width: 50px;
 	text-align: center;
-	color: #4485F5;
 }
 
 #calendar-container table tr th.sun,
