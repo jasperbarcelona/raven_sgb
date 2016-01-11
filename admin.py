@@ -922,9 +922,9 @@ def sync_database():
 @app.route('/data/receive',methods=['GET','POST'])
 def receive_records():
     data = flask.request.form.to_dict()
-    if Student.query.filter_by(id_no=data['id_no']):
+    if Student.query.filter_by(id_no=data['id_no']).first() or Student.query.filter_by(id_no=data['id_no']).first() != None:
         return jsonify(status='success'),201
-        
+
     if data['middle_name']:
         student = Student(
         school_id='123456789',
