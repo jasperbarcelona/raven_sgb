@@ -926,7 +926,7 @@ def receive_records():
     print data['first_name']
     if data['middle_name']:
         student = Student(
-        school_id=data['school_id'],
+        school_id='123456789',
         id_no=data['id_no'],
         first_name=data['first_name'],
         last_name=data['last_name'],
@@ -940,7 +940,7 @@ def receive_records():
         )
     else:
         student = Student(
-        school_id=data['shcool_id'],
+        school_id='123456789',
         id_no=data['id_no'],
         first_name=data['first_name'],
         last_name=data['last_name'],
