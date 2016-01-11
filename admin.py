@@ -922,8 +922,10 @@ def sync_database():
 @app.route('/data/receive',methods=['GET','POST'])
 def receive_records():
     students = flask.request.form.get('students')
+    print 'zxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    print students
     for student in students:
-        if student.middle_name or student.middle_name != None:
+        if student.middle_name or student.middle_name != None or student.middle_name != '':
             a = Student(
             school_id=student.shcool_id,
             id_no=student.id_no,
