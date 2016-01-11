@@ -921,39 +921,38 @@ def sync_database():
 
 @app.route('/data/receive',methods=['GET','POST'])
 def receive_records():
-    students = flask.request.form.get('students')
+    student = flask.request.form.to_dict()
     print 'zxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-    print students[0].first_name
-    for student in students:
-        if student.middle_name:
-            a = Student(
-            school_id=student.school_id,
-            id_no=student.id_no,
-            first_name=student.first_name,
-            last_name=student.last_name,
-            middle_name=student.middle_name,
-            level=student.level,
-            department=student.department,
-            section=student.section,
-            absences=student.absences,
-            lates=student.lates,
-            parent_contact=student.parent_contact
-            )
-        else:
-            a = Student(
-            school_id=student.shcool_id,
-            id_no=student.id_no,
-            first_name=student.first_name,
-            last_name=student.last_name,
-            level=student.level,
-            department=student.department,
-            section=student.section,
-            absences=student.absences,
-            lates=student.lates,
-            parent_contact=student.parent_contact
-            )
-        db.session.add(student)
-        db.session.commit()
+    print student['first_name']
+    if data['middle_name']:
+        student = Student(
+        school_id=data['school_id'],
+        id_no=data['id_no'],
+        first_name=data['first_name'],
+        last_name=data['last_name'],
+        middle_name=data['middle_name'],
+        level=data['level'],
+        department=data['department'],
+        section=data['section'],
+        absences=data['absences'],
+        lates=data['lates'],
+        parent_contact=data['parent_contact']
+        )
+    else:
+        student = Student(
+        school_id=data['shcool_id'],
+        id_no=data['id_no'],
+        first_name=data['first_name'],
+        last_name=data['last_name'],
+        level=data['level'],
+        department=data['department'],
+        section=data['section'],
+        absences=data['absences'],
+        lates=data['lates'],
+        parent_contact=data['parent_contact']
+        )
+    db.session.add(student)
+    db.session.commit()
     return jsonify(status='success'),201
 
 
