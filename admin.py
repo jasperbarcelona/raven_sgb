@@ -923,7 +923,7 @@ def sync_database():
 def receive_records():
     data = flask.request.form.to_dict()
     print 'zxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-    print student['first_name']
+    print data['first_name']
     if data['middle_name']:
         student = Student(
         school_id=data['school_id'],
