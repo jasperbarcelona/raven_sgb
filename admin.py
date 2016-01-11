@@ -925,7 +925,7 @@ def receive_records():
     if Student.query.filter_by(id_no=data['id_no']).first() or Student.query.filter_by(id_no=data['id_no']).first() != None:
         return jsonify(status='success'),201
 
-    if data['middle_name']:
+    if data['middle_name'] or data['middle_name'] != None or data['middle_name'] != '':
         student = Student(
         school_id='123456789',
         id_no=data['id_no'],
