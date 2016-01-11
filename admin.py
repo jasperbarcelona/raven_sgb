@@ -923,9 +923,9 @@ def sync_database():
 def receive_records():
     students = flask.request.form.get('students')
     print 'zxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-    print students
+    print students[0].first_name
     for student in students:
-        if student.get('middle_name'):
+        if student.middle_name:
             a = Student(
             school_id=student.school_id,
             id_no=student.id_no,
