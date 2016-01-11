@@ -934,8 +934,8 @@ def receive_records():
         level=data['level'],
         department=data['department'],
         section=data['section'],
-        absences=data['absences'],
-        lates=data['lates'],
+        absences=0,
+        lates=0,
         parent_contact=data['parent_contact']
         )
     else:
@@ -947,8 +947,8 @@ def receive_records():
         level=data['level'],
         department=data['department'],
         section=data['section'],
-        absences=data['absences'],
-        lates=data['lates'],
+        absences=0,
+        lates=0,
         parent_contact=data['parent_contact']
         )
     db.session.add(student)
