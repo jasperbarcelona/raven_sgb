@@ -925,7 +925,7 @@ def receive_records():
     print 'zxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
     print students
     for student in students:
-        if student.middle_name:
+        if student.get('middle_name'):
             a = Student(
             school_id=student.school_id,
             id_no=student.id_no,
