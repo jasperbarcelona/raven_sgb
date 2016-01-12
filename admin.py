@@ -675,7 +675,7 @@ def get_schedule():
 @nocache
 def index():
     if not session:
-        return redirect('http://127.0.0.1:9000/')
+        return redirect('/signin')
     session['logs_limit'] = 100
     session['late_limit'] = 100
     session['attendance_limit'] = 100
