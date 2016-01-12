@@ -1191,26 +1191,27 @@ def validate_id():
 
 @app.route('/calendar/data/get',methods=['GET','POST'])
 def populate_calendar():
-    cal = Calendar(6)
-    session['year'] = date.today().year
-    session['month'] = date.today().month
-    day = date.today().day
-    dates = cal.monthdatescalendar(session['year'], session['month'])
+    # cal = Calendar(6)
+    # session['year'] = date.today().year
+    # session['month'] = date.today().month
+    # day = date.today().day
+    # dates = cal.monthdatescalendar(session['year'], session['month'])
 
-    calendar_params = {
-        'api_key':session['api_key'],
-        'month':session['month'],
-        'year':session['year']
-    }
+    # calendar_params = {
+    #     'api_key':session['api_key'],
+    #     'month':session['month'],
+    #     'year':session['year']
+    # }
 
-    try:
-        get_events = requests.get(CALENDAR_URL%'/events/get',params=calendar_params)
-        events = get_events.json()['days']
-        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today=day, events=events, month_name=calendar.month_name[session['month']])
+    # try:
+    #     get_events = requests.get(CALENDAR_URL%'/events/get',params=calendar_params)
+    #     events = get_events.json()['days']
+    #     return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today=day, events=events, month_name=calendar.month_name[session['month']])
 
-    except requests.exceptions.ConnectionError as e:
-        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today=day) #return diff template??
+    # except requests.exceptions.ConnectionError as e:
+    #     return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today=day) #return diff template??
 
+    return flask.render_template('dates.html')
 
 @app.route('/calendar/next/get',methods=['GET','POST'])
 def next_month():
