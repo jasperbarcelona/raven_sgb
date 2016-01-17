@@ -276,23 +276,6 @@ def message_options(message, msisdn):
     return message_options
 
 
-def send_message(type, message, msisdn, request_url):
-    sent = False
-    while not sent:
-        try:
-            r = requests.post(
-                request_url,
-                message_options(message, msisdn)
-                # timeout=(int(CONNECT_TIMEOUT))           
-            )
-            sent = True
-            print r.status_code #update log database (put 'sent' to status)
-
-        except requests.exceptions.ConnectionError as e:
-            print "Sending Failed!"
-            sleep(5)
-
-
 def authenticate_user(school_id, password):
     if not School.query.filter_by(id=school_id, password=password).first():
         return False
@@ -465,29 +448,13 @@ def time_in(school_id,api_key,id_no,name,level,section,
     db.session.add(add_this)
     db.session.commit()
 
+    compose_message(id_no,time,'entered')
+
     if department != 'faculty':
-        return check_if_late(school_id, api_key, id_no,name,level,
+        check_if_late(school_id, api_key, id_no,name,level,
                   section, date, department, time, timestamp)
 
-    return '', 201
-
-
-def compose_message(id_no,time,action):
-    student = get_student_data(id_no)
-    message = 'Good day! We would like to inform you that '+student.first_name+' '+\
-                student.last_name+' has '+action+' the school gate at '+\
-                time+'.'
-
-    message_thread = threading.Thread(
-        target=send_message,
-        args=[
-            'log',
-            message,
-            student.parent_contact,
-            SMS_URL
-            ]
-        )
-    message_thread.start()
+    return jsonify(status='Success',type='entry',action='entered'), 201
 
 
 def time_out(id_no, time, school_id):
@@ -495,7 +462,43 @@ def time_out(id_no, time, school_id):
     a.time_out=time  
     db.session.commit()
 
-    return '', 201
+    compose_message(id_no,time,'left')
+
+    return jsonify(status='Success',type='exit',action='left'), 201
+
+
+def compose_message(id_no,time,action):
+    student = get_student_data(id_no)
+    message = 'Good day! We would like to inform you that '+student.first_name+' '+\
+                student.last_name+' has '+action+' the campus at exactly '+\
+                time+'.'
+
+    send_message('log',message,student.parent_contact,SMS_URL)
+            
+
+def send_message(type, message, msisdn, request_url):
+    message_options = {
+            'message_type': 'SEND',
+            'message': message,
+            'client_id': CLIENT_ID,
+            'mobile_number': msisdn,
+            'secret_key': SECRET_KEY,
+            'shortcode': SHORT_CODE,
+            'message_id': uuid.uuid4().hex
+        }
+
+    try:
+        r = requests.post(
+            request_url,
+            message_options
+            # timeout=(int(CONNECT_TIMEOUT))           
+        )
+        sent = True
+        print r.status_code #update log database (put 'sent' to status)
+
+    except requests.exceptions.ConnectionError as e:
+        print "Sending Failed!"
+            sleep(5)
 
 
 def prepare():
@@ -876,15 +879,11 @@ def add_log():
 
     if not logged or logged.time_out != None:
 
-        time_in(data['school_id'],data['api_key'],data['id_no'],data['name'],
+        return time_in(data['school_id'],data['api_key'],data['id_no'],data['name'],
                 data['level'],data['section'],data['date'],data['department'],
                 data['time'],data['timestamp'])
-     
-        return jsonify(status='Success',type='entry',action='entered'), 201
 
-    time_out(data['id_no'],data['time'],data['school_id'])    
-
-    return jsonify(status='Success',type='exit',action='left'), 201
+    return time_out(data['id_no'],data['time'],data['school_id'])    
 
 
 @app.route('/blast',methods=['GET','POST'])
@@ -1524,15 +1523,15 @@ def rebuild_database():
     #     parent_contact='09183339068'
     #     )
 
-    # d = Section(
-    #     school_id='123456789',
-    #     name='Charity'
-    #     )
+    d = Section(
+        school_id='123456789',
+        name='Charity'
+        )
 
-    # e = Section(
-    #     school_id='123456789',
-    #     name='Fidelity'
-    #     )
+    e = Section(
+        school_id='123456789',
+        name='Fidelity'
+        )
 
     # f = Section(
     #     school_id='123456789',
@@ -1638,8 +1637,8 @@ def rebuild_database():
     # db.session.add(a)
     # db.session.add(b)
     # db.session.add(c)
-    # db.session.add(d)
-    # db.session.add(e)
+    db.session.add(d)
+    db.session.add(e)
     # db.session.add(f)
     # db.session.add(message)
     # db.session.add(message1)
@@ -1649,7 +1648,8 @@ def rebuild_database():
     # db.session.add(message5)
     # db.session.add(message6)
     # db.session.add(message7)
-    # db.session.commit()
+    db.session.commit()
+
     return jsonify(status='Success'),201
 
 
