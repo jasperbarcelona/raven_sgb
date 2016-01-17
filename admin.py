@@ -498,7 +498,6 @@ def send_message(type, message, msisdn, request_url):
 
     except requests.exceptions.ConnectionError as e:
         print "Sending Failed!"
-            sleep(5)
 
 
 def prepare():
