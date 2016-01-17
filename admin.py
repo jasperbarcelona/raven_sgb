@@ -147,6 +147,7 @@ class Log(db.Model, Serializer):
     time_in = db.Column(db.String(10))
     time_out = db.Column(db.String(10),default=None)
     timestamp = db.Column(db.String(50))
+    notification_status = db.Column(db.String(10), unique=False, default='Pending')
 
 
 class Student(db.Model, Serializer):
@@ -448,7 +449,7 @@ def time_in(school_id,api_key,id_no,name,level,section,
     db.session.add(add_this)
     db.session.commit()
 
-    compose_message(id_no,time,'entered')
+    compose_message(add_this,id_no,time,'entered')
 
     if department != 'faculty':
         check_if_late(school_id, api_key, id_no,name,level,
@@ -458,25 +459,26 @@ def time_in(school_id,api_key,id_no,name,level,section,
 
 
 def time_out(id_no, time, school_id):
-    a = Log.query.filter_by(id_no=id_no,school_id=school_id).order_by(Log.timestamp.desc()).first()
-    a.time_out=time  
+    log = Log.query.filter_by(id_no=id_no,school_id=school_id).order_by(Log.timestamp.desc()).first()
+    log.time_out=time
+    log.notification_status='Pending'
     db.session.commit()
 
-    compose_message(id_no,time,'left')
+    compose_message(log,id_no,time,'left')
 
     return jsonify(status='Success',type='exit',action='left'), 201
 
 
-def compose_message(id_no,time,action):
+def compose_message(log,id_no,time,action):
     student = get_student_data(id_no)
     message = 'Good day! We would like to inform you that '+student.first_name+' '+\
                 student.last_name+' has '+action+' the campus at exactly '+\
                 time+'.'
 
-    send_message('log',message,student.parent_contact,SMS_URL)
+    send_message(log,'log',message,student.parent_contact,SMS_URL)
             
 
-def send_message(type, message, msisdn, request_url):
+def send_message(log, type, message, msisdn, request_url):
     message_options = {
             'message_type': 'SEND',
             'message': message,
@@ -488,17 +490,16 @@ def send_message(type, message, msisdn, request_url):
         }
 
     try:
-        r = requests.post(
-            request_url,
-            message_options
-            # timeout=(int(CONNECT_TIMEOUT))           
-        )
-        sent = True
+        r = requests.post(request_url,message_options)           
+        if r.status_code == 201:
+            log.notification_status='Success'
+            db.session.commit()
         print r.status_code #update log database (put 'sent' to status)
 
     except requests.exceptions.ConnectionError as e:
         print "Sending Failed!"
-
+        log.notification_status='Failed'
+        db.session.commit()
 
 def prepare():
     global variable
