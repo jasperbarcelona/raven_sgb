@@ -1525,12 +1525,57 @@ def rebuild_database():
 
     d = Section(
         school_id='123456789',
-        name='Charity'
+        name='Benedict'
         )
 
     e = Section(
         school_id='123456789',
-        name='Fidelity'
+        name='Anthony'
+        )
+
+    f = Section(
+        school_id='123456789',
+        name='Ignatius'
+        )
+
+    g = Section(
+        school_id='123456789',
+        name='Louis'
+        )
+
+    h = Section(
+        school_id='123456789',
+        name='John'
+        )
+
+    i = Section(
+        school_id='123456789',
+        name='Francis'
+        )
+
+    j = Section(
+        school_id='123456789',
+        name='Lorenzo Ruiz'
+        )
+
+    k = Section(
+        school_id='123456789',
+        name='Augustine'
+        )
+
+    l = Section(
+        school_id='123456789',
+        name='Vincent'
+        )
+
+    m = Section(
+        school_id='123456789',
+        name='Thomas'
+        )
+
+    n = Section(
+        school_id='123456789',
+        name='Jerome'
         )
 
     # f = Section(
@@ -1639,6 +1684,15 @@ def rebuild_database():
     # db.session.add(c)
     db.session.add(d)
     db.session.add(e)
+    db.session.add(f)
+    db.session.add(g)
+    db.session.add(h)
+    db.session.add(i)
+    db.session.add(j)
+    db.session.add(k)
+    db.session.add(l)
+    db.session.add(m)
+    db.session.add(n)
     # db.session.add(f)
     # db.session.add(message)
     # db.session.add(message1)
