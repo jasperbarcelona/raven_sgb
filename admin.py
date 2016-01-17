@@ -491,7 +491,7 @@ def send_message(log, type, message, msisdn, request_url):
 
     try:
         r = requests.post(request_url,message_options)           
-        if r.status_code == 201:
+        if r.status_code == 200:
             log.notification_status='Success'
             db.session.commit()
         print r.status_code #update log database (put 'sent' to status)
