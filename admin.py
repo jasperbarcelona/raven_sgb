@@ -492,11 +492,13 @@ def send_message(log, type, message, msisdn, request_url):
     try:
         r = requests.post(request_url,message_options)           
         if r.status_code == 200:
+            print str(r.status_code)
             log.notification_status='Success'
             db.session.commit()
             return
         log.notification_status='Failed'
         db.session.commit()
+        print str(r.status_code)
         return
 
     except requests.exceptions.ConnectionError as e:
@@ -864,6 +866,8 @@ def retry_sms(unsent_sms):
         else:
             action = 'left'
             time = sms.time_out
+        print 'xxxxxxxxxxxxxxxxxxxxxxx'
+        print 'retrying' + str(sms.id_no)
         compose_message(sms,sms.id_no,time,action)
     return 'success',200
 
