@@ -499,8 +499,6 @@ def send_message(log, type, message, msisdn, request_url):
         db.session.commit()
         return
 
-        print r.status_code #update log database (put 'sent' to status)
-
     except requests.exceptions.ConnectionError as e:
         print "Sending Failed!"
         log.notification_status='Failed'
