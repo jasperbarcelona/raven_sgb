@@ -449,7 +449,7 @@ def time_in(school_id,api_key,id_no,name,level,section,
     db.session.add(add_this)
     db.session.commit()
 
-    compose_message(add_this,id_no,time,'entered')
+    compose_message(add_this.id,id_no,time,'entered')
 
     if department != 'faculty':
         check_if_late(school_id, api_key, id_no,name,level,
@@ -464,21 +464,22 @@ def time_out(id_no, time, school_id):
     log.notification_status='Pending'
     db.session.commit()
 
-    compose_message(log,id_no,time,'left')
+    compose_message(log.id,id_no,time,'left')
 
     return jsonify(status='Success',type='exit',action='left'), 201
 
 
-def compose_message(log,id_no,time,action):
+def compose_message(log_id,id_no,time,action):
     student = get_student_data(id_no)
     message = 'Good day! We would like to inform you that '+student.first_name+' '+\
                 student.last_name+' has '+action+' the campus at exactly '+\
                 time+'.'
 
-    send_message(log,'log',message,student.parent_contact,SMS_URL)
+    send_message(log_id,'log',message,student.parent_contact,SMS_URL)
             
 
-def send_message(log, type, message, msisdn, request_url):
+def send_message(log_id, type, message, msisdn, request_url):
+    log = Log.query.filter_by(id=log_id).first()
     message_options = {
             'message_type': 'SEND',
             'message': message,
@@ -868,7 +869,7 @@ def retry_sms(unsent_sms):
             time = sms.time_out
         print 'xxxxxxxxxxxxxxxxxxxxxxx'
         print 'retrying' + str(sms.id_no)
-        compose_message(sms,sms.id_no,time,action)
+        compose_message(sms.id,sms.id_no,time,action)
     return 'success',200
 
 
