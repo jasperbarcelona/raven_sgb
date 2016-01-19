@@ -494,12 +494,18 @@ def send_message(log, type, message, msisdn, request_url):
         if r.status_code == 200:
             log.notification_status='Success'
             db.session.commit()
+            return
+        log.notification_status='Failed'
+        db.session.commit()
+        return
+
         print r.status_code #update log database (put 'sent' to status)
 
     except requests.exceptions.ConnectionError as e:
         print "Sending Failed!"
         log.notification_status='Failed'
         db.session.commit()
+        return
 
 def prepare():
     global variable
@@ -850,6 +856,26 @@ def mark_absent_afternoon():
 def logout():
     session.clear()
     return redirect('/signin')
+
+
+def retry_sms(unsent_sms):
+    for sms in unsent_sms:
+        if sms.time_out == '' or sms.time_out == None or sms.time_out == 'None':
+            action = 'left'
+        else:
+            action = 'entered'
+        print 'xxxxxxxxxxxxxxxxxxxxx'
+        print str(sms.id_no) + action
+    return 'success',200
+
+
+@app.route('/sms/retry', methods=['GET', 'POST'])
+def sms_retry():
+    unsent_sms = Log.query.filter_by(date=time.strftime("%B %d, %Y"),notification_status='Pending').all()
+    retry_sms_thread = threading.Thread(target=retry_sms,args=[unsent_sms])
+    retry_sms_thread.start()
+    return jsonify(status='success'),200
+        
 
 
 @app.route('/student/info/get', methods=['GET', 'POST'])
