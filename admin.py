@@ -866,8 +866,7 @@ def retry_sms(unsent_sms):
         else:
             action = 'left'
             time = sms.time_out
-        print str(sms.id_no) + ' ' + action + ' at ' + str(time) 
-        # compose_message(sms,sms.id_no,time,action)
+        compose_message(sms,sms.id_no,time,action)
     return 'success',200
 
 
