@@ -861,9 +861,9 @@ def logout():
 def retry_sms(unsent_sms):
     for sms in unsent_sms:
         if sms.time_out == '' or sms.time_out == None or sms.time_out == 'None':
-            action = 'left'
-        else:
             action = 'entered'
+        else:
+            action = 'left'
         print 'xxxxxxxxxxxxxxxxxxxxx'
         print str(sms.id_no) + action
     return 'success',200
