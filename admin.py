@@ -875,7 +875,7 @@ def retry_sms(unsent_sms):
 
 @app.route('/sms/retry', methods=['GET', 'POST'])
 def sms_retry():
-    unsent_sms = Log.query.filter_by(date=time.strftime("%B %d, %Y"),notification_status='Pending').all()
+    unsent_sms = Log.query.filter_by(date=time.strftime("%B %d, %Y"),notification_status='Failed').all()
     retry_sms_thread = threading.Thread(target=retry_sms,args=[unsent_sms])
     retry_sms_thread.start()
     return jsonify(status='success'),200
