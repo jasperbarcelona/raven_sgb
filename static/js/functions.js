@@ -134,10 +134,6 @@ function supply_data(studentId){
     });
 }
 
-function resize_tbody(height,subtrahend){
-  $('#'+tab).css("height",height-subtrahend);
-}
-
 function textCounter(field,field2,maxlimit){
  var countfield = document.getElementById(field2);
   if( field.value.length > maxlimit ){
@@ -632,6 +628,7 @@ function prev_month(){
 
 function show_search_load(){
   if (is_done == true){
+  $('#search-loading').show();
   $('#search-loading img').show();
   is_done = false
   }
@@ -640,14 +637,16 @@ function show_search_load(){
 function toggle_search(){
   if ((typeof eval(tab+'SearchStatus') === 'undefined') || (eval(tab+'SearchStatus') == 'off')){
         $('#'+tab+'-search-panel').show();
-        $('#search-loading').show();
-        resize_tbody($(window).height()-49,108);
+        /*$('#search-loading').show();*/
+        $('#'+tab).removeClass('maximized');
+        $('#'+tab).addClass('minimized');
         window[tab+'SearchStatus'] = 'on';
     }
     else{
         $('#'+tab+'-search-panel').hide();
         $('#search-loading').hide();
-        resize_tbody($(window).height()-49,38);
+        $('#'+tab).addClass('maximized');
+        $('#'+tab).removeClass('minimized');
         $('#'+tab+'-search-panel .search-text').val('');
         window[tab+'SearchStatus'] = 'off';
         window[tab+'_result'] = false;
@@ -742,5 +741,16 @@ function populate_irregular_schedule(date,month,day,year){
       $('#junior_afternoon_end').val(data['junior_afternoon_end']);
       $('#senior_afternoon_start').val(data['senior_afternoon_start']);
       $('#senior_afternoon_end').val(data['senior_afternoon_end']);
+    });
+}
+
+function populate_schedule(){
+  $('#schedule-loading').show();
+  $('.schedule-nav-tabs li').addClass('disabled');
+  $.post('/schedule/regular/get',
+    function(data){
+      $('#monday-tab').addClass('active');
+      $('.schedule-nav-tabs li').removeClass('disabled');
+      $('#schedule-loading').hide();
     });
 }

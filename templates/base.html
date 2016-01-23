@@ -29,7 +29,7 @@
                 </div>
                 <div class="container">
                         <div id="tabs">
-                                <ul class="nav nav-tabs">
+                                <ul class="nav main-nav-tabs nav-tabs">
                                         {% if tab == 'logs'%}
                                         <li class="active">
                                         {% else %}
@@ -93,7 +93,7 @@
                                                                 <li onclick="change_tab('logs')"><a href="/view?view=faculty">Faculty{% if view=='faculty' %}<span class="glyphicon glyphicon-ok active-view"></span>{% endif %}</a></li>
                                                                 <li class="divider"></li>
                                                                 <li><a href="#" data-toggle="modal" data-target="#calendar-modal" onclick="populate_calendar()">A.Y. Calendar</a></li>
-                                                                <li id="regular-schedule-btn"><a href="#" data-toggle="modal" data-target="#schedule-modal">Regular Schedule</a></li>
+                                                                <li id="regular-schedule-btn"><a href="#" data-toggle="modal" data-target="#schedule-modal" onclick="populate_schedule()">Regular Schedule</a></li>
                                                                 <li class="divider"></li>
                                                                 <li><a href="/logout">Logout</a></li>
                                                         </ul>

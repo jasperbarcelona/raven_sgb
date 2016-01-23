@@ -1075,10 +1075,13 @@ def search_student_logs():
         session['logs_search_limit']=100
     
     limit = session['logs_search_limit']-100
-    
-    result = search_logs(session['logs_search_limit'],date=data['date'], id_no=data['id_no'],
-                       name=data['name'], level=data['level'],
-                       section=data['section'])
+
+    if session['department'] == 'student':
+        result = search_logs(session['logs_search_limit'],date=data['date'], id_no=data['id_no'],
+                       name=data['name'], level=data['level'],section=data['section'])
+    else:
+        result = search_logs(session['logs_search_limit'],date=data['date'], id_no=data['id_no'],
+                       name=data['name'])
 
     return flask.render_template(
         data['needed']+'.html',
@@ -1097,9 +1100,14 @@ def search_student_attendance():
         session['attendance_search_limit']=100
     
     limit = session['attendance_search_limit']-100
-    
-    result = search_attendance(session['attendance_search_limit'],last_name=session['attendance_data']['last_name'], first_name=session['attendance_data']['first_name'],
+
+    if session['department'] == 'student':
+        result = search_attendance(session['attendance_search_limit'],last_name=session['attendance_data']['last_name'], first_name=session['attendance_data']['first_name'],
                 middle_name=session['attendance_data']['middle_name'], id_no=session['attendance_data']['id_no'], level=session['attendance_data']['level'], section=session['attendance_data']['section'])
+
+    else:
+        result = search_attendance(session['attendance_search_limit'],last_name=session['attendance_data']['last_name'], first_name=session['attendance_data']['first_name'],
+                middle_name=session['attendance_data']['middle_name'], id_no=session['attendance_data']['id_no'])
 
 
     return flask.render_template(
@@ -1290,6 +1298,12 @@ def prev_month():
 
     except requests.exceptions.ConnectionError as e:
         return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today='')
+
+
+@app.route('/schedule/regular/get',methods=['GET','POST'])
+def populate_regular_schedule():
+    sleep(3)
+    return '',200
 
 
 @app.route('/schedule/sync',methods=['GET','POST'])

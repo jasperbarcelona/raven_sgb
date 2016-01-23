@@ -298,17 +298,30 @@ option {
 	z-index: 9000 !important;
 }
 
+#schedule-tabs,.schedule-modal-content{
+	background-color: transparent;
+}
+
 .schedule-modal-dialog,
 .schedule-modal-content {
     /* 80% of window height */
     	position: absolute;
-	    height: 95%;
-	    width: 500px;
 	    position: fixed;
+	    height: 100%;
 	    left: 0;
 	    right: 0;
+	    padding: 0 !important;
 	    margin-left: auto;
 	    margin-right: auto;
+	    margin-top: 0 !important;
+}
+
+.schedule-modal-dialog{
+	width: 95%;
+}
+
+.schedule-modal-content{
+	width: 100%;
 }
 
 
@@ -317,10 +330,17 @@ option {
 }
 
 .schedule-modal-body{
-	height: calc(100% - 120px) !important;
-	overflow: scroll;
+	padding: 0 !important;
+	height: calc(100% - 100px) !important;
+	overflow-y: scroll;
 	overflow-x: hidden; 
+	border-top: 1px solid #999;
+	border-right: 1px solid #999;
 	z-index: 9000 !important;
+}
+
+.schedule-modal-body, #schedule-modal-footer{
+	background-color: #FFFFFF;
 }
 
 
@@ -344,7 +364,9 @@ option {
 	color: #FFFFFF;
 }
 
-.sched-group{
+.sched-group-header{
+	height: 50px;
+	width: 100%;
 	display: -webkit-flex;
 	display: flex;
 	-webkit-flex-direction: column;
@@ -353,13 +375,26 @@ option {
 	align-items: center;
 	-webkit-justify-content: center;
 	justify-content: center;
-	margin-bottom: 15px;
-	padding-bottom: 25px;
-	border-bottom: 2px solid #DDDDDD;
 }
 
-.sched-group:last-of-type{
-	margin-bottom: 0px;
+.sched-group-body{
+	height: calc(100% - 50px);
+	width: 100%;
+}
+
+.sched-group{
+	height: 50%;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: column;
+	flex-direction: column;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+	padding: 0 !important;
+	border-left: 1px solid #999;
+	border-bottom: 1px solid #999;
 }
 
 .time-label{
@@ -637,6 +672,25 @@ option {
 	height: calc(100% - 157px);
 }
 
+#schedule-loading{
+	position: absolute;
+	top: 40px;
+	left: 0;
+	right: 0;
+	background-color: #FFFFFF;
+	width: 100%;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+	z-index: 999999;
+	height: calc(100% - 100px);
+}
+
 #student-info-loading{
 	position: absolute;
 	left: 0;
@@ -676,6 +730,10 @@ option {
 	background-color: #4485F5 !important;
 }
 
+.ui-datepicker-calendar tbody tr td a{
+	text-align: center !important;
+}
+
 #intro-mask{
 	position: absolute;
 	bottom: 0;
@@ -701,12 +759,20 @@ option {
 
 .table tbody{
 	position: absolute;
-	height: calc(100% - 38px) !important;
+	
 	width: 100%;
 	overflow: hidden;
 	overflow-x:hidden;
 	background-color: #F5F5F5;
 	overflow-y: scroll;
+}
+
+.maximized{
+	height: calc(100% - 38px) !important;
+}
+
+.minimized{
+	height: calc(100% - 108px) !important;
 }
 
 .table thead{
@@ -739,6 +805,11 @@ option {
 
 .nav-tabs{
 	border: none;
+	border-radius: 0 !important;
+}
+
+.nav-tabs>li>a:hover{
+	color: #FFFFFF !important;
 }
 
 .long{
@@ -846,20 +917,20 @@ table.table thead tr th, table.table tfoot tr th {
 	color: #ffffff;
 }
 
-.nav-tabs li .tab-item{
+.tab-item,.schedule-tab-item{
 	color: #FFFFFF;
 	font-weight: bold;
-	border-radius: 0px;
+	border-radius: 0 !important;
 	border: none !important;
 }
 
-.nav-tabs li .tab-item:hover{
+.main-nav-tabs li .tab-item:hover{
 	background-color: #373A3C;
 }
 
-.nav-tabs > li.active > a,
-.nav-tabs > li.active > a:hover,
-.nav-tabs > li.active > a:focus{
+.main-nav-tabs > li.active > a,
+.main-nav-tabs > li.active > a:hover,
+.main-nav-tabs > li.active > a:focus{
 	color: #FFFFFF;
 	cursor: default;
 	background-color: #373A3C;	
@@ -978,3 +1049,38 @@ table.table thead tr .headerSortDown {
 	background-position: right;
 	background-size: 25px;
 }*/
+
+
+
+.schedule-nav-tabs li{
+	width: 20%;
+	text-align: center;
+}
+
+.schedule-tab-item{
+	color: #FFFFFF;
+	font-weight: bold;
+	border-radius: 0px;
+	border: none !important;
+	background-color: #4485F5;
+	margin-left: 1px !important;
+	margin-right: 1px !important;
+}
+
+.schedule-tab-item:hover{
+	background-color: #234681 !important;
+}
+
+.schedule-nav-tabs > li.active > a,
+.schedule-nav-tabs > li.active > a:hover,
+.schedule-nav-tabs > li.active > a:focus{
+	color: #FFFFFF;
+	cursor: default;
+	border-bottom-color: transparent;
+	background-color: #234681 !important;
+	outline: none;
+} 
+
+.disabled{
+	pointer-events: none !important;
+}

@@ -63,7 +63,7 @@
 					</tr>
 				</thead>
 				
-				<tbody id="logs">
+				<tbody id="logs" class="maximized">
 					{% if log[0] %}
 					{% for i in log %}
 					<tr class="rows">
@@ -150,7 +150,7 @@
 						{% endif %}
 					</tr>
 				</thead>
-				<tbody id="attendance">
+				<tbody id="attendance" class="maximized">
 					{% if attendance[0] %}
 					{% for index in attendance %}
 					<tr id="{{index.id}}" class="rows" data-toggle="modal" data-target="#edit-user-modal" onclick="supply_data(this.id)">
@@ -227,7 +227,7 @@
 						</td>
 					</tr>
 				</thead>
-				<tbody id="absent">
+				<tbody id="absent" class="maximized">
 					{% if absent[0] %}
 					{% for index in absent %}
 					<tr class="rows">
@@ -301,7 +301,7 @@
 						<td class="short"></td>
 					</tr>
 				</thead>
-				<tbody id="late">
+				<tbody id="late" class="maximized">
 					{% if late[0] %}
 					{% for a in late %}
 					<tr class="rows">
