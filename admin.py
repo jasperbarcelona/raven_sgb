@@ -40,7 +40,7 @@ CLIENT_ID = 'ef8cf56d44f93b6ee6165a0caa3fe0d1ebeee9b20546998931907edbb266eb72'
 SECRET_KEY = 'c4c461cc5aa5f9f89b701bc016a73e9981713be1bf7bb057c875dbfacff86e1d'
 SHORT_CODE = '29290420420'
 CONNECT_TIMEOUT = 5.0
-CALENDAR_URL = 'http://ravenclock.herokuapp.com%s'
+CALENDAR_URL = 'http://127.0.0.1:7000%s'
 
 KINDERGARTEN = ['Junior Kinder', 'Senior Kinder']
 PRIMARY = ['1st Grade', '2nd Grade', '3rd Grade', '4th Grade', '5th Grade', '6th Grade']
@@ -82,62 +82,148 @@ def SWJsonify(*args, **kwargs):
 
 class School(db.Model, Serializer):
     __public__= ['id','api_key','password','id_no','name','address','city','email','tel']
-    id = db.Column(db.String(32),primary_key=True)
+    id = db.Column(db.Integer,primary_key=True)
+    school_no = db.Column(db.String(32), unique=True)
     api_key = db.Column(db.String(32))
     password = db.Column(db.String(20))
     name = db.Column(db.String(50))
-    url = db.Column(db.String(50))
     address = db.Column(db.String(120))
     city = db.Column(db.String(30))
     email = db.Column(db.String(60))
-    tel = db.Column(db.String(15))
+    contact = db.Column(db.String(15))
 
-    kinder_morning_class = db.Column(Boolean, unique=False)
-    kinder_afternoon_class = db.Column(Boolean, unique=False)
-    primary_morning_class = db.Column(Boolean, unique=False)
-    primary_afternoon_class = db.Column(Boolean, unique=False)
-    junior_morning_class = db.Column(Boolean, unique=False)
-    junior_afternoon_class = db.Column(Boolean, unique=False)
-    senior_morning_class = db.Column(Boolean, unique=False)
-    senior_afternoon_class = db.Column(Boolean, unique=False)
 
-    kinder_morning_start = db.Column(db.String(30))
-    kinder_morning_end = db.Column(db.String(30))
-    kinder_afternoon_start = db.Column(db.String(30))
-    kinder_afternoon_end = db.Column(db.String(30))
-    primary_morning_start = db.Column(db.String(30))
-    primary_morning_end = db.Column(db.String(30))
-    primary_afternoon_start = db.Column(db.String(30))
-    primary_afternoon_end = db.Column(db.String(30))
-    junior_morning_start = db.Column(db.String(30))
-    junior_morning_end = db.Column(db.String(30))
-    junior_afternoon_start = db.Column(db.String(30))
-    junior_afternoon_end = db.Column(db.String(30))
-    senior_morning_start = db.Column(db.String(30))
-    senior_morning_end = db.Column(db.String(30))
-    senior_afternoon_start = db.Column(db.String(30))
-    senior_afternoon_end = db.Column(db.String(30))
+class AdminUser(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    school_no = db.Column(db.String(32), unique=True)
+    email = db.Column(db.String(60))
+    password = db.Column(db.String(20))
+    first_name = db.Column(db.String(30))
+    last_name = db.Column(db.String(30))
+    address = db.Column(db.String(120))
+    msisdn = db.Column(db.String(15))
+
+
+class Schedule(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    school_no = db.Column(db.String(32))
+
+    junior_kinder_morning_class = db.Column(Boolean, unique=False)
+    junior_kinder_afternoon_class = db.Column(Boolean, unique=False)
+    senior_kinder_morning_class = db.Column(Boolean, unique=False)
+    senior_kinder_afternoon_class = db.Column(Boolean, unique=False)
+    first_grade_morning_class = db.Column(Boolean, unique=False)
+    first_grade_afternoon_class = db.Column(Boolean, unique=False)
+    second_grade_morning_class = db.Column(Boolean, unique=False)
+    second_grade_afternoon_class = db.Column(Boolean, unique=False)
+    third_grade_morning_class = db.Column(Boolean, unique=False)
+    third_grade_afternoon_class = db.Column(Boolean, unique=False)
+    fourth_grade_morning_class = db.Column(Boolean, unique=False)
+    fourth_grade_afternoon_class = db.Column(Boolean, unique=False)
+    fifth_grade_morning_class = db.Column(Boolean, unique=False)
+    fifth_grade_afternoon_class = db.Column(Boolean, unique=False)
+    sixth_grade_morning_class = db.Column(Boolean, unique=False)
+    sixth_grade_afternoon_class = db.Column(Boolean, unique=False)
+    seventh_grade_morning_class = db.Column(Boolean, unique=False)
+    seventh_grade_afternoon_class = db.Column(Boolean, unique=False)
+    eight_grade_morning_class = db.Column(Boolean, unique=False)
+    eight_grade_afternoon_class = db.Column(Boolean, unique=False)
+    ninth_grade_morning_class = db.Column(Boolean, unique=False)
+    ninth_grade_afternoon_class = db.Column(Boolean, unique=False)
+    tenth_grade_morning_class = db.Column(Boolean, unique=False)
+    tenth_grade_afternoon_class = db.Column(Boolean, unique=False)
+    eleventh_grade_morning_class = db.Column(Boolean, unique=False)
+    eleventh_grade_afternoon_class = db.Column(Boolean, unique=False)
+    twelfth_grade_morning_class = db.Column(Boolean, unique=False)
+    twelfth_grade_afternoon_class = db.Column(Boolean, unique=False)
+
+    junior_kinder_morning_start = db.Column(db.String(30))
+    junior_kinder_morning_end = db.Column(db.String(30))
+    junior_kinder_afternoon_start = db.Column(db.String(30))
+    junior_kinder_afternoon_end = db.Column(db.String(30))
+    senior_kinder_morning_start = db.Column(db.String(30))
+    senior_kinder_morning_end = db.Column(db.String(30))
+    senior_kinder_afternoon_start = db.Column(db.String(30))
+    senior_kinder_afternoon_end = db.Column(db.String(30))
+    first_grade_morning_start = db.Column(db.String(30))
+    first_grade_morning_end = db.Column(db.String(30))
+    first_grade_afternoon_start = db.Column(db.String(30))
+    first_grade_afternoon_end = db.Column(db.String(30))
+    second_grade_morning_start = db.Column(db.String(30))
+    second_grade_morning_end = db.Column(db.String(30))
+    second_grade_afternoon_start = db.Column(db.String(30))
+    second_grade_afternoon_end = db.Column(db.String(30))
+
+    third_grade_morning_start = db.Column(db.String(30))
+    third_grade_morning_end = db.Column(db.String(30))
+    third_grade_afternoon_start = db.Column(db.String(30))
+    third_grade_afternoon_end = db.Column(db.String(30))
+
+    fourth_grade_morning_start = db.Column(db.String(30))
+    fourth_grade_morning_end = db.Column(db.String(30))
+    fourth_grade_afternoon_start = db.Column(db.String(30))
+    fourth_grade_afternoon_end = db.Column(db.String(30))
+
+    fifth_grade_morning_start = db.Column(db.String(30))
+    fifth_grade_morning_end = db.Column(db.String(30))
+    fifth_grade_afternoon_start = db.Column(db.String(30))
+    fifth_grade_afternoon_end = db.Column(db.String(30))
+
+    sixth_grade_morning_start = db.Column(db.String(30))
+    sixth_grade_morning_end = db.Column(db.String(30))
+    sixth_grade_afternoon_start = db.Column(db.String(30))
+    sixth_grade_afternoon_end = db.Column(db.String(30))
+
+    seventh_grade_morning_start = db.Column(db.String(30))
+    seventh_grade_morning_end = db.Column(db.String(30))
+    seventh_grade_afternoon_start = db.Column(db.String(30))
+    seventh_grade_afternoon_end = db.Column(db.String(30))
+
+    eight_grade_morning_start = db.Column(db.String(30))
+    eight_grade_morning_end = db.Column(db.String(30))
+    eight_grade_afternoon_start = db.Column(db.String(30))
+    eight_grade_afternoon_end = db.Column(db.String(30))
+
+    ninth_grade_morning_start = db.Column(db.String(30))
+    ninth_grade_morning_end = db.Column(db.String(30))
+    ninth_grade_afternoon_start = db.Column(db.String(30))
+    ninth_grade_afternoon_end = db.Column(db.String(30))
+
+    tenth_grade_morning_start = db.Column(db.String(30))
+    tenth_grade_morning_end = db.Column(db.String(30))
+    tenth_grade_afternoon_start = db.Column(db.String(30))
+    tenth_grade_afternoon_end = db.Column(db.String(30))
+
+    eleventh_grade_morning_start = db.Column(db.String(30))
+    eleventh_grade_morning_end = db.Column(db.String(30))
+    eleventh_grade_afternoon_start = db.Column(db.String(30))
+    eleventh_grade_afternoon_end = db.Column(db.String(30))
+
+    twelfth_grade_morning_start = db.Column(db.String(30))
+    twelfth_grade_morning_end = db.Column(db.String(30))
+    twelfth_grade_afternoon_start = db.Column(db.String(30))
+    twelfth_grade_afternoon_end = db.Column(db.String(30))
 
 
 class Section(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    school_id = db.Column(db.String(32))
+    school_no = db.Column(db.String(32))
     name = db.Column(db.String(30))
 
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    school_id = db.Column(db.String(32))
+    school_no = db.Column(db.String(32))
     date = db.Column(db.String(20))
     time = db.Column(db.String(10))
     content = db.Column(db.UnicodeText())
 
 
 class Log(db.Model, Serializer):
-    __public__ = ['id','school_id','date','id_no','name','level',
+    __public__ = ['id','school_no','date','id_no','name','level',
                   'department','section','time_in','time_out','timestamp']
     id = db.Column(db.Integer, primary_key=True)
-    school_id = db.Column(db.String(32))
+    school_no = db.Column(db.String(32))
     date = db.Column(db.String(20))
     id_no = db.Column(db.String(20))
     name = db.Column(db.String(60))
@@ -151,10 +237,10 @@ class Log(db.Model, Serializer):
 
 
 class Student(db.Model, Serializer):
-    __public__ = ['id','school_id','id_no','first_name','last_name','middle_name',
+    __public__ = ['id','school_no','id_no','first_name','last_name','middle_name',
                   'level','department','section','absences','lates','parent_contact']
     id = db.Column(db.Integer, primary_key=True)
-    school_id = db.Column(db.String(32))
+    school_no = db.Column(db.String(32))
     id_no = db.Column(db.String(20))
     first_name = db.Column(db.String(30))
     last_name = db.Column(db.String(30))
@@ -169,7 +255,7 @@ class Student(db.Model, Serializer):
 
 class Late(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    school_id = db.Column(db.String(32))
+    school_no = db.Column(db.String(32))
     date = db.Column(db.String(20))
     id_no = db.Column(db.String(20))
     name = db.Column(db.String(60))
@@ -182,7 +268,7 @@ class Late(db.Model):
 
 class Absent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    school_id = db.Column(db.String(32))
+    school_no = db.Column(db.String(32))
     date = db.Column(db.String(20))
     id_no = db.Column(db.String(20))
     name = db.Column(db.String(60))
@@ -195,14 +281,26 @@ class Absent(db.Model):
 
 class IngAdmin(sqla.ModelView):
     column_display_pk = True
+
+class SchoolAdmin(sqla.ModelView):
+    column_display_pk = True
+    column_include_list = ['api_key', 'name', 'url', 'address', 'city', 'email', 'tel']
+    edit_template = 'test_edit.html'
+
+class StudentAdmin(sqla.ModelView):
+    column_display_pk = True
+    column_searchable_list = ['first_name', 'last_name', 'middle_name', 'id_no']
+
+
 admin = Admin(app, name='raven')
-admin.add_view(IngAdmin(School, db.session))
+admin.add_view(SchoolAdmin(School, db.session))
 admin.add_view(IngAdmin(Section, db.session))
 admin.add_view(IngAdmin(Log, db.session))
-admin.add_view(IngAdmin(Student, db.session))
+admin.add_view(StudentAdmin(Student, db.session))
 admin.add_view(IngAdmin(Late, db.session))
 admin.add_view(IngAdmin(Absent, db.session))
 admin.add_view(IngAdmin(Message, db.session))
+admin.add_view(IngAdmin(Schedule, db.session))
 
 
 def crossdomain(origin=None, methods=None, headers=None,
@@ -277,14 +375,25 @@ def message_options(message, msisdn):
     return message_options
 
 
-def authenticate_user(school_id, password):
-    if not School.query.filter_by(id=school_id, password=password).first():
-        return False
-    return True
+def authenticate_user(school_no, email, password):
+    school = School.query.filter_by(school_no=school_no).first()
+    if not school or school == None:
+        return jsonify(status='failed', error='Invalid school ID')
+    user = AdminUser.query.filter_by(school_no=school_no,email=email,password=password).first()
+    if not user or user == None:
+        return jsonify(status='failed', error='Invalid email or password')
+    session['school_no'] = school.school_no
+    session['api_key'] = school.api_key
+    session['user_id'] = user.id
+    session['user_school_no'] = user.school_no
+    session['user_name'] = user.first_name+' '+user.last_name
+    session['department'] = 'student'
+    session['tab'] = 'logs'
+    return jsonify(status='success', error=''),200
 
 
-def mark_morning_absent(school_id,api_key):
-    all_students = Student.query.filter_by(school_id=school_id).all()
+def mark_morning_absent(school_no,api_key):
+    all_students = Student.query.filter_by(school_no=school_no).all()
 
     for student in all_students:
         logged = Log.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no).order_by(Log.timestamp.desc()).first()
@@ -295,7 +404,7 @@ def mark_morning_absent(school_id,api_key):
             if student.middle_name:
                 student_name += ' '+student.middle_name[:1]+'.'
             absent = Absent(
-            school_id=school_id,
+            school_no=school_no,
             date=time.strftime("%B %d, %Y"),
             id_no=student.id_no,
             name=student_name,
@@ -307,14 +416,14 @@ def mark_morning_absent(school_id,api_key):
             )
 
             db.session.add(absent)
-            student.absences=Absent.query.filter_by(id_no=student.id_no, school_id=school_id).count()
+            student.absences=Absent.query.filter_by(id_no=student.id_no, school_no=school_no).count()
             db.session.commit()
-            absent_count = Absent.query.filter_by(school_id=school_id,date=time.strftime("%B %d, %Y"),time_of_day='morning').count()
+            absent_count = Absent.query.filter_by(school_no=school_no,date=time.strftime("%B %d, %Y"),time_of_day='morning').count()
     return jsonify(status='Success', absent_count=absent_count),201
 
 
-def mark_afternoon_absent(school_id,api_key):
-    all_students = Student.query.filter_by(school_id=school_id).all()
+def mark_afternoon_absent(school_no,api_key):
+    all_students = Student.query.filter_by(school_no=school_no).all()
 
     for student in all_students:
         print 'xxxxxxxxxxxxxxxxxxxxx'
@@ -325,7 +434,7 @@ def mark_afternoon_absent(school_id,api_key):
             if student.middle_name:
                 student_name += ' '+student.middle_name[:1]+'.'
             absent = Absent(
-            school_id=school_id,
+            school_no=school_no,
             date=time.strftime("%B %d, %Y"),
             id_no=student.id_no,
             name=student_name,
@@ -337,18 +446,18 @@ def mark_afternoon_absent(school_id,api_key):
             )
 
             db.session.add(absent)
-            student.absences=Absent.query.filter_by(id_no=student.id_no, school_id=school_id).count()
+            student.absences=Absent.query.filter_by(id_no=student.id_no, school_no=school_no).count()
             db.session.commit()
-            absent_count = Absent.query.filter_by(school_id=school_id,date=time.strftime("%B %d, %Y"),time_of_day='afternoon').count()
+            absent_count = Absent.query.filter_by(school_no=school_no,date=time.strftime("%B %d, %Y"),time_of_day='afternoon').count()
     return jsonify(status='Success', absent_count=absent_count),201
 
-def mark_specific_absent(school_id,id_no,time_of_day):
-    student = Student.query.filter_by(school_id=school_id,id_no=id_no).first()
+def mark_specific_absent(school_no,id_no,time_of_day):
+    student = Student.query.filter_by(school_no=school_no,id_no=id_no).first()
     student_name = student.last_name+', '+student.first_name
     if student.middle_name:
         student_name += ' '+student.middle_name[:1]+'.'
     absent = Absent(
-            school_id=school_id,
+            school_no=school_no,
             date=time.strftime("%B %d, %Y"),
             id_no=id_no,
             name=student_name,
@@ -361,25 +470,49 @@ def mark_specific_absent(school_id,id_no,time_of_day):
     db.session.add(absent)
     db.session.commit()
 
-    student.absences=Absent.query.filter_by(id_no=id_no, school_id=school_id).count()
+    student.absences=Absent.query.filter_by(id_no=id_no, school_no=school_no).count()
     db.session.commit()
 
 
-def check_if_late(school_id,api_key,id_no,name,level,
+def check_if_late(school_no,api_key,id_no,name,level,
                 section,date,department,time,timestamp):
 
     time_now = str(now.replace(hour=get_hour(time), minute=int(time[3:5])))[11:16]
-    school = School.query.filter_by(api_key=api_key).first()
-    if level in KINDERGARTEN:
-        educ = 'kinder'
-    elif level in PRIMARY:
-        educ = 'primary'
-    elif level in JUNIOR_HIGH:
-        educ = 'junior'
-    elif level in SENIOR_HIGH:
-        educ = 'senior'
+    schedule = Schedule.query.filter_by(school_no=school_no).first()
+    if level == 'Junior Kinder':
+        educ = 'junior_kinder'
+    elif level == 'Senior Kinder':
+        educ = 'senior_kinder'
+    elif level == '1st Grade':
+        educ = 'first_grade'
+    elif level == '2nd Grade':
+        educ = 'second_grade'
+    elif level == '3rd Grade':
+        educ = 'third_grade'
+    elif level == '4th Grade':
+        educ = 'fourth_grade'
+    elif level == '5th Grade':
+        educ = 'fifth_grade'
+    elif level == '6th Grade':
+        educ = 'sixth_grade'
+    elif level == '7th Grade':
+        educ = 'seventh_grade'
+    elif level == '8th Grade':
+        educ = 'eight_grade'
+    elif level == '9th Grade':
+        educ = 'ninth_grade'
+    elif level == '10th Grade':
+        educ = 'tenth_grade'
+    elif level == '11th Grade':
+        educ = 'eleventh_grade'
+    elif level == '12th Grade':
+        educ = 'twelfth_grade'
 
-    query = 'school.%s' %educ
+
+    query = 'schedule.%s' %educ
+
+    morning_class = eval(query+'_morning_class')
+    afternoon_class = eval(query+'_afternoon_class')
 
     morning_start = eval(query+'_morning_start')
     morning_end = eval(query+'_morning_end')
@@ -395,29 +528,29 @@ def check_if_late(school_id,api_key,id_no,name,level,
 
     if parse_date(time_now) >= parse_date(morning_start) and\
         parse_date(time_now) < parse_date(morning_end) and\
-        Absent.query.filter_by(school_id=school_id,id_no=id_no,date=date,time_of_day='morning').first() == None:
-
-        if str(parse_date(time_now) - parse_date(morning_start)) > '1:00:00':
-            mark_specific_absent(school_id,id_no,'morning')
-        else:
-            record_as_late(school_id, id_no, name, level, section, 
-                        date, department, time, timestamp)
+        Absent.query.filter_by(school_no=school_no,id_no=id_no,date=date,time_of_day='morning').first() == None:
+        if morning_class:
+            if str(parse_date(time_now) - parse_date(morning_start)) > '1:00:00':
+                mark_specific_absent(school_no,id_no,'morning')
+            else:
+                record_as_late(school_no, id_no, name, level, section, 
+                            date, department, time, timestamp)
 
     elif (parse_date(time_now) >= parse_date(afternoon_start) and\
         parse_date(time_now) < parse_date(afternoon_end)) and\
-        Absent.query.filter_by(school_id=school_id,id_no=id_no,date=date,time_of_day='afternoon').first() == None:
+        Absent.query.filter_by(school_no=school_no,id_no=id_no,date=date,time_of_day='afternoon').first() == None:
+        if afternoon_class:
+            if str(parse_date(time_now) - parse_date(afternoon_start)) > '1:00:00':
+                mark_specific_absent(school_no,id_no,'afternoon')
+            else:
+                record_as_late(school_no, id_no, name, level, section, 
+                            date, department, time, timestamp)
 
-        if str(parse_date(time_now) - parse_date(afternoon_start)) > '1:00:00':
-            mark_specific_absent(school_id,id_no,'afternoon')
-        else:
-            record_as_late(school_id, id_no, name, level, section, 
-                        date, department, time, timestamp)
 
-
-def record_as_late(school_id, id_no, name, level, section, 
+def record_as_late(school_no, id_no, name, level, section, 
                     date, department, time, timestamp):
     late = Late(
-            school_id=school_id,date=date,id_no=id_no,
+            school_no=school_no,date=date,id_no=id_no,
             name=name,level=level,section=section,
             time_in=time,department=department,
             timestamp=timestamp
@@ -426,16 +559,16 @@ def record_as_late(school_id, id_no, name, level, section,
     db.session.add(late)
     db.session.commit()
 
-    student=Student.query.filter_by(id_no=id_no, school_id=school_id).one()
-    student.lates=Late.query.filter_by(id_no=id_no, school_id=school_id).count()
+    student=Student.query.filter_by(id_no=id_no, school_no=school_no).one()
+    student.lates=Late.query.filter_by(id_no=id_no, school_no=school_no).count()
     db.session.commit()
 
 
-def time_in(school_id,api_key,id_no,name,level,section,
+def time_in(school_no,api_key,id_no,name,level,section,
             date,department,time,timestamp):
 
     add_this = Log(
-        school_id=school_id,
+        school_no=school_no,
         date=date,
         id_no=id_no,
         name=name,
@@ -452,14 +585,14 @@ def time_in(school_id,api_key,id_no,name,level,section,
     compose_message(add_this.id,id_no,time,'entered')
 
     if department != 'faculty':
-        check_if_late(school_id, api_key, id_no,name,level,
+        check_if_late(school_no, api_key, id_no,name,level,
                   section, date, department, time, timestamp)
 
     return jsonify(status='Success',type='entry',action='entered'), 201
 
 
-def time_out(id_no, time, school_id):
-    log = Log.query.filter_by(id_no=id_no,school_id=school_id).order_by(Log.timestamp.desc()).first()
+def time_out(id_no, time, school_no):
+    log = Log.query.filter_by(id_no=id_no,school_no=school_no).order_by(Log.timestamp.desc()).first()
     log.time_out=time
     log.notification_status='Pending'
     db.session.commit()
@@ -515,28 +648,28 @@ def prepare():
     session['attendance_limit']+=100
     variable = pool.apply_async(fetch_next, (session['logs_limit'],
                       session['late_limit'],session['attendance_limit'],
-                      session['absent_limit'],session['school_id'],
+                      session['absent_limit'],session['school_no'],
                       session['department'])).get()
 
 
-def fetch_first(logs_limit, late_limit, attendance_limit, absent_limit, school_id, department):
+def fetch_first(logs_limit, late_limit, attendance_limit, absent_limit, school_no, department):
      logs = Log.query.filter_by(
-        school_id=school_id,
+        school_no=school_no,
         department=department
         ).order_by(Log.timestamp.desc()).slice((logs_limit-100),logs_limit)
 
      late = Late.query.filter_by(
-        school_id=school_id,
+        school_no=school_no,
         department=department
         ).order_by(Late.timestamp.desc()).slice((late_limit-100),late_limit)
 
      attendance = Student.query.filter_by(
-        school_id=school_id,
+        school_no=school_no,
         department=department)\
         .order_by(Student.last_name).slice((attendance_limit-100),attendance_limit)
 
      absent = Absent.query.filter_by(
-        school_id=school_id,
+        school_no=school_no,
         department=department)\
         .order_by(Absent.date.desc()).slice((absent_limit-100),absent_limit)
 
@@ -566,7 +699,7 @@ def fetch_next(needed):
         sort_by = 'timestamp'
         sort_type='.desc()'
 
-    result = eval(search_table+'.query.filter_by(school_id=session[\'school_id\'],department=session[\'department\']).order_by('+search_table+'.'+sort_by+sort_type+').slice('+str(session[needed+'_limit']-100)+','+str(session[needed+'_limit'])+')')
+    result = eval(search_table+'.query.filter_by(school_no=session[\'school_no\'],department=session[\'department\']).order_by('+search_table+'.'+sort_by+sort_type+').slice('+str(session[needed+'_limit']-100)+','+str(session[needed+'_limit'])+')')
 
 
     return flask.render_template(
@@ -578,7 +711,7 @@ def fetch_next(needed):
 
 
 def search_logs(*args, **kwargs):
-    query = 'Log.query.filter(Log.department.ilike("'+session['department']+'"),Log.school_id.ilike("'+session['school_id']+'"),'
+    query = 'Log.query.filter(Log.department.ilike("'+session['department']+'"),Log.school_no.ilike("'+session['school_no']+'"),'
     for arg_name in kwargs:
         if kwargs[arg_name]:
             query += 'Log.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
@@ -589,7 +722,7 @@ def search_logs(*args, **kwargs):
 
 
 def search_attendance(*args, **kwargs):
-    query = 'Student.query.filter(Student.department.ilike("'+session['department']+'"),Student.school_id.ilike("'+session['school_id']+'"),'
+    query = 'Student.query.filter(Student.department.ilike("'+session['department']+'"),Student.school_no.ilike("'+session['school_no']+'"),'
     for arg_name in kwargs:
         if kwargs[arg_name]:
             query += 'Student.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
@@ -599,7 +732,7 @@ def search_attendance(*args, **kwargs):
 
 
 def search_absent(*args, **kwargs):
-    query = 'Absent.query.filter(Absent.school_id.ilike("'+session['school_id']+'"),'
+    query = 'Absent.query.filter(Absent.school_no.ilike("'+session['school_no']+'"),'
     for arg_name in kwargs:
         if kwargs[arg_name]:
             query += 'Absent.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
@@ -609,7 +742,7 @@ def search_absent(*args, **kwargs):
 
 
 def search_late(*args, **kwargs):
-    query = 'Late.query.filter(Late.school_id.ilike("'+session['school_id']+'"),'
+    query = 'Late.query.filter(Late.school_no.ilike("'+session['school_no']+'"),'
     for arg_name in kwargs:
         if kwargs[arg_name]:
             query += 'Late.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
@@ -682,10 +815,17 @@ def get_schedule():
 
 
 @app.route('/', methods=['GET', 'POST'])
-@nocache
 def index():
+    if session:
+        return redirect(url_for('dashboard'))
+    return flask.render_template('cover.html')
+
+
+@app.route('/dashboard', methods=['GET', 'POST'])
+@nocache
+def dashboard():
     if not session:
-        return redirect('/signin')
+        return redirect('/login')
     session['logs_limit'] = 100
     session['late_limit'] = 100
     session['attendance_limit'] = 100
@@ -696,11 +836,11 @@ def index():
     session['absent_search_limit'] = 100
     session['attendance_search_status'] = False
 
-    school = School.query.filter_by(api_key=session['api_key']).one()
-    sections = Section.query.filter_by(school_id=session['school_id']).all()
+    school = School.query.filter_by(api_key=session['api_key']).first()
+    sections = Section.query.filter_by(school_no=session['school_no']).all()
 
     first_set = fetch_first(session['logs_limit'],session['late_limit'],
-        session['attendance_limit'],session['absent_limit'],session['school_id'],
+        session['attendance_limit'],session['absent_limit'],session['school_no'],
         session['department'])
 
     # prepare()
@@ -713,23 +853,8 @@ def index():
         absent=first_set['absent'], 
         view=session['department'],
         sections=sections,
-        kinder_morning_start=school.kinder_morning_start,
-        kinder_morning_end=school.kinder_morning_end,
-        kinder_afternoon_start=school.kinder_afternoon_start,
-        kinder_afternoon_end=school.kinder_afternoon_end,
-        primary_morning_start=school.primary_morning_start,
-        primary_morning_end=school.primary_morning_end,
-        primary_afternoon_start=school.primary_afternoon_start,
-        primary_afternoon_end=school.primary_afternoon_end,
-        junior_morning_start=school.junior_morning_start,
-        junior_morning_end=school.junior_morning_end,
-        junior_afternoon_start=school.junior_afternoon_start,
-        junior_afternoon_end=school.junior_afternoon_end,
-        senior_morning_start=school.senior_morning_start,
-        senior_morning_end=school.senior_morning_end,
-        senior_afternoon_start=school.senior_afternoon_start,
-        senior_afternoon_end=school.senior_afternoon_end,
-        tab=session['tab']
+        tab=session['tab'],
+        user_name=session['user_name']
         )
 
 
@@ -746,6 +871,7 @@ def reset_attendance():
 @app.route('/schedule/irregular/get', methods=['GET', 'POST'])
 def get_irregular_schedule():
     data = flask.request.form.to_dict()
+    session['day'] = data['day']
     calendar_params = {
         'api_key':session['api_key'],
         'month':data['month'],
@@ -755,58 +881,108 @@ def get_irregular_schedule():
     get_events = requests.get(CALENDAR_URL%'/schedule/irregular/get',params=calendar_params)
     schedule = get_events.json()
     return jsonify(
-        kinder_morning_class=schedule['kinder_morning_class'],
-        kinder_afternoon_class=schedule['kinder_afternoon_class'],
-        primary_morning_class=schedule['primary_morning_class'],
-        primary_afternoon_class=schedule['primary_afternoon_class'],
-        junior_morning_class=schedule['junior_morning_class'],
-        junior_afternoon_class=schedule['junior_afternoon_class'],
-        senior_morning_class=schedule['senior_morning_class'],
-        senior_afternoon_class=schedule['senior_afternoon_class'],
-        kinder_morning_start=schedule['kinder_morning_start'],
-        kinder_morning_end=schedule['kinder_morning_end'],
-        kinder_afternoon_start=schedule['kinder_afternoon_start'],
-        kinder_afternoon_end=schedule['kinder_afternoon_end'],
-        primary_morning_start=schedule['primary_morning_start'],
-        primary_morning_end=schedule['primary_morning_end'],
-        primary_afternoon_start=schedule['primary_afternoon_start'],
-        primary_afternoon_end=schedule['primary_afternoon_end'],
-        junior_morning_start=schedule['junior_morning_start'],
-        junior_morning_end=schedule['junior_morning_end'],
-        junior_afternoon_start=schedule['junior_afternoon_start'],
-        junior_afternoon_end=schedule['junior_afternoon_end'],
-        senior_morning_start=schedule['senior_morning_start'],
-        senior_morning_end=schedule['senior_morning_end'],
-        senior_afternoon_start=schedule['senior_afternoon_start'],
-        senior_afternoon_end=schedule['senior_afternoon_end']
+        date=str(calendar.month_name[int(data['month'])]+' ' +data['day']+', '+data['year']),
+        junior_kinder_morning_class=schedule['junior_kinder_morning_class'],
+        junior_kinder_afternoon_class=schedule['junior_kinder_afternoon_class'],
+        senior_kinder_morning_class=schedule['senior_kinder_morning_class'],
+        senior_kinder_afternoon_class=schedule['senior_kinder_afternoon_class'],
+        first_grade_morning_class=schedule['first_grade_morning_class'],
+        first_grade_afternoon_class=schedule['first_grade_afternoon_class'],
+        second_grade_morning_class=schedule['second_grade_morning_class'],
+        second_grade_afternoon_class=schedule['second_grade_afternoon_class'],
+        third_grade_morning_class=schedule['third_grade_morning_class'],
+        third_grade_afternoon_class=schedule['third_grade_afternoon_class'],
+        fourth_grade_morning_class=schedule['fourth_grade_morning_class'],
+        fourth_grade_afternoon_class=schedule['fourth_grade_afternoon_class'],
+        fifth_grade_morning_class=schedule['fifth_grade_morning_class'],
+        fifth_grade_afternoon_class=schedule['fifth_grade_afternoon_class'],
+        sixth_grade_morning_class=schedule['sixth_grade_morning_class'],
+        sixth_grade_afternoon_class=schedule['sixth_grade_afternoon_class'],
+        seventh_grade_morning_class=schedule['seventh_grade_morning_class'],
+        seventh_grade_afternoon_class=schedule['seventh_grade_afternoon_class'],
+        eight_grade_morning_class=schedule['eight_grade_morning_class'],
+        eight_grade_afternoon_class=schedule['eight_grade_afternoon_class'],
+        ninth_grade_morning_class=schedule['ninth_grade_morning_class'],
+        ninth_grade_afternoon_class=schedule['ninth_grade_afternoon_class'],
+        tenth_grade_morning_class=schedule['tenth_grade_morning_class'],
+        tenth_grade_afternoon_class=schedule['tenth_grade_afternoon_class'],
+        eleventh_grade_morning_class=schedule['eleventh_grade_morning_class'],
+        eleventh_grade_afternoon_class=schedule['eleventh_grade_afternoon_class'],
+        twelfth_grade_morning_class=schedule['twelfth_grade_morning_class'],
+        twelfth_grade_afternoon_class=schedule['twelfth_grade_afternoon_class'],
+        junior_kinder_morning_start=schedule['junior_kinder_morning_start'],
+        junior_kinder_morning_end=schedule['junior_kinder_morning_end'],
+        junior_kinder_afternoon_start=schedule['junior_kinder_afternoon_start'],
+        junior_kinder_afternoon_end=schedule['junior_kinder_afternoon_end'],
+        senior_kinder_morning_start=schedule['senior_kinder_morning_start'],
+        senior_kinder_morning_end=schedule['senior_kinder_morning_end'],
+        senior_kinder_afternoon_start=schedule['senior_kinder_afternoon_start'],
+        senior_kinder_afternoon_end=schedule['senior_kinder_afternoon_end'],
+        first_grade_morning_start=schedule['first_grade_morning_start'],
+        first_grade_morning_end=schedule['first_grade_morning_end'],
+        first_grade_afternoon_start=schedule['first_grade_afternoon_start'],
+        first_grade_afternoon_end=schedule['first_grade_afternoon_end'],
+        second_grade_morning_start=schedule['second_grade_morning_start'],
+        second_grade_morning_end=schedule['second_grade_morning_end'],
+        second_grade_afternoon_start=schedule['second_grade_afternoon_start'],
+        second_grade_afternoon_end=schedule['second_grade_afternoon_end'],
+        third_grade_morning_start=schedule['third_grade_morning_start'],
+        third_grade_morning_end=schedule['third_grade_morning_end'],
+        third_grade_afternoon_start=schedule['third_grade_afternoon_start'],
+        third_grade_afternoon_end=schedule['third_grade_afternoon_end'],
+        fourth_grade_morning_start=schedule['fourth_grade_morning_start'],
+        fourth_grade_morning_end=schedule['fourth_grade_morning_end'],
+        fourth_grade_afternoon_start=schedule['fourth_grade_afternoon_start'],
+        fourth_grade_afternoon_end=schedule['fourth_grade_afternoon_end'],
+        fifth_grade_morning_start=schedule['fifth_grade_morning_start'],
+        fifth_grade_morning_end=schedule['fifth_grade_morning_end'],
+        fifth_grade_afternoon_start=schedule['fifth_grade_afternoon_start'],
+        fifth_grade_afternoon_end=schedule['fifth_grade_afternoon_end'],
+        sixth_grade_morning_start=schedule['sixth_grade_morning_start'],
+        sixth_grade_morning_end=schedule['sixth_grade_morning_end'],
+        sixth_grade_afternoon_start=schedule['sixth_grade_afternoon_start'],
+        sixth_grade_afternoon_end=schedule['sixth_grade_afternoon_end'],
+        seventh_grade_morning_start=schedule['seventh_grade_morning_start'],
+        seventh_grade_morning_end=schedule['seventh_grade_morning_end'],
+        seventh_grade_afternoon_start=schedule['seventh_grade_afternoon_start'],
+        seventh_grade_afternoon_end=schedule['seventh_grade_afternoon_end'],
+        eight_grade_morning_start=schedule['eight_grade_morning_start'],
+        eight_grade_morning_end=schedule['eight_grade_morning_end'],
+        eight_grade_afternoon_start=schedule['eight_grade_afternoon_start'],
+        eight_grade_afternoon_end=schedule['eight_grade_afternoon_end'],
+        ninth_grade_morning_start=schedule['ninth_grade_morning_start'],
+        ninth_grade_morning_end=schedule['ninth_grade_morning_end'],
+        ninth_grade_afternoon_start=schedule['ninth_grade_afternoon_start'],
+        ninth_grade_afternoon_end=schedule['ninth_grade_afternoon_end'],
+        tenth_grade_morning_start=schedule['tenth_grade_morning_start'],
+        tenth_grade_morning_end=schedule['tenth_grade_morning_end'],
+        tenth_grade_afternoon_start=schedule['tenth_grade_afternoon_start'],
+        tenth_grade_afternoon_end=schedule['tenth_grade_afternoon_end'],
+        eleventh_grade_morning_start=schedule['eleventh_grade_morning_start'],
+        eleventh_grade_morning_end=schedule['eleventh_grade_morning_end'],
+        eleventh_grade_afternoon_start=schedule['eleventh_grade_afternoon_start'],
+        eleventh_grade_afternoon_end=schedule['eleventh_grade_afternoon_end'],
+        twelfth_grade_morning_start=schedule['twelfth_grade_morning_start'],
+        twelfth_grade_morning_end=schedule['twelfth_grade_morning_end'],
+        twelfth_grade_afternoon_start=schedule['twelfth_grade_afternoon_start'],
+        twelfth_grade_afternoon_end=schedule['twelfth_grade_afternoon_end']
         )
 
 
-@app.route('/signin', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 @nocache
 def login_page():
     if session:
-        return redirect('/')
+        return redirect('/dashboard')
     return flask.render_template('login.html')
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/user/authenticate', methods=['GET', 'POST'])
 def login():
     if session:
-        return redirect('/')
-    
+        return redirect('/dashboard')
     login_data = flask.request.form.to_dict()
-
-    if not authenticate_user(login_data['school_id'], login_data['password']):
-        return redirect('/signin')
-
-    school = School.query.filter_by(id=login_data['school_id']).first()
-
-    session['school_id'] = school.id
-    session['api_key'] = school.api_key
-    session['department'] = 'student'
-    session['tab'] = 'logs'
-    return redirect('/')
+    return authenticate_user(login_data['school_no'], login_data['user_email'], login_data['user_password'])
 
 
 @app.route('/home', methods=['GET', 'POST'])
@@ -833,30 +1009,30 @@ def change_view():
 
 @app.route('/absent/morning/mark', methods=['GET', 'POST'])
 def mark_absent_morning():
-    school_id = flask.request.form.get('school_id')
+    school_no = flask.request.form.get('school_no')
     api_key = flask.request.form.get('api_key')
 
-    if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
+    if not api_key or not School.query.filter_by(school_no=school_no, api_key=api_key):
         return jsonify(status='Failed', error='School not found'),404
 
-    return mark_morning_absent(school_id,api_key)
+    return mark_morning_absent(school_no,api_key)
 
 
 @app.route('/absent/afternoon/mark', methods=['GET', 'POST'])
 def mark_absent_afternoon():
-    school_id = flask.request.form.get('school_id')
+    school_no = flask.request.form.get('school_no')
     api_key = flask.request.form.get('api_key')
 
-    if not api_key or not School.query.filter_by(id=school_id, api_key=api_key):
+    if not api_key or not School.query.filter_by(school_no=school_no, api_key=api_key):
         return jsonify(status='Failed',error='School not found'),404
 
-    return mark_afternoon_absent(school_id,api_key)
+    return mark_afternoon_absent(school_no,api_key)
 
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     session.clear()
-    return redirect('/signin')
+    return redirect('/login')
 
 
 def retry_sms(unsent_sms):
@@ -886,7 +1062,7 @@ def sms_retry():
 def get_student_info():
     student_id = flask.request.form.get('student_id')
     student = Student.query.filter_by(id=student_id).first()
-    sections = Section.query.filter_by(school_id=session['school_id']).all()
+    sections = Section.query.filter_by(school_no=session['school_no']).all()
     return flask.render_template('student_info.html', student=student, sections=sections)
 
 
@@ -902,29 +1078,29 @@ def add_log():
     sleep(1)
     data = flask.request.form.to_dict()
 
-    if not data['api_key'] or not School.query.filter_by(id=data['school_id'],api_key=data['api_key']):
+    if not data['api_key'] or not School.query.filter_by(school_no=data['school_no'],api_key=data['api_key']):
         return jsonify(status='500',message='Unauthorized'), 500
 
-    logged = Log.query.filter_by(date=data['date'],school_id=data['school_id'],id_no=data['id_no']).order_by(Log.timestamp.desc()).first()
+    logged = Log.query.filter_by(date=data['date'],school_no=data['school_no'],id_no=data['id_no']).order_by(Log.timestamp.desc()).first()
 
     if not logged or logged.time_out != None:
 
-        return time_in(data['school_id'],data['api_key'],data['id_no'],data['name'],
+        return time_in(data['school_no'],data['api_key'],data['id_no'],data['name'],
                 data['level'],data['section'],data['date'],data['department'],
                 data['time'],data['timestamp'])
 
-    return time_out(data['id_no'],data['time'],data['school_id'])    
+    return time_out(data['id_no'],data['time'],data['school_no'])    
 
 
 @app.route('/blast',methods=['GET','POST'])
 def blast_message():
     password = flask.request.form.get('password')
     message = flask.request.form.get('message')
-    if not authenticate_user(session['school_id'], password):
+    if not authenticate_user(session['school_no'], password):
         return flask.render_template('status.html', status='Unauthorized')
 
     for user in db.session.query(Student.parent_contact).filter\
-              (Student.school_id==session['school_id']).distinct(): 
+              (Student.school_no==session['school_no']).distinct(): 
 
         blast_thread = threading.Thread(
             target=send_message,
@@ -942,9 +1118,9 @@ def blast_message():
 
 @app.route('/sync',methods=['GET','POST'])
 def sync_database():
-    school_id = flask.request.args.get('school_id')
+    school_no = flask.request.args.get('school_no')
     return SWJsonify({
-        'Records': Student.query.filter_by(school_id=school_id).all()
+        'Records': Student.query.filter_by(school_no=school_no).all()
         }), 201
 
 
@@ -956,7 +1132,7 @@ def receive_records():
 
     if data.get('middle_name'):
         student = Student(
-        school_id='123456789',
+        school_no='123456789',
         id_no=data['id_no'],
         first_name=data['first_name'],
         last_name=data['last_name'],
@@ -970,7 +1146,7 @@ def receive_records():
         )
     else:
         student = Student(
-        school_id='123456789',
+        school_no='123456789',
         id_no=data['id_no'],
         first_name=data['first_name'],
         last_name=data['last_name'],
@@ -991,7 +1167,7 @@ def add_user():
     student_data = flask.request.form.to_dict()
     if student_data['department'] == 'student':
         user = Student(
-            school_id = session['school_id'],
+            school_no = session['school_no'],
             id_no = student_data['id_no'],
             first_name = student_data['first_name'],
             last_name = student_data['last_name'],
@@ -1005,7 +1181,7 @@ def add_user():
             )
     else:
         user = Student(
-            school_id = session['school_id'],
+            school_no = session['school_no'],
             id_no = student_data['id_no'],
             first_name = student_data['first_name'],
             last_name = student_data['last_name'],
@@ -1160,50 +1336,13 @@ def search_student_late():
         )
 
 
-@app.route('/sched',methods=['GET','POST'])
+@app.route('/schedule/regular/save',methods=['GET','POST'])
 def change_sched():
-
-    data = flask.request.form.to_dict()
-
-    school = School.query.filter_by(id=session['school_id']).one()
-
-    school.kinder_morning_start = data['kinder_morning_start']
-    school.kinder_morning_end = data['kinder_morning_end']
-    school.kinder_afternoon_start = data['kinder_afternoon_start']
-    school.kinder_afternoon_end = data['kinder_afternoon_end']
-    school.primary_morning_start = data['primary_morning_start']
-    school.primary_morning_end = data['primary_morning_end']
-    school.primary_afternoon_start = data['primary_afternoon_start']
-    school.primary_afternoon_end = data['primary_afternoon_end']
-    school.junior_morning_start = data['junior_morning_start']
-    school.junior_morning_end = data['junior_morning_end']
-    school.junior_afternoon_start = data['junior_afternoon_start']
-    school.junior_afternoon_end = data['junior_afternoon_end']
-    school.senior_morning_start = data['senior_morning_start']
-    school.senior_morning_end = data['senior_morning_end']
-    school.senior_afternoon_start = data['senior_afternoon_start']
-    school.senior_afternoon_end = data['senior_afternoon_end']
-
-    db.session.commit()
+    schedule = flask.request.form.getlist('schedule[]')
 
     sched_data = {
-        'school_id': session['school_id'],
-        'kinder_morning_start': data['kinder_morning_start'],
-        'kinder_morning_end': data['kinder_morning_end'],
-        'kinder_afternoon_start': data['kinder_afternoon_start'],
-        'kinder_afternoon_end':data['kinder_afternoon_end'],
-        'primary_morning_start': data['primary_morning_start'],
-        'primary_morning_end': data['primary_morning_end'],
-        'primary_afternoon_start': data['primary_afternoon_start'],
-        'primary_afternoon_end':data['primary_afternoon_end'],
-        'junior_morning_start': data['junior_morning_start'],
-        'junior_morning_end': data['junior_morning_end'],
-        'junior_afternoon_start': data['junior_afternoon_start'],
-        'junior_afternoon_end': data['junior_afternoon_end'],
-        'senior_morning_start': data['senior_morning_start'],
-        'senior_morning_end': data['senior_morning_end'],
-        'senior_afternoon_start': data['senior_afternoon_start'],
-        'senior_afternoon_end': data['senior_afternoon_end']
+        'api_key': session['api_key'],
+        'schedule': schedule 
     }
 
     try:
@@ -1213,7 +1352,28 @@ def change_sched():
     except requests.exceptions.ConnectionError as e:
         print "Disconnected!"
 
-    return redirect('/')
+    return '',200
+
+
+@app.route('/schedule/irregular/save',methods=['GET','POST'])
+def change_irregular_sched():
+    schedule = flask.request.form.to_dict()
+
+    request_param = {
+        'api_key':session['api_key'],
+        'month':session['month'],
+        'day':session['day'],
+        'year':session['year']
+    }
+
+    try:
+        r = requests.post(CALENDAR_URL%'/schedule/irregular/new',schedule,params=request_param)
+        print r.status_code #update log database (put 'sent' to status)
+
+    except requests.exceptions.ConnectionError as e:
+        print "Disconnected!"
+
+    return '',200
 
 
 @app.route('/id/validate',methods=['GET','POST'])
@@ -1228,36 +1388,33 @@ def validate_id():
 
 @app.route('/calendar/data/get',methods=['GET','POST'])
 def populate_calendar():
-    # cal = Calendar(6)
-    # session['year'] = date.today().year
-    # session['month'] = date.today().month
-    # day = date.today().day
-    # dates = cal.monthdatescalendar(session['year'], session['month'])
-
-    # calendar_params = {
-    #     'api_key':session['api_key'],
-    #     'month':session['month'],
-    #     'year':session['year']
-    # }
-
-    # try:
-    #     get_events = requests.get(CALENDAR_URL%'/events/get',params=calendar_params)
-    #     events = get_events.json()['days']
-    #     return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today=day, events=events, month_name=calendar.month_name[session['month']])
-
-    # except requests.exceptions.ConnectionError as e:
-    #     return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today=day) #return diff template??
-
-    return flask.render_template('dates.html')
-
-@app.route('/calendar/next/get',methods=['GET','POST'])
-def next_month():
     cal = Calendar(6)
-    if session['month'] == 12:
-        session['year'] += 1
-        session['month'] = 1
-    else:
-        session['month'] += 1
+    session['year'] = date.today().year
+    session['month'] = date.today().month
+    day = date.today().day
+    dates = cal.monthdatescalendar(session['year'], session['month'])
+
+    calendar_params = {
+        'api_key':session['api_key'],
+        'month':session['month'],
+        'year':session['year']
+    }
+
+    try:
+        get_events = requests.get(CALENDAR_URL%'/events/get',params=calendar_params)
+        events = get_events.json()['days']
+        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today=day, events=events, month_name=calendar.month_name[session['month']])
+
+    except requests.exceptions.ConnectionError as e:
+        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today=day) #return diff template??
+
+
+@app.route('/calendar/date/go',methods=['GET','POST'])
+def next_month():
+    data = flask.request.form.to_dict()
+    cal = Calendar(6)
+    session['month'] = int(data['month'])
+    session['year'] = int(data['year'])
     dates = cal.monthdatescalendar(session['year'], session['month'])
 
     calendar_params = {
@@ -1302,35 +1459,115 @@ def prev_month():
 
 @app.route('/schedule/regular/get',methods=['GET','POST'])
 def populate_regular_schedule():
-    sleep(3)
-    return '',200
+    calendar_params = {
+        'api_key':session['api_key']
+    }
+
+    try:
+        get_sched = requests.get(CALENDAR_URL%'/schedule/regular/get',params=calendar_params)
+        return SWJsonify({
+        'monday': get_sched.json()['monday'],
+        'tuesday': get_sched.json()['tuesday'],
+        'wednesday': get_sched.json()['wednesday'],
+        'thursday': get_sched.json()['thursday'],
+        'friday': get_sched.json()['friday'],
+        }), 200
+
+    except requests.exceptions.ConnectionError as e:
+        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today='')
 
 
 @app.route('/schedule/sync',methods=['GET','POST'])
 def sync_schedule():
     data = flask.request.form.to_dict()
 
-    school = School.query.filter_by(id=data['school_id']).one()
+    schedule = Schedule.query.filter_by(school_no=data['school_no']).one()
 
-    school.primary_morning_class = str2bool(data['primary_morning_class'])
-    school.primary_afternoon_class = str2bool(data['primary_afternoon_class'])
-    school.junior_morning_class = str2bool(data['junior_morning_class'])
-    school.junior_afternoon_class = str2bool(data['junior_afternoon_class'])
-    school.senior_morning_class = str2bool(data['senior_morning_class'])
-    school.senior_afternoon_class = str2bool(data['senior_afternoon_class'])
+    schedule.junior_kinder_morning_class = str2bool(data['junior_kinder_morning_class'])
+    schedule.junior_kinder_afternoon_class = str2bool(data['junior_kinder_afternoon_class'])
+    schedule.senior_kinder_morning_class = str2bool(data['senior_kinder_morning_class'])
+    schedule.senior_kinder_afternoon_class = str2bool(data['senior_kinder_afternoon_class'])
+    schedule.first_grade_morning_class = str2bool(data['first_grade_morning_class'])
+    schedule.first_grade_afternoon_class = str2bool(data['first_grade_afternoon_class'])
+    schedule.second_grade_morning_class = str2bool(data['second_grade_morning_class'])
+    schedule.second_grade_afternoon_class = str2bool(data['second_grade_afternoon_class'])
+    schedule.third_grade_morning_class = str2bool(data['third_grade_morning_class'])
+    schedule.third_grade_afternoon_class = str2bool(data['third_grade_afternoon_class'])
+    schedule.fourth_grade_morning_class = str2bool(data['fourth_grade_morning_class'])
+    schedule.fourth_grade_afternoon_class = str2bool(data['fourth_grade_afternoon_class'])
+    schedule.fifth_grade_morning_class = str2bool(data['fifth_grade_morning_class'])
+    schedule.fifth_grade_afternoon_class = str2bool(data['fifth_grade_afternoon_class'])
+    schedule.sixth_grade_morning_class = str2bool(data['sixth_grade_morning_class'])
+    schedule.sixth_grade_afternoon_class = str2bool(data['sixth_grade_afternoon_class'])
+    schedule.seventh_grade_morning_class = str2bool(data['seventh_grade_morning_class'])
+    schedule.seventh_grade_afternoon_class = str2bool(data['seventh_grade_afternoon_class'])
+    schedule.eight_grade_morning_class = str2bool(data['eight_grade_morning_class'])
+    schedule.eight_grade_afternoon_class = str2bool(data['eight_grade_afternoon_class'])
+    schedule.ninth_grade_morning_class = str2bool(data['ninth_grade_morning_class'])
+    schedule.ninth_grade_afternoon_class = str2bool(data['ninth_grade_afternoon_class'])
+    schedule.tenth_grade_morning_class = str2bool(data['tenth_grade_morning_class'])
+    schedule.tenth_grade_afternoon_class = str2bool(data['tenth_grade_afternoon_class'])
+    schedule.eleventh_grade_morning_class = str2bool(data['eleventh_grade_morning_class'])
+    schedule.eleventh_grade_afternoon_class = str2bool(data['eleventh_grade_afternoon_class'])
+    schedule.twelfth_grade_morning_class = str2bool(data['twelfth_grade_morning_class'])
+    schedule.twelfth_grade_afternoon_class = str2bool(data['twelfth_grade_afternoon_class'])
 
-    school.primary_morning_start = data['primary_morning_start']
-    school.primary_morning_end = data['primary_morning_end']
-    school.junior_morning_start = data['junior_morning_start']
-    school.junior_morning_end = data['junior_morning_end']
-    school.senior_morning_start = data['senior_morning_start']
-    school.senior_morning_end = data['senior_morning_end']
-    school.primary_afternoon_start = data['primary_afternoon_start']
-    school.primary_afternoon_end = data['primary_afternoon_end']
-    school.junior_afternoon_start = data['junior_afternoon_start']
-    school.junior_afternoon_end = data['junior_afternoon_end']
-    school.senior_afternoon_start = data['senior_afternoon_start']
-    school.senior_afternoon_end = data['senior_afternoon_end']
+    schedule.junior_kinder_morning_start = data['junior_kinder_morning_start']
+    schedule.junior_kinder_morning_end = data['junior_kinder_morning_end']
+    schedule.junior_kinder_afternoon_start = data['junior_kinder_afternoon_start']
+    schedule.junior_kinder_afternoon_end = data['junior_kinder_afternoon_end']
+    schedule.senior_kinder_morning_start = data['senior_kinder_morning_start']
+    schedule.senior_kinder_morning_end = data['senior_kinder_morning_end']
+    schedule.senior_kinder_afternoon_start = data['senior_kinder_afternoon_start']
+    schedule.senior_kinder_afternoon_end = data['senior_kinder_afternoon_end']
+    schedule.first_grade_morning_start = data['first_grade_morning_start']
+    schedule.first_grade_morning_end = data['first_grade_morning_end']
+    schedule.first_grade_afternoon_start = data['first_grade_afternoon_start']
+    schedule.first_grade_afternoon_end = data['first_grade_afternoon_end']
+    schedule.second_grade_morning_start = data['second_grade_morning_start']
+    schedule.second_grade_morning_end = data['second_grade_morning_end']
+    schedule.second_grade_afternoon_start = data['second_grade_afternoon_start']
+    schedule.second_grade_afternoon_end = data['second_grade_afternoon_end']
+    schedule.third_grade_morning_start = data['third_grade_morning_start']
+    schedule.third_grade_morning_end = data['third_grade_morning_end']
+    schedule.third_grade_afternoon_start = data['third_grade_afternoon_start']
+    schedule.third_grade_afternoon_end = data['third_grade_afternoon_end']
+    schedule.fourth_grade_morning_start = data['fourth_grade_morning_start']
+    schedule.fourth_grade_morning_end = data['fourth_grade_morning_end']
+    schedule.fourth_grade_afternoon_start = data['fourth_grade_afternoon_start']
+    schedule.fourth_grade_afternoon_end = data['fourth_grade_afternoon_end']
+    schedule.fifth_grade_morning_start = data['fifth_grade_morning_start']
+    schedule.fifth_grade_morning_end = data['fifth_grade_morning_end']
+    schedule.fifth_grade_afternoon_start = data['fifth_grade_afternoon_start']
+    schedule.fifth_grade_afternoon_end = data['fifth_grade_afternoon_end']
+    schedule.sixth_grade_morning_start = data['sixth_grade_morning_start']
+    schedule.sixth_grade_morning_end = data['sixth_grade_morning_end']
+    schedule.sixth_grade_afternoon_start = data['sixth_grade_afternoon_start']
+    schedule.sixth_grade_afternoon_end = data['sixth_grade_afternoon_end']
+    schedule.seventh_grade_morning_start = data['seventh_grade_morning_start']
+    schedule.seventh_grade_morning_end = data['seventh_grade_morning_end']
+    schedule.seventh_grade_afternoon_start = data['seventh_grade_afternoon_start']
+    schedule.seventh_grade_afternoon_end = data['seventh_grade_afternoon_end']
+    schedule.eight_grade_morning_start = data['eight_grade_morning_start']
+    schedule.eight_grade_morning_end = data['eight_grade_morning_end']
+    schedule.eight_grade_afternoon_start = data['eight_grade_afternoon_start']
+    schedule.eight_grade_afternoon_end = data['eight_grade_afternoon_end']
+    schedule.ninth_grade_morning_start = data['ninth_grade_morning_start']
+    schedule.ninth_grade_morning_end = data['ninth_grade_morning_end']
+    schedule.ninth_grade_afternoon_start = data['ninth_grade_afternoon_start']
+    schedule.ninth_grade_afternoon_end = data['ninth_grade_afternoon_end']
+    schedule.tenth_grade_morning_start = data['tenth_grade_morning_start']
+    schedule.tenth_grade_morning_end = data['tenth_grade_morning_end']
+    schedule.tenth_grade_afternoon_start = data['tenth_grade_afternoon_start']
+    schedule.tenth_grade_afternoon_end = data['tenth_grade_afternoon_end']
+    schedule.eleventh_grade_morning_start = data['eleventh_grade_morning_start']
+    schedule.eleventh_grade_morning_end = data['eleventh_grade_morning_end']
+    schedule.eleventh_grade_afternoon_start = data['eleventh_grade_afternoon_start']
+    schedule.eleventh_grade_afternoon_end = data['eleventh_grade_afternoon_end']
+    schedule.twelfth_grade_morning_start = data['twelfth_grade_morning_start']
+    schedule.twelfth_grade_morning_end = data['twelfth_grade_morning_end']
+    schedule.twelfth_grade_afternoon_start = data['twelfth_grade_afternoon_start']
+    schedule.twelfth_grade_afternoon_end = data['twelfth_grade_afternoon_end']
 
     db.session.commit()
     return '',201
@@ -1343,7 +1580,7 @@ def favicon():
 
 @app.route('/messages',methods=['GET','POST'])
 def fetch_sent_messages():
-    messages = Message.query.filter_by(school_id=session['school_id']).all()
+    messages = Message.query.filter_by(school_no=session['school_no']).all()
     return flask.render_template('sent_messages.html',messages=messages)
 
 
@@ -1356,7 +1593,7 @@ def compose_new_message():
 def add_faculty():
     for i in range(500):
         a = Student(
-            school_id=1234,
+            school_no=1234,
             id_no=str(i),
             first_name='Jasper'+str(i),
             last_name='Barcelona',
@@ -1412,47 +1649,118 @@ def rebuild_database():
     db.drop_all()
     db.create_all()
 
+    admin = AdminUser(
+        school_no = '123456789',
+        email = 'barcelona.jasperoliver@gmail.com',
+        password = 'test',
+        first_name = 'Jasper',
+        last_name = 'Barcelona',
+        address = '12, Zamora St. Ciudad Maharlika, Lucena City',
+        msisdn = '09183339068'
+        )
+
     school = School(
-        id='123456789',
+        school_no='123456789',
         api_key='ecc67d28db284a2fb351d58fe18965f9',
         password='test',
         name="Scuola Gesu Bambino",
-        url='scuolagesubambino',
         address="10, Brgy Isabang",
         city="Lucena City",
         email="sgb.edu@gmail.com",
-        tel="555-8898",
+        contact="555-8898"
+        )
 
-        kinder_morning_class = True,
-        kinder_afternoon_class = True,
-        primary_morning_class = True,
-        primary_afternoon_class = True,
-        junior_morning_class = True,
-        junior_afternoon_class = True,
-        senior_morning_class = True,
-        senior_afternoon_class = True,
+    schedule = Schedule(
+        school_no=123456789,
+        junior_kinder_morning_class=False,
+        junior_kinder_afternoon_class=False,
+        senior_kinder_morning_class=False,
+        senior_kinder_afternoon_class=False,
+        first_grade_morning_class=False,
+        first_grade_afternoon_class=False,
+        second_grade_morning_class=False,
+        second_grade_afternoon_class=False,
+        third_grade_morning_class=False,
+        third_grade_afternoon_class=False,
+        fourth_grade_morning_class=False,
+        fourth_grade_afternoon_class=False,
+        fifth_grade_morning_class=False,
+        fifth_grade_afternoon_class=False,
+        sixth_grade_morning_class=False,
+        sixth_grade_afternoon_class=False,
+        seventh_grade_morning_class=False,
+        seventh_grade_afternoon_class=False,
+        eight_grade_morning_class=False,
+        eight_grade_afternoon_class=False,
+        ninth_grade_morning_class=False,
+        ninth_grade_afternoon_class=False,
+        tenth_grade_morning_class=False,
+        tenth_grade_afternoon_class=False,
+        eleventh_grade_morning_class=False,
+        eleventh_grade_afternoon_class=False,
+        twelfth_grade_morning_class=False,
+        twelfth_grade_afternoon_class=False,
 
-        kinder_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
-        kinder_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-        kinder_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-        kinder_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
-
-        primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
-        primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-        primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-        primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
-
-        junior_morning_start = str(now.replace(hour=12, minute=0, second=0))[11:16],
-        junior_morning_end = str(now.replace(hour=13, minute=0, second=0))[11:16],
-        junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-        junior_afternoon_end = str(now.replace(hour=13, minute=30, second=0))[11:16],
-
-        senior_morning_start = str(now.replace(hour=12, minute=0, second=0))[11:16],
-        senior_morning_end = str(now.replace(hour=13, minute=0, second=0))[11:16],
-        senior_afternoon_start = str(now.replace(hour=12, minute=30, second=0))[11:16],
-        senior_afternoon_end = str(now.replace(hour=13, minute=30, second=0))[11:16]
+        junior_kinder_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        junior_kinder_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        junior_kinder_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        junior_kinder_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        senior_kinder_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        senior_kinder_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        senior_kinder_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        senior_kinder_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        first_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        first_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        first_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        first_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        second_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        second_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        second_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        second_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        third_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        third_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        third_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        third_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        fourth_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        fourth_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        fourth_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        fourth_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        fifth_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        fifth_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        fifth_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        fifth_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        sixth_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        sixth_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        sixth_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        sixth_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        seventh_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        seventh_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        seventh_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        seventh_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        eight_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        eight_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        eight_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        eight_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        ninth_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        ninth_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        ninth_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        ninth_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        tenth_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        tenth_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        tenth_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        tenth_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        eleventh_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        eleventh_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        eleventh_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        eleventh_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        twelfth_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        twelfth_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        twelfth_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        twelfth_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16]
         )
     db.session.add(school)
+    db.session.add(schedule)
+    db.session.add(admin)
     db.session.commit()
 
     # school = School(
@@ -1568,57 +1876,57 @@ def rebuild_database():
     #     )
 
     d = Section(
-        school_id='123456789',
+        school_no='123456789',
         name='Benedict'
         )
 
     e = Section(
-        school_id='123456789',
+        school_no='123456789',
         name='Anthony'
         )
 
     f = Section(
-        school_id='123456789',
+        school_no='123456789',
         name='Ignatius'
         )
 
     g = Section(
-        school_id='123456789',
+        school_no='123456789',
         name='Louis'
         )
 
     h = Section(
-        school_id='123456789',
+        school_no='123456789',
         name='John'
         )
 
     i = Section(
-        school_id='123456789',
+        school_no='123456789',
         name='Francis'
         )
 
     j = Section(
-        school_id='123456789',
+        school_no='123456789',
         name='Lorenzo Ruiz'
         )
 
     k = Section(
-        school_id='123456789',
+        school_no='123456789',
         name='Augustine'
         )
 
     l = Section(
-        school_id='123456789',
+        school_no='123456789',
         name='Vincent'
         )
 
     m = Section(
-        school_id='123456789',
+        school_no='123456789',
         name='Thomas'
         )
 
     n = Section(
-        school_id='123456789',
+        school_no='123456789',
         name='Jerome'
         )
 

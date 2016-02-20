@@ -4,7 +4,6 @@
         <div class="modal-dialog message-modal-dialog">
                 <div id="message-modal-conent" class="modal-content">
                         <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                 <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">Sent Messages</h4>
                         </div>
                         <div id="message-modal-body" class="modal-body">
@@ -24,7 +23,6 @@
         <div class="modal-dialog new-message-modal-dialog">
                 <div id="compose-message-modal-conent" class="modal-content">
                         <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                 <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">New Message</h4>
                         </div>
                         <div id="compose-message-modal-body" class="modal-body">
@@ -32,7 +30,7 @@
                         </div>
                         <div class="modal-footer">
                                 <input disabled  value="Remaining: 420" id="counter">
-                                <button type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
                                 <button id="send" type="button" class="btn btn-primary done-btn" data-toggle="modal" data-target="#confirm-modal" disabled>Send</button>
                         </div>
                 </div><!-- /.modal-content -->
@@ -47,7 +45,7 @@
                         </div>
                         <div class="modal-footer">
                                 <input type="password" id="message-confirm-password" class="form-control" placeholder="Re-enter password" />
-                                <button type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
                                 <button type="button" id="confirm-send" class="btn btn-primary done-btn" onclick="blast_message()" disabled>Send</button>
                         </div>
                 </div><!-- /.modal-content -->
@@ -78,7 +76,7 @@
                                 <input type="text" class="form-control" id="add_student_first_name" placeholder="First Name" data-class="input-label" />
                                 <input type="text" class="form-control" id="add_student_middle_name" placeholder="Middle Name" data-class="input-label" />
                                 
-                                <input type="text" class="form-control" id="add_student_contact" placeholder="Parent Contact Number" data-class="input-label" />
+                                <input type="text" class="form-control" id="add_student_contact" placeholder="Guardian Contact Number" data-class="input-label" />
                                 
 
                                 <select class="form-control select" id="add_student_level" placeholder="Grade/Level" required>
@@ -114,8 +112,8 @@
                                         <i class="material-icons save-status-success md-28">done</i>
                                 </div>
 
-                                <button id = "add-user-cancel" type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Cancel</button>
-                                <button id="save-student" type="button" class="btn btn-primary done-btn save-btn" disabled><span>Save</span></button>
+                                <button id = "add-user-cancel" type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
+                                <button id="save-student" type="button" class="btn btn-primary done-btn save-btn" disabled data-loading-text="Saving" data-complete-text="Save" autocomplete="off">Save</button>
                         </div>
                 </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
@@ -142,8 +140,8 @@
                                         <i class="material-icons save-status-success md-28">done</i>
                                 </div>
 
-                                <button id = "add-user-cancel" type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Cancel</button>
-                                <button id="save-user" type="button" class="btn btn-primary done-btn save-btn" disabled><span>Save</span></button>
+                                <button id = "add-user-cancel" type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
+                                <button id="save-user" type="button" class="btn btn-primary done-btn save-btn" disabled data-loading-text="Saving" data-complete-text="Save" autocomplete="off"><span>Save</span></button>
                         </div>
                 </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
@@ -159,25 +157,25 @@
 <div class="modal fade" id="schedule-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog schedule-modal-dialog">
                 <div class="modal-content schedule-modal-content">
-                        <div id="schedule-loading">
-                                <img src="../static/images/assets/282.GIF">
+                        <div id="schedule-loading" class="loading">
+                                <div class="loader"></div>
                         </div>
                         <div id="schedule-tabs">
                                 <ul class="nav nav-tabs schedule-nav-tabs">
-                                        <li class="active disabled">
-                                        <a href="#monday-tab" class="schedule-tab-item" data-toggle="tab">Monday</a>
+                                        <li class="schedule-tab-container active disabled">
+                                        <a href="#monday-tab" class="schedule-tab-item" data-toggle="tab">MONDAY</a>
                                         </li>
-                                        <li class="disabled">
-                                        <a href="#tuesday-tab" class="schedule-tab-item" data-toggle="tab">Tuesday</a>
+                                        <li class="schedule-tab-container disabled">
+                                        <a href="#tuesday-tab" class="schedule-tab-item" data-toggle="tab">TUESDAY</a>
                                         </li>
-                                        <li class="disabled">
-                                        <a href="#wednesday-tab" class="schedule-tab-item" data-toggle="tab">Wednesday</a>
+                                        <li class="schedule-tab-container disabled">
+                                        <a href="#wednesday-tab" class="schedule-tab-item" data-toggle="tab">WEDNESDAY</a>
                                         </li>
-                                        <li class="disabled">
-                                        <a href="#thursday-tab" class="schedule-tab-item" data-toggle="tab">Thursday</a>
+                                        <li class="schedule-tab-container disabled">
+                                        <a href="#thursday-tab" class="schedule-tab-item" data-toggle="tab">THURSDAY</a>
                                         </li>
-                                        <li class="disabled">
-                                        <a href="#friday-tab" class="schedule-tab-item" data-toggle="tab">Friday</a>
+                                        <li class="schedule-tab-container disabled">
+                                        <a href="#friday-tab" class="schedule-tab-item" data-toggle="tab">FRIDAY</a>
                                         </li>
                                 </ul>
                         </div>
@@ -191,19 +189,18 @@
                                                         </div>
                                                         <div class="sched-group-body">
                                                                 <div class="group-time-label morning">
-                                                                        <input id="junior_kinder_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Morning Classes</span>
                                                                 </div>
                                                                 <div id="junior_kinder_morning_class_sched" class="sched">                   
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_junior_kinder_morning_start" type="text" disabled class="form-control time" value="{{kinder_morning_start}}">
+                                                                        <input id="{{day}}_junior_kinder_morning_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_junior_kinder_morning_end" type="text" disabled class="form-control time" value="{{kinder_morning_end}}">
+                                                                        <input id="{{day}}_junior_kinder_morning_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -211,19 +208,18 @@
                                                                 </div>
                                                        
                                                                 <div class="group-time-label afternoon">
-                                                                        <input id="junior_kinder_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Afternoon Classes</span>
                                                                 </div>
                                                                 <div id="junior_kinder_afternoon_class_sched" class="sched">
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_junior_kinder_afternoon_start" type="text" disabled class="form-control time" value="{{kinder_afternoon_start}}">
+                                                                        <input id="{{day}}_junior_kinder_afternoon_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_junior_kinder_afternoon_end" type="text" disabled class="form-control time" value="{{kinder_afternoon_end}}">
+                                                                        <input id="{{day}}_junior_kinder_afternoon_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -238,19 +234,18 @@
                                                         </div>
                                                         <div class="sched-group-body">
                                                                 <div class="group-time-label morning">
-                                                                        <input id="senior_kinder_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Morning Classes</span>
                                                                 </div>
                                                                 <div id="senior_kinder_morning_class_sched" class="sched">                   
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_senior_kinder_morning_start" type="text" disabled class="form-control time" value="{{kinder_morning_start}}">
+                                                                        <input id="{{day}}_senior_kinder_morning_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_senior_kinder_morning_end" type="text" disabled class="form-control time" value="{{kinder_morning_end}}">
+                                                                        <input id="{{day}}_senior_kinder_morning_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -258,19 +253,18 @@
                                                                 </div>
                                                        
                                                                 <div class="group-time-label afternoon">
-                                                                        <input id="senior_kinder_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Afternoon Classes</span>
                                                                 </div>
                                                                 <div id="senior_kinder_afternoon_class_sched" class="sched">
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_senior_kinder_afternoon_start" type="text" disabled class="form-control time" value="{{kinder_afternoon_start}}">
+                                                                        <input id="{{day}}_senior_kinder_afternoon_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_senior_kinder_afternoon_end" type="text" disabled class="form-control time" value="{{kinder_afternoon_end}}">
+                                                                        <input id="{{day}}_senior_kinder_afternoon_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -285,19 +279,18 @@
                                                         </div>
                                                         <div class="sched-group-body">
                                                                 <div class="group-time-label morning">
-                                                                        <input id="first_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Morning Classes</span>
                                                                 </div>
                                                                 <div id="first_grade_morning_class_sched" class="sched">                   
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_first_grade_morning_start" type="text" disabled class="form-control time" value="{{kinder_morning_start}}">
+                                                                        <input id="{{day}}_first_grade_morning_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_first_grade_morning_end" type="text" disabled class="form-control time" value="{{kinder_morning_end}}">
+                                                                        <input id="{{day}}_first_grade_morning_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -305,19 +298,18 @@
                                                                 </div>
                                                        
                                                                 <div class="group-time-label afternoon">
-                                                                        <input id="first_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Afternoon Classes</span>
                                                                 </div>
                                                                 <div id="first_grade_afternoon_class_sched" class="sched">
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_first_grade_afternoon_start" type="text" disabled class="form-control time" value="{{kinder_afternoon_start}}">
+                                                                        <input id="{{day}}_first_grade_afternoon_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_first_grade_afternoon_end" type="text" disabled class="form-control time" value="{{kinder_afternoon_end}}">
+                                                                        <input id="{{day}}_first_grade_afternoon_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -332,19 +324,18 @@
                                                         </div>
                                                         <div class="sched-group-body">
                                                                 <div class="group-time-label morning">
-                                                                        <input id="second_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Morning Classes</span>
                                                                 </div>
                                                                 <div id="second_grade_morning_class_sched" class="sched">                   
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_second_grade_morning_start" type="text" disabled class="form-control time" value="{{kinder_morning_start}}">
+                                                                        <input id="{{day}}_second_grade_morning_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_second_grade_morning_end" type="text" disabled class="form-control time" value="{{kinder_morning_end}}">
+                                                                        <input id="{{day}}_second_grade_morning_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -352,19 +343,18 @@
                                                                 </div>
                                                        
                                                                 <div class="group-time-label afternoon">
-                                                                        <input id="second_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Afternoon Classes</span>
                                                                 </div>
                                                                 <div id="second_grade_afternoon_class_sched" class="sched">
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_second_grade_afternoon_start" type="text" disabled class="form-control time" value="{{kinder_afternoon_start}}">
+                                                                        <input id="{{day}}_second_grade_afternoon_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_second_grade_afternoon_end" type="text" disabled class="form-control time" value="{{kinder_afternoon_end}}">
+                                                                        <input id="{{day}}_second_grade_afternoon_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -379,19 +369,18 @@
                                                         </div>
                                                         <div class="sched-group-body">
                                                                 <div class="group-time-label morning">
-                                                                        <input id="third_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Morning Classes</span>
                                                                 </div>
                                                                 <div id="third_grade_morning_class_sched" class="sched">                   
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_third_grade_morning_start" type="text" disabled class="form-control time" value="{{kinder_morning_start}}">
+                                                                        <input id="{{day}}_third_grade_morning_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_third_grade_morning_end" type="text" disabled class="form-control time" value="{{kinder_morning_end}}">
+                                                                        <input id="{{day}}_third_grade_morning_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -399,19 +388,18 @@
                                                                 </div>
                                                        
                                                                 <div class="group-time-label afternoon">
-                                                                        <input id="third_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Afternoon Classes</span>
                                                                 </div>
                                                                 <div id="third_grade_afternoon_class_sched" class="sched">
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_third_grade_afternoon_start" type="text" disabled class="form-control time" value="{{kinder_afternoon_start}}">
+                                                                        <input id="{{day}}_third_grade_afternoon_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_third_grade_afternoon_end" type="text" disabled class="form-control time" value="{{kinder_afternoon_end}}">
+                                                                        <input id="{{day}}_third_grade_afternoon_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -426,19 +414,18 @@
                                                         </div>
                                                         <div class="sched-group-body">
                                                                 <div class="group-time-label morning">
-                                                                        <input id="fourth_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Morning Classes</span>
                                                                 </div>
                                                                 <div id="fourth_grade_morning_class_sched" class="sched">                   
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_fourth_grade_morning_start" type="text" disabled class="form-control time" value="{{kinder_morning_start}}">
+                                                                        <input id="{{day}}_fourth_grade_morning_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_fourth_grade_morning_end" type="text" disabled class="form-control time" value="{{kinder_morning_end}}">
+                                                                        <input id="{{day}}_fourth_grade_morning_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -446,19 +433,18 @@
                                                                 </div>
                                                        
                                                                 <div class="group-time-label afternoon">
-                                                                        <input id="fourth_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Afternoon Classes</span>
                                                                 </div>
                                                                 <div id="fourth_grade_afternoon_class_sched" class="sched">
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_fourth_grade_afternoon_start" type="text" disabled class="form-control time" value="{{kinder_afternoon_start}}">
+                                                                        <input id="{{day}}_fourth_grade_afternoon_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_fourth_grade_afternoon_end" type="text" disabled class="form-control time" value="{{kinder_afternoon_end}}">
+                                                                        <input id="{{day}}_fourth_grade_afternoon_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -473,19 +459,18 @@
                                                         </div>
                                                         <div class="sched-group-body">
                                                                 <div class="group-time-label morning">
-                                                                        <input id="fifth_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Morning Classes</span>
                                                                 </div>
                                                                 <div id="fifth_grade_morning_class_sched" class="sched">                   
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_fifth_grade_morning_start" type="text" disabled class="form-control time" value="{{kinder_morning_start}}">
+                                                                        <input id="{{day}}_fifth_grade_morning_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_fifth_grade_morning_end" type="text" disabled class="form-control time" value="{{kinder_morning_end}}">
+                                                                        <input id="{{day}}_fifth_grade_morning_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -493,19 +478,18 @@
                                                                 </div>
                                                        
                                                                 <div class="group-time-label afternoon">
-                                                                        <input id="fifth_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Afternoon Classes</span>
                                                                 </div>
                                                                 <div id="fifth_grade_afternoon_class_sched" class="sched">
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_fifth_grade_afternoon_start" type="text" disabled class="form-control time" value="{{kinder_afternoon_start}}">
+                                                                        <input id="{{day}}_fifth_grade_afternoon_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_fifth_grade_afternoon_end" type="text" disabled class="form-control time" value="{{kinder_afternoon_end}}">
+                                                                        <input id="{{day}}_fifth_grade_afternoon_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -520,19 +504,18 @@
                                                         </div>
                                                         <div class="sched-group-body">
                                                                 <div class="group-time-label morning">
-                                                                        <input id="sixth_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Morning Classes</span>
                                                                 </div>
                                                                 <div id="sixth_grade_morning_class_sched" class="sched">                   
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_sixth_grade_morning_start" type="text" disabled class="form-control time" value="{{kinder_morning_start}}">
+                                                                        <input id="{{day}}_sixth_grade_morning_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_sixth_grade_morning_end" type="text" disabled class="form-control time" value="{{kinder_morning_end}}">
+                                                                        <input id="{{day}}_sixth_grade_morning_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -540,19 +523,18 @@
                                                                 </div>
                                                        
                                                                 <div class="group-time-label afternoon">
-                                                                        <input id="sixth_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Afternoon Classes</span>
                                                                 </div>
                                                                 <div id="sixth_grade_afternoon_class_sched" class="sched">
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_sixth_grade_afternoon_start" type="text" disabled class="form-control time" value="{{kinder_afternoon_start}}">
+                                                                        <input id="{{day}}_sixth_grade_afternoon_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_sixth_grade_afternoon_end" type="text" disabled class="form-control time" value="{{kinder_afternoon_end}}">
+                                                                        <input id="{{day}}_sixth_grade_afternoon_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -567,19 +549,18 @@
                                                         </div>
                                                         <div class="sched-group-body">
                                                                 <div class="group-time-label morning">
-                                                                        <input id="seventh_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Morning Classes</span>
                                                                 </div>
                                                                 <div id="seventh_grade_morning_class_sched" class="sched">                   
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_seventh_grade_morning_start" type="text" disabled class="form-control time" value="{{kinder_morning_start}}">
+                                                                        <input id="{{day}}_seventh_grade_morning_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_seventh_grade_morning_end" type="text" disabled class="form-control time" value="{{kinder_morning_end}}">
+                                                                        <input id="{{day}}_seventh_grade_morning_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -587,19 +568,18 @@
                                                                 </div>
                                                        
                                                                 <div class="group-time-label afternoon">
-                                                                        <input id="seventh_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Afternoon Classes</span>
                                                                 </div>
                                                                 <div id="seventh_grade_afternoon_class_sched" class="sched">
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_seventh_grade_afternoon_start" type="text" disabled class="form-control time" value="{{kinder_afternoon_start}}">
+                                                                        <input id="{{day}}_seventh_grade_afternoon_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_seventh_grade_afternoon_end" type="text" disabled class="form-control time" value="{{kinder_afternoon_end}}">
+                                                                        <input id="{{day}}_seventh_grade_afternoon_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -614,19 +594,18 @@
                                                         </div>
                                                         <div class="sched-group-body">
                                                                 <div class="group-time-label morning">
-                                                                        <input id="eight_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Morning Classes</span>
                                                                 </div>
                                                                 <div id="eight_grade_morning_class_sched" class="sched">                   
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_eight_grade_morning_start" type="text" disabled class="form-control time" value="{{kinder_morning_start}}">
+                                                                        <input id="{{day}}_eight_grade_morning_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_eight_grade_morning_end" type="text" disabled class="form-control time" value="{{kinder_morning_end}}">
+                                                                        <input id="{{day}}_eight_grade_morning_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -634,19 +613,18 @@
                                                                 </div>
                                                        
                                                                 <div class="group-time-label afternoon">
-                                                                        <input id="eight_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Afternoon Classes</span>
                                                                 </div>
                                                                 <div id="eight_grade_afternoon_class_sched" class="sched">
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_eight_grade_afternoon_start" type="text" disabled class="form-control time" value="{{kinder_afternoon_start}}">
+                                                                        <input id="{{day}}_eight_grade_afternoon_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_eight_grade_afternoon_end" type="text" disabled class="form-control time" value="{{kinder_afternoon_end}}">
+                                                                        <input id="{{day}}_eight_grade_afternoon_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -661,19 +639,18 @@
                                                         </div>
                                                         <div class="sched-group-body">
                                                                 <div class="group-time-label morning">
-                                                                        <input id="ninth_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Morning Classes</span>
                                                                 </div>
                                                                 <div id="ninth_grade_morning_class_sched" class="sched">                   
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_ninth_grade_morning_start" type="text" disabled class="form-control time" value="{{kinder_morning_start}}">
+                                                                        <input id="{{day}}_ninth_grade_morning_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_ninth_grade_morning_end" type="text" disabled class="form-control time" value="{{kinder_morning_end}}">
+                                                                        <input id="{{day}}_ninth_grade_morning_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -681,19 +658,18 @@
                                                                 </div>
                                                        
                                                                 <div class="group-time-label afternoon">
-                                                                        <input id="ninth_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Afternoon Classes</span>
                                                                 </div>
                                                                 <div id="ninth_grade_afternoon_class_sched" class="sched">
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_ninth_grade_afternoon_start" type="text" disabled class="form-control time" value="{{kinder_afternoon_start}}">
+                                                                        <input id="{{day}}_ninth_grade_afternoon_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_ninth_grade_afternoon_end" type="text" disabled class="form-control time" value="{{kinder_afternoon_end}}">
+                                                                        <input id="{{day}}_ninth_grade_afternoon_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -708,19 +684,18 @@
                                                         </div>
                                                         <div class="sched-group-body">
                                                                 <div class="group-time-label morning">
-                                                                        <input id="tenth_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Morning Classes</span>
                                                                 </div>
                                                                 <div id="tenth_grade_morning_class_sched" class="sched">                   
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_tenth_grade_morning_start" type="text" disabled class="form-control time" value="{{kinder_morning_start}}">
+                                                                        <input id="{{day}}_tenth_grade_morning_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_tenth_grade_morning_end" type="text" disabled class="form-control time" value="{{kinder_morning_end}}">
+                                                                        <input id="{{day}}_tenth_grade_morning_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -728,19 +703,18 @@
                                                                 </div>
                                                        
                                                                 <div class="group-time-label afternoon">
-                                                                        <input id="tenth_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Afternoon Classes</span>
                                                                 </div>
                                                                 <div id="tenth_grade_afternoon_class_sched" class="sched">
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_tenth_grade_afternoon_start" type="text" disabled class="form-control time" value="{{kinder_afternoon_start}}">
+                                                                        <input id="{{day}}_tenth_grade_afternoon_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_tenth_grade_afternoon_end" type="text" disabled class="form-control time" value="{{kinder_afternoon_end}}">
+                                                                        <input id="{{day}}_tenth_grade_afternoon_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -755,19 +729,18 @@
                                                         </div>
                                                         <div class="sched-group-body">
                                                                 <div class="group-time-label morning">
-                                                                        <input id="eleventh_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Morning Classes</span>
                                                                 </div>
                                                                 <div id="eleventh_grade_morning_class_sched" class="sched">                   
-                                                                        <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_eleventh_grade_morning_start" type="text" disabled class="form-control time" value="{{kinder_morning_start}}">
+                                                                        <div class="input-group clockpicker-top schedule-text">
+                                                                        <input id="{{day}}_eleventh_grade_morning_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
-                                                                        <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_eleventh_grade_morning_end" type="text" disabled class="form-control time" value="{{kinder_morning_end}}">
+                                                                        <div class="input-group clockpicker-top schedule-text">
+                                                                        <input id="{{day}}_eleventh_grade_morning_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -775,19 +748,18 @@
                                                                 </div>
                                                        
                                                                 <div class="group-time-label afternoon">
-                                                                        <input id="eleventh_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Afternoon Classes</span>
                                                                 </div>
                                                                 <div id="eleventh_grade_afternoon_class_sched" class="sched">
-                                                                        <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_eleventh_grade_afternoon_start" type="text" disabled class="form-control time" value="{{kinder_afternoon_start}}">
+                                                                        <div class="input-group clockpicker-top schedule-text">
+                                                                        <input id="{{day}}_eleventh_grade_afternoon_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
-                                                                        <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_eleventh_grade_afternoon_end" type="text" disabled class="form-control time" value="{{kinder_afternoon_end}}">
+                                                                        <div class="input-group clockpicker-top schedule-text">
+                                                                        <input id="{{day}}_eleventh_grade_afternoon_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -802,19 +774,18 @@
                                                         </div>
                                                         <div class="sched-group-body">
                                                                 <div class="group-time-label morning">
-                                                                        <input id="twelfth_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Morning Classes</span>
                                                                 </div>
                                                                 <div id="twelfth_grade_morning_class_sched" class="sched">                   
-                                                                        <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_twelfth_grade_morning_start" type="text" disabled class="form-control time" value="{{kinder_morning_start}}">
+                                                                        <div class="input-group clockpicker-top schedule-text">
+                                                                        <input id="{{day}}_twelfth_grade_morning_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
-                                                                        <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_twelfth_grade_morning_end" type="text" disabled class="form-control time" value="{{kinder_morning_end}}">
+                                                                        <div class="input-group clockpicker-top schedule-text">
+                                                                        <input id="{{day}}_twelfth_grade_morning_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -822,19 +793,18 @@
                                                                 </div>
                                                        
                                                                 <div class="group-time-label afternoon">
-                                                                        <input id="twelfth_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
                                                                         <span class="time-label">Afternoon Classes</span>
                                                                 </div>
                                                                 <div id="twelfth_grade_afternoon_class_sched" class="sched">
-                                                                        <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_twelfth_grade_afternoon_start" type="text" disabled class="form-control time" value="{{kinder_afternoon_start}}">
+                                                                        <div class="input-group clockpicker-top schedule-text">
+                                                                        <input id="{{day}}_twelfth_grade_afternoon_start" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
                                                                         </div>
                                                                         <span class="to">to</span>
-                                                                        <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_twelfth_grade_afternoon_end" type="text" disabled class="form-control time" value="{{kinder_afternoon_end}}">
+                                                                        <div class="input-group clockpicker-top schedule-text">
+                                                                        <input id="{{day}}_twelfth_grade_afternoon_end" type="text" disabled class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -847,8 +817,8 @@
                                 </div>     
                         </div>
                         <div id="schedule-modal-footer" class="modal-footer">
-                                <button type="button" id="sched-cancel" class="btn btn-danger cancel-btn" data-dismiss="modal">Cancel</button>
-                                <button id="save-sched" type="button" class="btn btn-primary" data-toggle="modal" disabled><span>Save Changes</span></button>
+                                <button type="button" id="sched-cancel" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
+                                <button id="save-sched" type="button" class="btn btn-primary" data-toggle="modal" disabled onclick="save_sched()" data-loading-text="Saving" data-complete-text="Save Changes" autocomplete="off">Save Changes</button>
                         </div>
                 </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
@@ -857,7 +827,745 @@
 <div class="modal fade" id="calendar-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog calendar-modal-dialog">
                 <div id="calendar-modal-content" class="modal-content">
-                        
+                        <div id="calendar-loading" class="loading">
+                                <div class="loader"></div>
+                        </div>
+                        <div id="calendar-modal-header" class="modal-header">
+                                <select id="calendar-month" class="form-control">
+                                        <option class="calendar-options" value='1'>January</option>
+                                        <option class="calendar-options" value='2'>February</option>
+                                        <option class="calendar-options" value='3'>March</option>
+                                        <option class="calendar-options" value='4'>April</option>
+                                        <option class="calendar-options" value='5'>May</option>
+                                        <option class="calendar-options" value='6'>June</option>
+                                        <option class="calendar-options" value='7'>July</option>
+                                        <option class="calendar-options" value='8'>August</option>
+                                        <option class="calendar-options" value='9'>September</option>
+                                        <option class="calendar-options" value='10'>October</option>
+                                        <option class="calendar-options" value='11'>November</option>
+                                        <option class="calendar-options" value='12'>December</option>
+                                </select>
+                                <select id="calendar-year" class="form-control">
+                                        <option class="calendar-options" value='2015'>2015</option>
+                                        <option class="calendar-options" value='2016'>2016</option>
+                                </select>
+                                <button type="button" id="calendar-go" onclick="go_to_date()">Go</button>
+                        </div>
+                        <div id="calendar-modal-body" class="modal-body">
+                        </div>
+                </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="modal fade" id="calendar-schedule-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog calendar-schedule-modal-dialog">
+                <div class="modal-content calendar-schedule-modal-content">
+                        <div id="calendar-schedule-loading" class="loading">
+                                <div class="loader"></div>
+                        </div>
+                        <div id="calendar-schedule-modal-header" class="modal-header">
+                        </div>
+                        <div class="modal-body calendar-schedule-modal-body">
+                                <div class="sched-group col-md-6">
+                                        <div class="sched-group-header">
+                                                <span class="sched-label">Junior Kinder</span>
+                                        </div>
+                                        <div class="sched-group-body">
+                                                <div class="group-time-label morning">
+                                                        <input id="junior_kinder_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Morning Classes</span>
+                                                </div>
+                                                <div id="junior_kinder_morning_class_calendar_sched" class="sched">                   
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="junior_kinder_morning_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="junior_kinder_morning_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                       
+                                                <div class="group-time-label afternoon">
+                                                        <input id="junior_kinder_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Afternoon Classes</span>
+                                                </div>
+                                                <div id="junior_kinder_afternoon_class_calendar_sched" class="sched">
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="junior_kinder_afternoon_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="junior_kinder_afternoon_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+
+                                <div class="sched-group col-md-6">
+                                        <div class="sched-group-header">
+                                                <span class="sched-label">Senior Kinder</span>
+                                        </div>
+                                        <div class="sched-group-body">
+                                                <div class="group-time-label morning">
+                                                        <input id="senior_kinder_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Morning Classes</span>
+                                                </div>
+                                                <div id="senior_kinder_morning_class_calendar_sched" class="sched">                   
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="senior_kinder_morning_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="senior_kinder_morning_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                       
+                                                <div class="group-time-label afternoon">
+                                                        <input id="senior_kinder_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Afternoon Classes</span>
+                                                </div>
+                                                <div id="senior_kinder_afternoon_class_calendar_sched" class="sched">
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="senior_kinder_afternoon_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="senior_kinder_afternoon_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+
+                                <div class="sched-group col-md-6">
+                                        <div class="sched-group-header">
+                                                <span class="sched-label">1st Grade</span>
+                                        </div>
+                                        <div class="sched-group-body">
+                                                <div class="group-time-label morning">
+                                                        <input id="first_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Morning Classes</span>
+                                                </div>
+                                                <div id="first_grade_morning_class_calendar_sched" class="sched">                   
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="first_grade_morning_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="first_grade_morning_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                       
+                                                <div class="group-time-label afternoon">
+                                                        <input id="first_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Afternoon Classes</span>
+                                                </div>
+                                                <div id="first_grade_afternoon_class_calendar_sched" class="sched">
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="first_grade_afternoon_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="first_grade_afternoon_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+
+                                <div class="sched-group col-md-6">
+                                        <div class="sched-group-header">
+                                                <span class="sched-label">2nd Grade</span>
+                                        </div>
+                                        <div class="sched-group-body">
+                                                <div class="group-time-label morning">
+                                                        <input id="second_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Morning Classes</span>
+                                                </div>
+                                                <div id="second_grade_morning_class_calendar_sched" class="sched">                   
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="second_grade_morning_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="second_grade_morning_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                       
+                                                <div class="group-time-label afternoon">
+                                                        <input id="second_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Afternoon Classes</span>
+                                                </div>
+                                                <div id="second_grade_afternoon_class_calendar_sched" class="sched">
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="second_grade_afternoon_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="second_grade_afternoon_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+
+                                <div class="sched-group col-md-6">
+                                        <div class="sched-group-header">
+                                                <span class="sched-label">3rd Grade</span>
+                                        </div>
+                                        <div class="sched-group-body">
+                                                <div class="group-time-label morning">
+                                                        <input id="third_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Morning Classes</span>
+                                                </div>
+                                                <div id="third_grade_morning_class_calendar_sched" class="sched">                   
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="third_grade_morning_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="third_grade_morning_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                       
+                                                <div class="group-time-label afternoon">
+                                                        <input id="third_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Afternoon Classes</span>
+                                                </div>
+                                                <div id="third_grade_afternoon_class_calendar_sched" class="sched">
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="third_grade_afternoon_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="third_grade_afternoon_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+
+                                <div class="sched-group col-md-6">
+                                        <div class="sched-group-header">
+                                                <span class="sched-label">4th Grade</span>
+                                        </div>
+                                        <div class="sched-group-body">
+                                                <div class="group-time-label morning">
+                                                        <input id="fourth_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Morning Classes</span>
+                                                </div>
+                                                <div id="fourth_grade_morning_class_calendar_sched" class="sched">                   
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="fourth_grade_morning_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="fourth_grade_morning_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                       
+                                                <div class="group-time-label afternoon">
+                                                        <input id="fourth_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Afternoon Classes</span>
+                                                </div>
+                                                <div id="fourth_grade_afternoon_class_calendar_sched" class="sched">
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="fourth_grade_afternoon_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="fourth_grade_afternoon_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+
+                                <div class="sched-group col-md-6">
+                                        <div class="sched-group-header">
+                                                <span class="sched-label">5th Grade</span>
+                                        </div>
+                                        <div class="sched-group-body">
+                                                <div class="group-time-label morning">
+                                                        <input id="fifth_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Morning Classes</span>
+                                                </div>
+                                                <div id="fifth_grade_morning_class_calendar_sched" class="sched">                   
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="fifth_grade_morning_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="fifth_grade_morning_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                       
+                                                <div class="group-time-label afternoon">
+                                                        <input id="fifth_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Afternoon Classes</span>
+                                                </div>
+                                                <div id="fifth_grade_afternoon_class_calendar_sched" class="sched">
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="fifth_grade_afternoon_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="fifth_grade_afternoon_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+
+                                <div class="sched-group col-md-6">
+                                        <div class="sched-group-header">
+                                                <span class="sched-label">6th Grade</span>
+                                        </div>
+                                        <div class="sched-group-body">
+                                                <div class="group-time-label morning">
+                                                        <input id="sixth_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Morning Classes</span>
+                                                </div>
+                                                <div id="sixth_grade_morning_class_calendar_sched" class="sched">                   
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="sixth_grade_morning_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="sixth_grade_morning_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                       
+                                                <div class="group-time-label afternoon">
+                                                        <input id="sixth_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Afternoon Classes</span>
+                                                </div>
+                                                <div id="sixth_grade_afternoon_class_calendar_sched" class="sched">
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="sixth_grade_afternoon_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="sixth_grade_afternoon_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+
+                                <div class="sched-group col-md-6">
+                                        <div class="sched-group-header">
+                                                <span class="sched-label">7th Grade</span>
+                                        </div>
+                                        <div class="sched-group-body">
+                                                <div class="group-time-label morning">
+                                                        <input id="seventh_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Morning Classes</span>
+                                                </div>
+                                                <div id="seventh_grade_morning_class_calendar_sched" class="sched">                   
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="seventh_grade_morning_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="seventh_grade_morning_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                       
+                                                <div class="group-time-label afternoon">
+                                                        <input id="seventh_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Afternoon Classes</span>
+                                                </div>
+                                                <div id="seventh_grade_afternoon_class_calendar_sched" class="sched">
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="seventh_grade_afternoon_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="seventh_grade_afternoon_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+
+                                <div class="sched-group col-md-6">
+                                        <div class="sched-group-header">
+                                                <span class="sched-label">8th Grade</span>
+                                        </div>
+                                        <div class="sched-group-body">
+                                                <div class="group-time-label morning">
+                                                        <input id="eight_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Morning Classes</span>
+                                                </div>
+                                                <div id="eight_grade_morning_class_calendar_sched" class="sched">                   
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="eight_grade_morning_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="eight_grade_morning_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                       
+                                                <div class="group-time-label afternoon">
+                                                        <input id="eight_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Afternoon Classes</span>
+                                                </div>
+                                                <div id="eight_grade_afternoon_class_calendar_sched" class="sched">
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="eight_grade_afternoon_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="eight_grade_afternoon_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+
+                                <div class="sched-group col-md-6">
+                                        <div class="sched-group-header">
+                                                <span class="sched-label">9th Grade</span>
+                                        </div>
+                                        <div class="sched-group-body">
+                                                <div class="group-time-label morning">
+                                                        <input id="ninth_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Morning Classes</span>
+                                                </div>
+                                                <div id="ninth_grade_morning_class_calendar_sched" class="sched">                   
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="ninth_grade_morning_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="ninth_grade_morning_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                       
+                                                <div class="group-time-label afternoon">
+                                                        <input id="ninth_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Afternoon Classes</span>
+                                                </div>
+                                                <div id="ninth_grade_afternoon_class_calendar_sched" class="sched">
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="ninth_grade_afternoon_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="ninth_grade_afternoon_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+
+                                <div class="sched-group col-md-6">
+                                        <div class="sched-group-header">
+                                                <span class="sched-label">10th Grade</span>
+                                        </div>
+                                        <div class="sched-group-body">
+                                                <div class="group-time-label morning">
+                                                        <input id="tenth_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Morning Classes</span>
+                                                </div>
+                                                <div id="tenth_grade_morning_class_calendar_sched" class="sched">                   
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="tenth_grade_morning_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="tenth_grade_morning_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                       
+                                                <div class="group-time-label afternoon">
+                                                        <input id="tenth_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Afternoon Classes</span>
+                                                </div>
+                                                <div id="tenth_grade_afternoon_class_calendar_sched" class="sched">
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="tenth_grade_afternoon_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker schedule-text">
+                                                        <input id="tenth_grade_afternoon_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+
+                                <div class="sched-group col-md-6">
+                                        <div class="sched-group-header">
+                                                <span class="sched-label">11th Grade</span>
+                                        </div>
+                                        <div class="sched-group-body">
+                                                <div class="group-time-label morning">
+                                                        <input id="eleventh_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Morning Classes</span>
+                                                </div>
+                                                <div id="eleventh_grade_morning_class_calendar_sched" class="sched">                   
+                                                        <div class="input-group clockpicker-top schedule-text">
+                                                        <input id="eleventh_grade_morning_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker-top schedule-text">
+                                                        <input id="eleventh_grade_morning_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                       
+                                                <div class="group-time-label afternoon">
+                                                        <input id="eleventh_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Afternoon Classes</span>
+                                                </div>
+                                                <div id="eleventh_grade_afternoon_class_calendar_sched" class="sched">
+                                                        <div class="input-group clockpicker-top schedule-text">
+                                                        <input id="eleventh_grade_afternoon_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker-top schedule-text">
+                                                        <input id="eleventh_grade_afternoon_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+
+                                <div class="sched-group col-md-6">
+                                        <div class="sched-group-header">
+                                                <span class="sched-label">12th Grade</span>
+                                        </div>
+                                        <div class="sched-group-body">
+                                                <div class="group-time-label morning">
+                                                        <input id="twelfth_grade_morning_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Morning Classes</span>
+                                                </div>
+                                                <div id="twelfth_grade_morning_class_calendar_sched" class="sched">                   
+                                                        <div class="input-group clockpicker-top schedule-text">
+                                                        <input id="twelfth_grade_morning_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker-top schedule-text">
+                                                        <input id="twelfth_grade_morning_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                       
+                                                <div class="group-time-label afternoon">
+                                                        <input id="twelfth_grade_afternoon_class" class="no-class-checkbox" type="checkbox" value="regular">
+                                                        <span class="time-label">Afternoon Classes</span>
+                                                </div>
+                                                <div id="twelfth_grade_afternoon_class_calendar_sched" class="sched">
+                                                        <div class="input-group clockpicker-top schedule-text">
+                                                        <input id="twelfth_grade_afternoon_start" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                        <span class="to">to</span>
+                                                        <div class="input-group clockpicker-top schedule-text">
+                                                        <input id="twelfth_grade_afternoon_end" type="text" disabled class="form-control calendar-time">
+                                                        <span class="input-group-addon">
+                                                        <span class="glyphicon glyphicon-time"></span>
+                                                        </span>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>   
+                        </div>
+                        <div id="calendar-schedule-modal-footer" class="modal-footer">
+                                <button type="button" id="sched-cancel" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
+                                <button id="save-calendar-sched" type="button" class="btn btn-primary" data-toggle="modal" disabled onclick="save_calendar_sched()" data-loading-text="Saving" data-complete-text="Save Changes" autocomplete="off">Save Changes</button>
+                        </div>
                 </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
 </div>

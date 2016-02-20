@@ -1,24 +1,24 @@
 $(document).ready(function(){
 
-initial_data();
 searchStatus = 'off'
+profile_options = 'closed'
 
 $('.loading').hide();
-$('#search-loading img').hide();
 $('.add-user-footer-left').hide();
 $('#snackbar').hide();
 $('.id-loader').hide();
+$('#profile-options').hide();
 
 $(window).load(function() {
     $('#intro-mask').hide();
     $('#intro').fadeOut();
 });
 
-$(".datepicker").datepicker({
+/*$(".datepicker").datepicker({
     dateFormat: "MM dd, yy"
 });
-
-/*$(".datepicker").datepicker({
+*/
+$(".datepicker").datepicker({
         dateFormat: 'MM yy',
         changeMonth: true,
         changeYear: true,
@@ -38,7 +38,7 @@ $(".datepicker").datepicker({
             at: "center bottom",
             of: $(this)
         });
-    });*/
+    });
 
 $('.add-user-modal-body .form-control').floatlabel({
     labelEndTop:'-2px'
@@ -89,8 +89,19 @@ $('.time').on('change', function(){
 });
 
 $('#schedule-modal').on('hidden.bs.modal', function () {
-    reset_data();
     $('#save-sched').attr('disabled',true);
+});
+
+$('.calendar-time').on('change', function(){
+    $('#save-calendar-sched').removeAttr('disabled');
+});
+
+$('.no-class-checkbox').on('change', function(){
+    listen_to_checkbox();
+});
+
+$('#calendar-schedule-modal').on('hidden.bs.modal', function () {
+    $('#save-calendar-sched').attr('disabled',true);
 });
 
 $('.add-modal').on('hidden.bs.modal', function () {
@@ -116,8 +127,32 @@ $('#add-user-modal').on('shown.bs.modal', function () {
 
 
 $('#sched-cancel').on('click', function () {
-    reset_data();
     $('#save-sched').attr('disabled',true);
+});
+
+$('#header-display-pic').on('click', function () {
+    var $this = jQuery(this);
+    if ($this.data('activated')) return false;  // Pending, return
+    $this.data('activated', true);
+    setTimeout(function() {
+      $this.data('activated', false)
+    }, 500); // Freeze for 500ms
+
+    if ((typeof profile_options === 'undefined') || (profile_options == 'closed')){
+        var travel_width = $('#profile-options').width();
+        $('#user-icon-container').animate({'margin-right':travel_width+2});
+        profile_options = 'open'
+        setTimeout(function() {
+            $('#profile-options').fadeIn();
+        }, 500); // Freeze for 500ms
+    }
+    else{
+        $('#profile-options').fadeOut();
+        profile_options = 'closed'
+        setTimeout(function() {
+            $('#user-icon-container').animate({'margin-right':'0'});
+        }, 500); // Freeze for 500ms
+    }
 });
 
 $('#search-btn').on('click', function () {
@@ -130,10 +165,6 @@ $('#search-btn').on('click', function () {
         
     toggle_search()
     
-});
-
-$('#save-sched').on('click', function(){
-    save_sched();
 });
 
 $('#add-student-modal .add-user-modal-body .form-control').on('change', function () {
@@ -188,10 +219,7 @@ $('#add-user-modal .add-user-modal-body .form-control').donetyping(function(){
 });
 
 $('#save-student').on('click', function(){
-    $('#save-student').attr('disabled',true);
-    $('#save-student span').css({'display':'none'});
-    $('#save-student').css({'background-image':'url(../static/images/assets/white.GIF)','background-repeat': 'no-repeat','background-position': 'center'});
-
+    $('#save-student').button('loading');
     var last_name = $('#add_student_last_name').val();
     var first_name = $('#add_student_first_name').val();
     var middle_name = $('#add_student_middle_name').val();
@@ -262,13 +290,21 @@ $('.search-late-options').on('change', function(){
 
 $('.no-class-checkbox').change(function() {
         if($(this).is(":checked")) {
-            $('#'+$(this).attr('id')+'_sched').find('.input-group-addon').css('background-color','#4485F5');
-            $('#'+$(this).attr('id')+'_sched .schedule-text').removeClass('unbind');
+            $('#'+$(this).attr('id')+'_calendar_sched').find('.input-group-addon').css('background-color','#4485F5');
+            $('#'+$(this).attr('id')+'_calendar_sched .schedule-text').removeClass('unbind');
         }
         else{
-            $('#'+$(this).attr('id')+'_sched').find('.input-group-addon').css('background-color','#999');
-            $('#'+$(this).attr('id')+'_sched .schedule-text').addClass('unbind');
+            $('#'+$(this).attr('id')+'_calendar_sched').find('.input-group-addon').css('background-color','#999');
+            $('#'+$(this).attr('id')+'_calendar_sched .schedule-text').addClass('unbind');
         }    
     });
+
+$('.add-user-modal-body .form-control').on('keydown', function (e) {
+    var key = e.which;
+    if((key == 13) && ($('#save-student').is(':disabled') == false)){
+        $('#save-student').trigger('click');
+        return false;1
+    }
+});
 
 });

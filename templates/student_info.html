@@ -2,14 +2,11 @@
         <span class="modal-title user-modal-title" id="gridSystemModalLabel">Student Information</span>
 </div>
 <div class="modal-body edit-user-modal-body">
-        <div id="student-info-loading">
-            <img src="../static/images/assets/282.GIF">
-        </div>
         <input type="text" class="form-control" id="edit_id_no" placeholder="ID Number" value="{{student.id_no}}" data-class="input-label"/>
         <input type="text" class="form-control" id="edit_last_name" placeholder="Last Name" value="{{student.last_name}}" data-class="input-label" />
         <input type="text" class="form-control" id="edit_first_name" placeholder="First Name" value="{{student.first_name}}" data-class="input-label"/>
         <input type="text" class="form-control" id="edit_middle_name" placeholder="Middle Name" value="{{student.middle_name}}" data-class="input-label"/>
-        <input type="text" class="form-control" id="edit_contact" placeholder="Parent Contact Number" value="{{student.parent_contact}}" data-class="input-label" />
+        <input type="text" class="form-control" id="edit_contact" placeholder="Guardian Contact Number" value="{{student.parent_contact}}" data-class="input-label" />
         <select class="form-control select" id="edit_level">
                 <option selected>{{student.level}}</option>
                 <option>Junior Kinder</option>
@@ -38,7 +35,7 @@
 </div>
 <div class="modal-footer edit-user-modal-footer">
         <button id = "edit-user-cancel" type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Cancel</button>
-        <!-- <a href="/"> --><button id="{{student.id}}" type="button" class="btn btn-primary done-btn" disabled><span>Save</span></button><!-- </a> -->
+        <!-- <a href="/"> --><button id="{{student.id}}" type="button" class="btn btn-primary done-btn" disabled data-loading-text="Saving" data-complete-text="Save" autocomplete="off">Save</button><!-- </a> -->
 </div>
 
 <script type="text/javascript">
@@ -50,7 +47,7 @@ $('.edit-user-modal-body .form-control').floatlabel({
     labelEndTop:'-2px'
 });
 
-$('.edit-user-modal-body .form-control').on('keyup', function () {
+$('.edit-user-modal-body .form-control').on('input propertychange paste', function () {
 var re = /[A-Za-z]+$/;
 if (($('#edit_last_name').val() != "") && ($('#edit_first_name').val() != "") &&
 (re.test($('#edit_last_name').val())) && (re.test($('#edit_first_name').val())) &&
@@ -77,6 +74,7 @@ $('.edit-user-modal-footer .done-btn').attr('disabled',true);
 });
 
 $('.edit-user-modal-footer .done-btn').on('click', function(){
+    $(this).button('loading');
     var last_name = $('#edit_last_name').val();
     var first_name = $('#edit_first_name').val();
     var middle_name = $('#edit_middle_name').val();
