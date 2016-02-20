@@ -801,6 +801,8 @@ a, a:hover, a:active, a:focus{
 }
 
 #intro{
+	position: absolute;
+	bottom: 0;
 	z-index: 9999999;
 	height: 100%;
 	width: 100%;
@@ -1372,6 +1374,7 @@ table.table thead tr .headerSortDown {
 
 
 .intro-loader {
+	display: none;
   animation: intro 1s linear infinite;
   clip: rect(0, 80px, 80px, 40px); 
   height: 80px;
