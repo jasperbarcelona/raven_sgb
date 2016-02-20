@@ -4,7 +4,6 @@ searchStatus = 'off'
 profile_options = 'closed'
 
 $('.loading').hide();
-$('.intro-loader').show();
 $('.add-user-footer-left').hide();
 $('#snackbar').hide();
 $('.id-loader').hide();
