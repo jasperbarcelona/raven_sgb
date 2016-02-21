@@ -40,7 +40,7 @@ CLIENT_ID = 'ef8cf56d44f93b6ee6165a0caa3fe0d1ebeee9b20546998931907edbb266eb72'
 SECRET_KEY = 'c4c461cc5aa5f9f89b701bc016a73e9981713be1bf7bb057c875dbfacff86e1d'
 SHORT_CODE = '29290420420'
 CONNECT_TIMEOUT = 5.0
-CALENDAR_URL = 'http://127.0.0.1:7000%s'
+CALENDAR_URL = 'http://ravenclock.herokuapp.com%s'
 
 KINDERGARTEN = ['Junior Kinder', 'Senior Kinder']
 PRIMARY = ['1st Grade', '2nd Grade', '3rd Grade', '4th Grade', '5th Grade', '6th Grade']
