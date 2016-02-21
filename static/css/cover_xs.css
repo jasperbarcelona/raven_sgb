@@ -17,6 +17,14 @@ body{
 	color: #696969;
 }
 
+a, a:hover{
+	text-decoration: none;
+}
+
+.support-email{
+	color: #FFFFFF !important;
+}
+
 p{
 	font-size: 16px;
 	font-weight: 300;

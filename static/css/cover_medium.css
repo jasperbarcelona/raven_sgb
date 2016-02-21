@@ -21,6 +21,10 @@ a, a:hover{
 	text-decoration: none;
 }
 
+.support-email{
+	color: #FFFFFF !important;
+}
+
 p{
 	font-size: 18px;
 	font-weight: 300;
