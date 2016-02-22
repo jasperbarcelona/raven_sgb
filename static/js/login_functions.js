@@ -15,7 +15,7 @@ function login(){
 	  		$('#login-form-loader').hide();
 	  	}
 	   	else{
-	   		$(location).attr('href', 'http://http://projectraven.herokuapp.com/');
+	   		$(location).attr('href', 'http://projectraven.herokuapp.com/');
 	   	}
   });
 }
