@@ -820,13 +820,13 @@ def nocache(view):
 
 def send_email(new_user,email_address,user_name,school_name,password):
     s = smtplib.SMTP('smtp.gmail.com', 587)
-    myGmail = 'barcelona.jasperoliver@gmail.com'
-    myGMPasswd = 'enumaelish11'
+    myGmail = 'parentlyinc@gmail.com'
+    myGMPasswd = 'ratmaxi8'
     recipient = email_address
     message = text(('Hi, %s!\r\n \r\nWelcome to Parent.ly! %s has added you as administrator for %s. '
                'Please go to http://projectraven.herokuapp.com/ and login with you email. '
                'Your temporary password is: %s. We strongly recommend that you change it '
-               'immediately.\r\n \r\nRegards,\r\nCleverCloud Team')%(str(new_user),str(user_name), str(school_name), str(password)))
+               'immediately.\r\n \r\nRegards,\r\nParent.ly Team')%(str(new_user),str(user_name), str(school_name), str(password)))
     message['Subject'] = 'Welcome to Parent.ly'
     message['From'] = 'Parent.ly'
     message['To'] = recipient
