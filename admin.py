@@ -31,6 +31,7 @@ import string
 import smtplib
 from email.mime.text import MIMEText as text
 import os
+from postmark import PMMail
 
 
 app = flask.Flask(__name__)
@@ -819,21 +820,33 @@ def nocache(view):
 
 
 def send_email(new_user,email_address,user_name,school_name,password):
-    s = smtplib.SMTP('smtp.gmail.com', 587)
-    myGmail = 'parentlyinc@gmail.com'
-    myGMPasswd = 'ratmaxi8'
-    recipient = email_address
-    message = text(('Hi, %s!\r\n \r\nWelcome to Parent.ly! %s has added you as administrator for %s. '
+    # s = smtplib.SMTP('smtp.gmail.com', 587)
+    # myGmail = 'parentlyinc@gmail.com'
+    # myGMPasswd = 'ratmaxi8'
+    # recipient = email_address
+    # message = text(('Hi, %s!\r\n \r\nWelcome to Parent.ly! %s has added you as administrator for %s. '
+    #            'Please go to http://projectraven.herokuapp.com/ and login with you email. '
+    #            'Your temporary password is: %s. We strongly recommend that you change it '
+    #            'immediately.\r\n \r\nRegards,\r\nParent.ly Team')%(str(new_user),str(user_name), str(school_name), str(password)))
+    # message['Subject'] = 'Welcome to Parent.ly'
+    # message['From'] = 'Parent.ly'
+    # message['To'] = recipient
+    # s.starttls()
+    # s.login(myGmail, myGMPasswd)
+    # s.sendmail(myGmail,recipient,message.as_string())
+    # s.quit()
+
+    message = PMMail(api_key = os.environ.get('POSTMARK_API_TOKEN'),
+                 subject = "Welcome to Parent.ly",
+                 sender = "parentlyinc@gmail.com",
+                 to = email_address,
+                 text_body = ('Hi, %s!\r\n \r\nWelcome to Parent.ly! %s has added you as administrator for %s. '
                'Please go to http://projectraven.herokuapp.com/ and login with you email. '
                'Your temporary password is: %s. We strongly recommend that you change it '
-               'immediately.\r\n \r\nRegards,\r\nParent.ly Team')%(str(new_user),str(user_name), str(school_name), str(password)))
-    message['Subject'] = 'Welcome to Parent.ly'
-    message['From'] = 'Parent.ly'
-    message['To'] = recipient
-    s.starttls()
-    s.login(myGmail, myGMPasswd)
-    s.sendmail(myGmail,recipient,message.as_string())
-    s.quit()
+               'immediately.\r\n \r\nRegards,\r\nParent.ly Team')%(str(new_user),str(user_name), str(school_name), str(password)),
+                 tag = "welcome")
+
+    message.send()
 
 
 @app.route('/sched/get', methods=['GET', 'POST'])
