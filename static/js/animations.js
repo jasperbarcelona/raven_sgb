@@ -181,7 +181,34 @@ $('#add-student-modal .add-user-modal-body .form-control').on('change', function
     }
 });
 
+$('#add-student-modal .add-user-modal-body .form-control').on('keyup', function () {
+    var re = /[A-Za-z]+$/;
+    if (($('#add_student_last_name').val() != "") && ($('#add_student_first_name').val() != "") && 
+        (re.test($('#add_student_last_name').val())) && (re.test($('#add_student_first_name').val())) && 
+        ($('#add_student_level').val() != null) && ($('#add_student_section').val() != null) && ($('#add_student_contact').val() != null) &&
+        (!isNaN($('#add_student_contact').val())) && ($('#add_student_contact').val().length == 11) && ($('#student-id-error').text().length == 0)  &&
+        ($('#add_student_id_no').val().length == 10)){
+        $('#save-student').removeAttr('disabled');
+    }
+    else{
+        $('#save-student').attr('disabled',true);
+    }
+});
+
 $('#add-user-modal .add-user-modal-body .form-control').on('change', function () {
+    var re = /[A-Za-z]+$/;
+    if (($('#add_user_last_name').val() != "") && ($('#add_user_first_name').val() != "") && 
+        (re.test($('#add_user_last_name').val())) && 
+        (re.test($('#add_user_first_name').val())) &&
+        ($('#user-id-error').text().length == 0) && ($('#add_user_id_no').val().length == 10)){
+        $('#save-user').removeAttr('disabled'); 
+    }
+    else{
+        $('#save-user').attr('disabled',true);
+    }
+});
+
+$('#add-user-modal .add-user-modal-body .form-control').on('keyup', function () {
     var re = /[A-Za-z]+$/;
     if (($('#add_user_last_name').val() != "") && ($('#add_user_first_name').val() != "") && 
         (re.test($('#add_user_last_name').val())) && 
@@ -299,7 +326,7 @@ $('.no-class-checkbox').change(function() {
         }    
     });
 
-$('.add-user-modal-body .form-control').on('keydown', function (e) {
+$('.add-user-modal-body .form-control').on('keyup', function (e) {
     var key = e.which;
     if((key == 13) && ($('#save-student').is(':disabled') == false)){
         $('#save-student').trigger('click');

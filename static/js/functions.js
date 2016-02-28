@@ -1505,3 +1505,40 @@ function populate_schedule(){
       $('#schedule-loading').hide();
     });
 }
+
+function save_admin(){
+  first_name = $('#add_admin_first_name').val();
+  middle_name = $('#add_admin_middle_name').val();
+  last_name = $('#add_admin_last_name').val();
+  email = $('#add_admin_email').val();
+  status = $('#add_admin_status').val();
+  $.post('/accounts/new',{
+      first_name:first_name,
+      middle_name:middle_name,
+      last_name:last_name,
+      email:email,
+      status:status
+  },
+  function(data){
+    if (data['status']){
+      $('#add-admin-error').html(data['error']);
+    }
+    else{
+      $('#accounts-table tbody').html(data);
+      $('#save-admin').button('complete');
+      setTimeout(function(){ 
+          $('#save-admin').attr('disabled',true);
+          $('#add_admin_first_name').focus();
+          $('#add_admin_email').val('');
+          $('#add_admin_first_name').val('');
+          $('#add_admin_last_name').val('');
+          $('#add_admin_middle_name').val('');
+          $('.add-admin-modal-body .form-control').change();
+      }, 0); 
+      $('.add-admin-footer-left').fadeIn();
+      setTimeout(function() {
+          $('.add-admin-footer-left').fadeOut();
+      }, 2000);
+    }
+  });
+}

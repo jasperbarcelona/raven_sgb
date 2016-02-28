@@ -26,6 +26,10 @@ from datetime import date
 import time
 import json
 import uuid
+import random
+import string
+import smtplib
+from email.mime.text import MIMEText as text
 import os
 
 
@@ -95,13 +99,15 @@ class School(db.Model, Serializer):
 
 class AdminUser(db.Model):
     id = db.Column(db.Integer,primary_key=True)
-    school_no = db.Column(db.String(32), unique=True)
+    school_no = db.Column(db.String(32))
     email = db.Column(db.String(60))
     password = db.Column(db.String(20))
     first_name = db.Column(db.String(30))
     last_name = db.Column(db.String(30))
-    address = db.Column(db.String(120))
-    msisdn = db.Column(db.String(15))
+    middle_name = db.Column(db.String(30))
+    status = db.Column(db.String(8))
+    added_by = db.Column(db.Integer)
+    timestamp = db.Column(db.String(50))
 
 
 class Schedule(db.Model):
@@ -301,6 +307,7 @@ admin.add_view(IngAdmin(Late, db.session))
 admin.add_view(IngAdmin(Absent, db.session))
 admin.add_view(IngAdmin(Message, db.session))
 admin.add_view(IngAdmin(Schedule, db.session))
+admin.add_view(IngAdmin(AdminUser, db.session))
 
 
 def crossdomain(origin=None, methods=None, headers=None,
@@ -382,8 +389,11 @@ def authenticate_user(school_no, email, password):
     user = AdminUser.query.filter_by(school_no=school_no,email=email,password=password).first()
     if not user or user == None:
         return jsonify(status='failed', error='Invalid email or password')
+    if user.status != 'Active':
+        return jsonify(status='failed', error='Your account has been deactivated')
     session['school_no'] = school.school_no
     session['api_key'] = school.api_key
+    session['school_name'] = school.name
     session['user_id'] = user.id
     session['user_school_no'] = user.school_no
     session['user_name'] = user.first_name+' '+user.last_name
@@ -808,6 +818,24 @@ def nocache(view):
     return update_wrapper(no_cache, view)
 
 
+def send_email(new_user,email_address,user_name,school_name,password):
+    s = smtplib.SMTP('smtp.gmail.com', 587)
+    myGmail = 'parentlyinc@gmail.com'
+    myGMPasswd = 'ratmaxi8'
+    recipient = email_address
+    message = text(('Hi, %s!\r\n \r\nWelcome to Parent.ly! %s has added you as administrator for %s. '
+               'Please go to http://projectraven.herokuapp.com/ and login with you email. '
+               'Your temporary password is: %s. We strongly recommend that you change it '
+               'immediately.\r\n \r\nRegards,\r\nCleverCloud Team')%(str(new_user),str(user_name), str(school_name), str(password)))
+    message['Subject'] = 'Welcome to Parent.ly'
+    message['From'] = 'Parent.ly'
+    message['To'] = recipient
+    s.starttls()
+    s.login(myGmail, myGMPasswd)
+    s.sendmail(myGmail,recipient,message.as_string())
+    s.quit()
+
+
 @app.route('/sched/get', methods=['GET', 'POST'])
 def get_schedule():
     api_key = flask.request.args.get('api_key')
@@ -854,7 +882,8 @@ def dashboard():
         view=session['department'],
         sections=sections,
         tab=session['tab'],
-        user_name=session['user_name']
+        user_name=session['user_name'],
+        school_name=session['school_name']
         )
 
 
@@ -866,6 +895,45 @@ def reset_attendance():
         student.lates = 0
     db.session.commit()
     return jsonify(status='Success'),200
+
+
+@app.route('/accounts', methods=['GET', 'POST'])
+def manage_accounts():
+    accounts = AdminUser.query.filter_by(school_no=session['school_no']).all()
+    return flask.render_template('accounts.html', accounts=accounts, school_name=session['school_name'], user_name=session['user_name'])
+
+
+@app.route('/accounts/new', methods=['GET', 'POST'])
+def new_account():
+    account_info = flask.request.form.to_dict()
+    email_account = AdminUser.query.filter_by(email=account_info['email']).first()
+    if email_account or email_account != None:
+        return jsonify(status='failed',error='Email already in use')
+
+    account_count = AdminUser.query.count()
+    if account_count >= 5:
+        return jsonify(status='failed',error='You\'ve reached the limit of 5 accounts')
+
+    temp_password = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))
+    new_account = AdminUser(
+        school_no='123456789',
+        email=account_info['email'],
+        password=temp_password,
+        first_name=account_info['first_name'],
+        middle_name=account_info['middle_name'],
+        last_name=account_info['last_name'],
+        status=account_info['status'],
+        added_by=session['user_id'],
+        timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+        )
+    db.session.add(new_account)
+    db.session.commit()
+
+    email_thread = threading.Thread(target=send_email,args=[account_info['first_name'],account_info['email'],session['user_name'],session['school_name'], temp_password])
+    email_thread.start()
+
+    accounts = AdminUser.query.filter_by(school_no=session['school_no']).all()
+    return flask.render_template('account_table.html', accounts=accounts)
 
 
 @app.route('/schedule/irregular/get', methods=['GET', 'POST'])
@@ -1654,9 +1722,10 @@ def rebuild_database():
         email = 'barcelona.jasperoliver@gmail.com',
         password = 'test',
         first_name = 'Jasper',
+        middle_name= 'Estrada',
         last_name = 'Barcelona',
-        address = '12, Zamora St. Ciudad Maharlika, Lucena City',
-        msisdn = '09183339068'
+        status = 'Active',
+        timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
         )
 
     school = School(

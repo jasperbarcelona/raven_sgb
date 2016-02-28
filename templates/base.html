@@ -8,7 +8,7 @@
                 <link rel="stylesheet" href="../static/css/jquery-ui.css">
                 <link rel="stylesheet" href="../static/css/jquery-ui.structure.css">
                 <link rel="stylesheet" href="../static/css/style.css">
-                <link href="../static/css/icon.css" rel="stylesheet">
+                <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
                 <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico" />
                 <script src="//fast.eager.io/sgP7QN5AJL.js"></script>
                 <script src="//fast.eager.io/nH76uFjaDI.js"></script>
@@ -30,22 +30,7 @@
                 <div id="snackbar">
                         <span class="snackbar-status-message">Saved</span>
                 </div>
-                <div id="header">
-                        <div id="header-left">
-                                <span id="header-school-name">Scuola Gesu Bambino</span>
-                        </div>
-                        <div id="header-right">
-                                <div id="profile-options">
-                                        <span id="profile-settings-btn">PROFILE</span>
-                                        <elem id="separator">|</elem>
-                                        <a href="/logout"><span id="logout-btn">LOGOUT</span></a>
-                                </div>
-                                <div id="user-icon-container">
-                                        <span id="header-user-name">{{user_name}}</span>
-                                        <span><img id="header-display-pic" src="../static/images/users/default.png"></span>
-                                </div>
-                        </div>
-                </div>
+                {% include 'header.html' %}
                 <div class="container">
                         <div id="tabs">
                                 <ul class="nav main-nav-tabs nav-tabs">
@@ -114,6 +99,8 @@
                                                                 <label>Schedule:</label>
                                                                 <li><a href="#" data-toggle="modal" data-target="#calendar-modal" onclick="populate_calendar()">A.Y. Calendar</a></li>
                                                                 <li id="regular-schedule-btn"><a href="#" data-toggle="modal" data-target="#schedule-modal" onclick="populate_schedule()">Regular Schedule</a></li>
+                                                                <li class="divider"></li>
+                                                                <li id="manage-accounts-btn"><a href="/accounts">Manage Accounts</a></li>
                                                         </ul>
                                                 </div>
                                         </div>          
