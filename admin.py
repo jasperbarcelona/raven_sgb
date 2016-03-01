@@ -626,52 +626,52 @@ def compose_message(log_id,id_no,time,action):
 def send_message(log_id, type, message, msisdn, request_url):
     log = Log.query.filter_by(id=log_id).first()
 
-    message_options = {
-            "message": message,
-            "address": msisdn,
-            "access_token": 'Os-vcHVaxj6yQrjefuU4Z20tIkzyHxXom_AvK1GfLl0'
-        }
-
-    try:
-        r = requests.post(
-        IPP_URL % IPP_SHORT_CODE,
-        params=message_options
-        )
-        print r.status_code
-        print r.text
-        return
-
-    except requests.exceptions.ConnectionError as e:
-        print "Sending Failed!"
-        return
-
     # message_options = {
-    #         'message_type': 'SEND',
-    #         'message': message,
-    #         'client_id': CLIENT_ID,
-    #         'mobile_number': msisdn,
-    #         'secret_key': SECRET_KEY,
-    #         'shortcode': SHORT_CODE,
-    #         'message_id': uuid.uuid4().hex
+    #         "message": message,
+    #         "address": msisdn,
+    #         "access_token": 'Os-vcHVaxj6yQrjefuU4Z20tIkzyHxXom_AvK1GfLl0'
     #     }
 
     # try:
-    #     r = requests.post(request_url,message_options)           
-    #     if r.status_code == 200:
-    #         print str(r.status_code)
-    #         log.notification_status='Success'
-    #         db.session.commit()
-    #         return
-    #     log.notification_status='Failed'
-    #     db.session.commit()
-    #     print str(r.status_code)
+    #     r = requests.post(
+    #     IPP_URL % IPP_SHORT_CODE,
+    #     params=message_options
+    #     )
+    #     print r.status_code
+    #     print r.text
     #     return
 
     # except requests.exceptions.ConnectionError as e:
     #     print "Sending Failed!"
-    #     log.notification_status='Failed'
-    #     db.session.commit()
     #     return
+
+    message_options = {
+            'message_type': 'SEND',
+            'message': message,
+            'client_id': CLIENT_ID,
+            'mobile_number': msisdn,
+            'secret_key': SECRET_KEY,
+            'shortcode': SHORT_CODE,
+            'message_id': uuid.uuid4().hex
+        }
+
+    try:
+        r = requests.post(request_url,message_options)           
+        if r.status_code == 200:
+            print str(r.status_code)
+            log.notification_status='Success'
+            db.session.commit()
+            return
+        log.notification_status='Failed'
+        db.session.commit()
+        print str(r.status_code)
+        return
+
+    except requests.exceptions.ConnectionError as e:
+        print "Sending Failed!"
+        log.notification_status='Failed'
+        db.session.commit()
+        return
 
 def prepare():
     global variable
