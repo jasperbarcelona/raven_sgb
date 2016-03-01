@@ -72,7 +72,6 @@ $('#add-admin-modal').on('hidden.bs.modal', function () {
     $('#add_admin_email').val('');
     $('#add_admin_first_name').val('');
     $('#add_admin_last_name').val('');
-    $('#add_admin_middle_name').val('');
     $('.add-admin-modal-body .form-control').change();
     $('#save-admin').attr('disabled',true);
 });
