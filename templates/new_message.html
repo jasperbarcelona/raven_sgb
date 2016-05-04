@@ -1,23 +1,32 @@
-<div class="modal-header message-modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">New Message</h4>
-</div>
-<div id="compose-message-modal-body" class="modal-body">
-        <textarea oninput="textCounter(this,'counter',420);" id="message" placeholder="Write your message here..."></textarea>
-</div>
-<div class="modal-footer">
-        <input disabled  value="Remaining: 420" id="counter">
-        <button type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Cancel</button>
-        <button id="send" type="button" class="btn btn-primary done-btn" data-toggle="modal" data-target="#confirm-modal" disabled>Send</button>
-</div>
+<div class="compose-message-container">
+    <span><i id="close-compose-btn" class="material-icons" onclick="close_compose()">&#xE5CD;</i></span>
+    <div class="compose-message-upper">
+        <span class="compose-message-label">Compose Message</span>
+    </div>
+    <div class="compose-message-middle">
+        <div class="compose-message-middle-left">
+            <span class="send-to-label">Send to:</span>
+        </div>
+        <div class="compose-message-middle-right">
+            <input type="checkbox" class="form-control recipient-check-box" value="Parents" />
+            <span class="recipient-label">Parents</span>
 
-<script type="text/javascript">
-        $('#message').on('keyup', function(){
-    if (!$.trim($(this).val())) {
-        $('#send').attr('disabled',true);
-    }
-    else if (this.value){
-        $('#send').removeAttr('disabled');
-    }
-});
-</script>
+            <input type="checkbox" class="form-control recipient-check-box" value="Parents" />
+            <span class="recipient-label">Faculty</span>
+
+            <input type="checkbox" class="form-control recipient-check-box" value="Parents" />
+            <span class="recipient-label">Non Faculty</span>
+        </div>
+        <div class="compose-message-lower">
+            <textarea oninput="textCounter(this,'counter',420);" id="message" placeholder="Write your message here"></textarea>
+        </div>
+        <div class="compose-message-footer">
+            <div class="compose-message-footer-left">
+                <input disabled  value="Remaining: 420" id="counter">
+            </div>
+            <div class="compose-message-footer-right">
+                <span><i id="send-message-btn" class="material-icons">&#xE163;</i></span>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,10 @@
+<div class="message-container">
+	<span><i id="close-message-btn" class="material-icons" onclick="close_message()">&#xE5CD;</i></span>
+	
+	<span class="message-view-label">Sent by </span><span class="message-view-sender">{{message.sender_name}}</span><br />
+	<span class="message-view-label">To </span><span class="message-view-sender">{{message.recipient}}</span><br />
+	<span class="message-view-label">On </span><span class="message-view-date">{{message.date}}</span><br />
+	<span class="message-view-label">At </span><span class="message-view-time">{{message.time}}</span><br /><br />
+
+	<p class="message-view-body" align="justify">{{message.content}}</p>
+</div>

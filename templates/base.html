@@ -8,11 +8,11 @@
                 <link rel="stylesheet" href="../static/css/jquery-ui.css">
                 <link rel="stylesheet" href="../static/css/jquery-ui.structure.css">
                 <link rel="stylesheet" href="../static/css/style.css">
-                <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-                <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico" />
-                <script src="//fast.eager.io/sgP7QN5AJL.js"></script>
-                <script src="//fast.eager.io/nH76uFjaDI.js"></script>
-                <title>Dashboard | Scuola Gesu Bambino</title>
+                <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+                <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico" /> -->
+                <!--<script src="//fast.eager.io/sgP7QN5AJL.js"></script>
+                <script src="//fast.eager.io/nH76uFjaDI.js"></script> -->
+                <title>Dashboard | {{school_name}}</title>
         </head>
         <body>  
                 <input type="hidden" id="tab" value="{{tab}}" />
@@ -94,13 +94,15 @@
                                                         <ul id="options" class="dropdown-menu" role="menu">
                                                                 <label>View:</label>
                                                                 <li onclick="change_tab('logs')"><a href="/view?view=student">Students{% if view=='student' %}<span class="glyphicon glyphicon-ok active-view"></span>{% endif %}</a></li>
-                                                                <li onclick="change_tab('logs')"><a href="/view?view=faculty">Faculty{% if view=='faculty' %}<span class="glyphicon glyphicon-ok active-view"></span>{% endif %}</a></li>
+                                                                <li onclick="change_tab('logs')"><a href="/view?view=faculty">Staff{% if view=='faculty' %}<span class="glyphicon glyphicon-ok active-view"></span>{% endif %}</a></li>
                                                                 <li class="divider"></li>
                                                                 <label>Schedule:</label>
                                                                 <li><a href="#" data-toggle="modal" data-target="#calendar-modal" onclick="populate_calendar()">A.Y. Calendar</a></li>
                                                                 <li id="regular-schedule-btn"><a href="#" data-toggle="modal" data-target="#schedule-modal" onclick="populate_schedule()">Regular Schedule</a></li>
+                                                                {% if user.is_super_admin %}
                                                                 <li class="divider"></li>
                                                                 <li id="manage-accounts-btn"><a href="/accounts">Manage Accounts</a></li>
+                                                                {% endif %}
                                                         </ul>
                                                 </div>
                                         </div>          

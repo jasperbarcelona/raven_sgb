@@ -20,9 +20,62 @@ if (tab == 'attendance'){
     $('#add-user-btn').hide();
   }
 
-function view_message(){
+function view_message(message_id){
+  $('.message-row').removeClass('active-message');
   $('.message-modal-dialog').animate({'width':'900px'});
-  $('#message-modal-body').animate({'width':'340px'});
+  $('.message-row').css('padding-left','10px');
+  $('.message-row').css('padding-right','10px');
+  $('#message-modal-body-left').animate({'width':'340px'});
+  $('#message-modal-body-right').show();
+  $('#message-modal-right-preloader').show();
+  $('#'+message_id).addClass('active-message');
+  $.post('/messages/view',{
+      message_id:message_id,
+  },
+  function(data){
+      $('#message-modal-body-right').html(data);
+      $('#message-modal-right-preloader').hide();
+  });
+}
+
+function compose_message(){
+  $('.message-row').removeClass('active-message');
+  $('.message-modal-dialog').animate({'width':'900px'});
+  $('.message-row').css('padding-left','10px');
+  $('.message-row').css('padding-right','10px');
+  $('#message-modal-body-left').animate({'width':'340px'});
+  $('#message-modal-body-right').show();
+  $('#message-modal-right-preloader').show();
+  $.post('/messages/new',
+  function(data){
+      $('#message-modal-body-right').html(data);
+      $('#new-message-btn').attr('disabled', true);
+      $('#message-modal-right-preloader').hide();
+      setTimeout(function(){ 
+        $('#message-modal-cover').show();
+      }, 500);
+  });
+}
+
+function close_message(){
+    $('.message-row').removeClass('active-message');
+    $('.message-modal-dialog').css('width','600px');
+    $('.message-row').css('padding-left','20px');
+    $('.message-row').css('padding-right','20px');
+    $('#message-modal-body-left').css('width','100%');
+    $('#message-modal-body-right').hide();
+    $('#message-modal-right-preloader').hide();
+}
+
+function close_compose(){
+    $('#message-modal-cover').hide();
+    $('.message-modal-dialog').css('width','600px');
+    $('.message-row').css('padding-left','20px');
+    $('.message-row').css('padding-right','20px');
+    $('#message-modal-body-left').css('width','100%');
+    $('#message-modal-body-right').hide();
+    $('#message-modal-right-preloader').hide();
+    $('#new-message-btn').attr('disabled', false);
 }
 
 function validate_student_form(status){
@@ -167,10 +220,10 @@ function blast_message(){
 }
 
 function open_messages(){
-  console.log('openning messages')
+  $('#message-modal-preloader').show();
   $.post('/messages',
   function(data){
-    $('#message-modal-body').html(data);
+    $('#message-modal-body-left').html(data);
     $('#message-modal-preloader').hide();
   });
 }
@@ -1051,14 +1104,13 @@ function toggle_search(){
 }
 
 function populate_regular_schedule(date){
-  $('#schedule-modal-title').html(date);
+  $('#calendar-schedule-modal-header').html(date)
   $('.no-class-checkbox').show();
   $('.no-class-checkbox').prop('checked',true);
   $('.no-class-checkbox').change();
 }
 
 function populate_irregular_schedule(date,month,day,year){
-  $('#schedule-modal-title').html(date + ' (Irregular Schedule)');
   $('#calendar-schedule-loading').show();
   $.post('/schedule/irregular/get',{
         month:month,
@@ -1507,29 +1559,37 @@ function populate_schedule(){
 }
 
 function save_admin(){
+  $('#save-admin').button('loading');
+  if ($('#is_super_admin').is(":checked")){
+    is_super_admin = true;
+  }
+  else{
+    is_super_admin = false;
+  }
   first_name = $('#add_admin_first_name').val();
   last_name = $('#add_admin_last_name').val();
   email = $('#add_admin_email').val();
-  status = $('#add_admin_status').val();
   $.post('/accounts/new',{
       first_name:first_name,
       last_name:last_name,
       email:email,
-      status:status
+      is_super_admin:is_super_admin
   },
   function(data){
+    $('#add-admin-error').html('');
+    $('#save-admin').button('complete');
     if (data['status']){
       $('#add-admin-error').html(data['error']);
     }
     else{
       $('#accounts-table tbody').html(data);
-      $('#save-admin').button('complete');
       setTimeout(function(){ 
           $('#save-admin').attr('disabled',true);
           $('#add_admin_first_name').focus();
           $('#add_admin_email').val('');
           $('#add_admin_first_name').val('');
           $('#add_admin_last_name').val('');
+          $('#is_super_admin').prop('checked',false);
           $('.add-admin-modal-body .form-control').change();
       }, 0); 
       $('.add-admin-footer-left').fadeIn();

@@ -61,7 +61,7 @@ a, a:hover, a:active, a:focus{
 
 #header{
 	background-color: #337ab7;
-	height: 60px;
+	height: 70px;
 	width: 100%;
 	min-width: 800px;
 	padding-left: 2.5%;
@@ -106,6 +106,7 @@ a, a:hover, a:active, a:focus{
 
 #header-logo{
 	height: 100%;
+	margin-right: 10px;
 }
 
 #header-school-name{
@@ -114,7 +115,7 @@ a, a:hover, a:active, a:focus{
 }
 
 #header-user-name{
-	margin-top: 5px;
+	margin-top: 3px;
 	color: #FFFFFF;
 	font-size: 14px;
 	text-transform: uppercase;
@@ -123,14 +124,14 @@ a, a:hover, a:active, a:focus{
 #header-display-pic{
 	border-radius: 0;
 	margin-left: 10px;
-	height: 35px;
+	height: 38px;
 }
 
 #profile-options{
 	position: absolute;
 	right: 0;
 	height: 100%;
-	padding-top: 5px;
+	padding-top: 3px;
 	color: #FFFFFF;
 	font-size: 14px;
 	display: -webkit-flex;
@@ -202,6 +203,12 @@ a, a:hover, a:active, a:focus{
 	box-shadow: none !important;
 }
 
+.add-admin-modal-body, .add-admin-midal-footer{
+	float: left !important;
+	width: 100%;
+	background-color: #FFFFFF;
+}
+
 .md-30{
 	font-size: 30px;
 }
@@ -221,6 +228,7 @@ a, a:hover, a:active, a:focus{
 	box-shadow: none !important;
 	font-size: 15px;
 }
+
 .add-admin-modal-dialog{
 	width: 500px;
 }
@@ -273,5 +281,23 @@ a, a:hover, a:active, a:focus{
 }
 
 #add-admin-error{
+	text-align: center;
+	margin-top: 20px;
+	float: left;
+	width: 100%;
 	color: red;
+}
+
+#is_super_admin{
+	float: left;
+	height: 18px !important;
+	width: 18px !important;
+	margin-left: 5px;
+}
+
+#is-super-admin-label{
+	float: left;
+	margin-top: 2px;
+	font-size: 16px;
+	margin-left: 5px;
 }

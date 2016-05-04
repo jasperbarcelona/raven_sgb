@@ -11,7 +11,7 @@
 <body>
 	{% include 'header.html' %}
 	<div class="container">
-		<h3 class="accounts-label">Accounts</h3>
+		<h3 class="accounts-label">Admin Accounts</h3>
 		<button class="btn" id="add-admin-btn" data-toggle="modal" data-target="#add-admin-modal"><i class="material-icons add-icon">add</i>ADD ACCOUNT</button>
 		<table class="table" id="accounts-table">
 			<thead>
@@ -47,20 +47,15 @@
                             <input type="text" class="form-control" id="add_admin_first_name" placeholder="First Name" data-class="input-label" />
                             <input type="text" class="form-control" id="add_admin_last_name" placeholder="Last Name" data-class="input-label" />
                             <input type="email" class="form-control" id="add_admin_email" placeholder="Email" data-class="input-label" />
-                            <select id="add_admin_status" class="form-control">
-							        <option value="Active">Active</option>
-							        <option value="Inactive">Inactive</option>
-							</select>
-							<center>
-								<span id="add-admin-error"></span>
-							</center>
+                            <input type="checkbox" id="is_super_admin" /><span id="is-super-admin-label">Can view and manage accounts.</span>
+							<span id="add-admin-error"></span>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer add-admin-midal-footer">
                             <div class="add-admin-footer-left">
                                     <i class="material-icons save-status-success md-30">done</i>
                             </div>
                             <button id = "add-admin-cancel" type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
-                            <button id="save-admin" type="button" class="btn btn-primary done-btn save-admin-btn" disabled data-loading-text="Saving" data-complete-text="Save" autocomplete="off"><span>Save</span></button>
+                            <button id="save-admin" type="button" class="btn btn-primary done-btn save-admin-btn" disabled data-loading-text="Saving" data-complete-text="Save" onclick="save_admin()"><span>Save</span></button>
                     </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->

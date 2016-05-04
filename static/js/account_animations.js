@@ -11,7 +11,16 @@ $('#add-admin-modal').on('shown.bs.modal', function () {
     $('#add_admin_first_name').focus();
 });
 
-$('#header-display-pic').on('click', function () {
+$('#is-super-admin-label').on('click', function () {
+    if ($('#is_super_admin').is(":checked")){
+        $('#is_super_admin').prop('checked',false);
+    }
+    else{
+        $('#is_super_admin').prop('checked',true);
+    }
+});
+
+$('#user-icon-container').on('click', function () {
     var $this = jQuery(this);
     if ($this.data('activated')) return false;  // Pending, return
     $this.data('activated', true);
@@ -64,7 +73,7 @@ $('.add-admin-modal-body .form-control').on('keyup', function (e) {
     var key = e.which;
     if((key == 13) && ($('#save-admin').is(':disabled') == false)){
     	save_admin();
-        return false;1
+        return false;
     }
 });
 

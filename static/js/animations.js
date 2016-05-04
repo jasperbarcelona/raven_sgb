@@ -8,17 +8,20 @@ $('.add-user-footer-left').hide();
 $('#snackbar').hide();
 $('.id-loader').hide();
 $('#profile-options').hide();
+$('#message-modal-right-preloader').hide();
+$('#message-modal-body-right').hide();
+
 
 $(window).load(function() {
     $('#intro-mask').hide();
     $('#intro').fadeOut();
 });
 
-/*$(".datepicker").datepicker({
+$(".datepicker").datepicker({
     dateFormat: "MM dd, yy"
 });
-*/
-$(".datepicker").datepicker({
+
+/*$(".datepicker").datepicker({
         dateFormat: 'MM yy',
         changeMonth: true,
         changeYear: true,
@@ -38,7 +41,7 @@ $(".datepicker").datepicker({
             at: "center bottom",
             of: $(this)
         });
-    });
+    });*/
 
 $('.add-user-modal-body .form-control').floatlabel({
     labelEndTop:'-2px'
@@ -69,6 +72,17 @@ $('#message').on('keyup', function(){
 $('#confirm-modal').on('hidden.bs.modal', function () {
     $('#message-confirm-password').val('');
     $('#confirm-send').attr('disabled',true);
+});
+
+$('#message-modal').on('hidden.bs.modal', function () {
+    $('#message-modal-cover').hide();
+    $('#new-message-btn').attr('disabled', false);
+    $('.message-modal-dialog').css('width','600px');
+    $('.message-row').css('padding-left','20px');
+    $('.message-row').css('padding-right','20px');
+    $('#message-modal-body-left').css('width','100%');
+    $('#message-modal-body-right').hide();
+    $('#message-modal-right-preloader').hide();
 });
 
 $('#message-status-modal').on('hidden.bs.modal', function () {
@@ -125,12 +139,11 @@ $('#add-user-modal').on('shown.bs.modal', function () {
     $('#add_user_id_no').focus();
 });
 
-
 $('#sched-cancel').on('click', function () {
     $('#save-sched').attr('disabled',true);
 });
 
-$('#header-display-pic').on('click', function () {
+$('#user-icon-container').on('click', function () {
     var $this = jQuery(this);
     if ($this.data('activated')) return false;  // Pending, return
     $this.data('activated', true);

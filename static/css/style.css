@@ -59,9 +59,17 @@ a, a:hover, a:active, a:focus{
 	color: inherit;
 }
 
+.colored-font{
+	color: #337ab7;
+}
+
+.colored-bg{
+	background-color: #337ab7;
+}
+
 #header{
 	background-color: #337ab7;
-	height: 60px;
+	height: 70px;
 	width: 100%;
 	min-width: 800px;
 	padding-left: 2.5%;
@@ -106,6 +114,7 @@ a, a:hover, a:active, a:focus{
 
 #header-logo{
 	height: 100%;
+	margin-right: 10px;
 }
 
 #header-school-name{
@@ -114,7 +123,7 @@ a, a:hover, a:active, a:focus{
 }
 
 #header-user-name{
-	margin-top: 5px;
+	margin-top: 3px;
 	color: #FFFFFF;
 	font-size: 14px;
 	text-transform: uppercase;
@@ -123,14 +132,14 @@ a, a:hover, a:active, a:focus{
 #header-display-pic{
 	border-radius: 0;
 	margin-left: 10px;
-	height: 35px;
+	height: 38px;
 }
 
 #profile-options{
 	position: absolute;
 	right: 0;
 	height: 100%;
-	padding-top: 5px;
+	padding-top: 3px;
 	color: #FFFFFF;
 	font-size: 14px;
 	display: -webkit-flex;
@@ -141,6 +150,7 @@ a, a:hover, a:active, a:focus{
 	align-items: center;
 	-webkit-justify-content: left;
 	justify-content: left;
+	cursor: pointer
 }
 
 #separator{
@@ -200,6 +210,13 @@ a, a:hover, a:active, a:focus{
 	padding-top: 0px;
 }
 
+#close-message-btn, #close-compose-btn{
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	font-size: 22px !important;
+}
+
 .md-28{
 	font-size: 30px !important;
 }
@@ -231,10 +248,8 @@ a, a:hover, a:active, a:focus{
 }
 
 #counter{
-	float: left;
 	background-color: transparent;
 	border: none;
-	margin-top: 7px;
 }
 
 .status-modal-dialog{
@@ -268,6 +283,10 @@ a, a:hover, a:active, a:focus{
 
 .save-status-message{
 	font-size: 16px;
+}
+
+#message{
+	padding: 10px;
 }
 
 #snackbar{
@@ -319,14 +338,189 @@ a, a:hover, a:active, a:focus{
 }
 
 #message-modal-body{
+	position: relative;
 	height: 400px;
 	width: 100%;
 	padding-left: 0px;
 	padding-right: 0px;
 	padding-top: 0px;
 	padding-bottom: 0px;
+	overflow: hidden;
+}
+
+.compose-message-container{
+	height: 100%;
+	width: 100%;
+}
+
+#message-modal-cover{
+	height: calc(100% - 120px);
+	width: 340px;
+	position: absolute;
+	background-color: #FFFFFF;
+	opacity: 0.7;
+	z-index: 5000;
+	display: none;
+}
+
+.recipient-check-box{
+	height: 17px !important;
+	width: 17px !important;
+	margin-right: 3px !important;
+	display: inline-block;
+	margin-top: -1px !important;
+	margin-left: 25px !important;
+}
+
+.recipient-label{
+	font-size: 14px;
+}
+
+.send-to-label{
+	font-size: 16px;
+	display: inline-block;;
+}
+
+.compose-message-upper{
+	height: 45px;
+	width: 100%;
+	padding: 10px;
+}
+
+.compose-message-label{
+	font-size: 20px;
+}
+
+.compose-message-middle{
+	height: 50px;
+	width: 100%;
+	border-bottom: 1px solid #e5e5e5;
+	border-top: 1px solid #e5e5e5;
+}
+
+.compose-message-lower{
+	position: absolute;
+	height: calc(100% - 135px);
+	width: 100%;
+	top: 95px !important;
+	left: 0 !important;
+	border-bottom: 1px solid #e5e5e5;
+}
+
+.compose-message-footer{
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	height: 40px;
+	width: 100%;
+}
+
+.compose-message-footer-left{
+	float: left;
+	height: 100%;
+	width: 50%;
+	padding-top: 10px;
+	padding-left: 12px;
+	text-align: left;
+}
+
+.compose-message-footer-right{
+	float: left;
+	height: 100%;
+	width: 50%;
+	padding-top: 5px;
+	padding-right: 12px;
+	text-align: right;
+}
+
+#send-message-btn{
+	font-size: 32px !important;
+	color: #337ab7;
+}
+
+.compose-message-middle-left{
+	float: left;
+	height: 100%;
+	width: 15%;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: column;
+	flex-direction: column;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+	border-right: 1px solid #e5e5e5;
+}
+
+.compose-message-middle-right{
+	float: left;
+	height: 100%;
+	width: 85%;
+	padding-top: 3px !important;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: left;
+	justify-content: left;
+}
+
+#message-modal-body-left{
+	position: relative;
+	float: left;
+	height: 100%;
+	width: 100%;
 	overflow-y: scroll;
 	overflow-x: hidden;
+}
+
+#message-modal-body-right{
+	position: relative;
+	float: right;
+	height: 100%; 
+	width: calc(100% - 340px);
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.message-container{
+	width: 100%;
+	padding-left: 20px;
+	padding-right: 20px;
+	padding-top: 12px;
+	padding-bottom: 10px;
+}
+
+.message-view-label{
+	font-size: 12px;
+}
+
+.message-view-sender,
+.message-view-sender,
+.message-view-date,
+.message-view-time{
+	font-size: 14px;
+}
+
+#message-modal-right-preloader{
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 100%;
+	width: calc(100% - 340px);
+	z-index: 5000;
+	background-color: #FFFFFF;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: column;
+	flex-direction: column;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+	justify-content: center;
 }
 
 #compose-message-modal-body{
@@ -582,7 +776,7 @@ a, a:hover, a:active, a:focus{
 	padding-left: 0 !important;
 	padding-right: 0 !important;
 	padding-bottom: 0 !important;
-	height: calc(100vh - 60px) !important;
+	height: calc(100vh - 70px) !important;
 }
 
 #new-message-btn:focus{
@@ -600,7 +794,7 @@ a, a:hover, a:active, a:focus{
 }
 
 .btn-group{
-	margin-top: 1px !important;
+	margin-top: 3px !important;
 }
 
 .buttons{
@@ -645,7 +839,7 @@ a, a:hover, a:active, a:focus{
 
 #message-modal-preloader{
 	position: absolute;
-	height: 100%;
+	height: calc(100% - 55px);
 	width: 100%;
 	z-index: 5000;
 	background-color: #FFFFFF;
@@ -662,30 +856,44 @@ a, a:hover, a:active, a:focus{
 .message-row{
 	position: relative;
 	width: 100%;
-	height: 70px;
-	padding: 10px;
+	height: 90px;
+	padding-left: 20px;
+	padding-right: 20px;
+	padding-top: 15px;
+	padding-bottom: 15px;
 	border-top: 0 !important;
 	border-left: 0 !important;
 	border-right: 0 !important;
-	border-bottom: 1px solid #999 !important;
+	border-bottom: 1px solid #e5e5e5 !important;
 	cursor: pointer;
 }
 
 .message-row:hover{
-	background-color: #DCDBDB!important;
+	background-color: #e9e9e9 !important;
 }
 
-.message-date{
+.message-date, .message-time{
 	font-size: 14px;
+}
+
+.message-time{
+	float: right;
+}
+
+.message-sender{
+	width: 85% !important;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	margin-bottom: 0 !important;
 }
 
 .message-content-preview{
 	font-size: 12px;
-	width: 100%;
+	width: 85% !important;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
-	display:inline-block;
 }
 
 #search-btn{
@@ -842,11 +1050,12 @@ a, a:hover, a:active, a:focus{
 
 .table tbody{
 	position: absolute;
-	width: 100%;
+	width: calc(100% + 1px) !important;
 	overflow: hidden;
 	overflow-x:hidden;
 	background-color: #FFFFFF;
-	overflow-y: scroll;
+	overflow-y: hidden;
+	overflow-x: scroll;
 }
 
 .maximized{
@@ -859,12 +1068,13 @@ a, a:hover, a:active, a:focus{
 
 .table thead{
 	display:table;
-	width:100%;
+	width: calc(100% + 1px);
+	padding-left: 10px !important;
+	text-transform: uppercase;
 }
 
 .table tbody tr {
     display:table;
-    width: calc(100% + 14px);
     background-color: #FFFFFF;
 }
 
@@ -873,16 +1083,18 @@ a, a:hover, a:active, a:focus{
 }
 
 .tab-pane{
-	height: 100%;
-	width: 100%;
+	position: relative !important;
+	height: 100% !important;
+	width: 100% !important;
+	padding: 0 !important;
 	/*overflow: scroll;
 	overflow-x: hidden;*/
 }
 
 .tab-content{
-	position: relative;
-	height: 100%;
-	width: 100%;
+	position: relative !important;
+	height: 100% !important;
+	width: 100% !important;
 }
 
 .nav-tabs{
@@ -904,9 +1116,9 @@ a, a:hover, a:active, a:focus{
 }
 
 .short{
-	width: 100px;
-	max-width: 100px;
-	min-width: 100px;
+	width: 100px !important;
+	max-width: 100px !important;
+	min-width: 100px !important;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -948,6 +1160,7 @@ a, a:hover, a:active, a:focus{
 	/*background-color: rgba(255,255,255,1);*/
 	background-color: transparent;
 	height: calc(100% - 36px);
+	width: 100%;
 }
 
 #copyright{
@@ -964,8 +1177,8 @@ a, a:hover, a:active, a:focus{
 
 #table-container{
 	position: relative;
-	height: 100%;
-	width: 100%;
+	height: 100% !important;
+	width: 100% !important;
 	background-color: transparent;
 }
 
@@ -974,10 +1187,14 @@ a, a:hover, a:active, a:focus{
 }
 
 .table{
-	height: 100% !important;
 	position: relative !important;
+	height: 100% !important;
 	margin-bottom: 0 !important;
 	/*border-bottom: none !important;*/
+}
+
+.table tbody tr{
+	width: 100%;
 }
 
 h3{
@@ -1109,23 +1326,9 @@ table.table thead tr th, table.table tfoot tr th {
 	width: 20px !important;
 }
 
-
-
-
-/*table.table thead tr .headerSortUp {
-	background-image: url('../images/asc.gif');
-	background-repeat: no-repeat;
-	background-position: right;
-	background-size: 25px;
+.active-message{
+	background-color: #e9e9e9;
 }
-table.table thead tr .headerSortDown {
-	background-image: url('../images/desc.gif');
-	background-repeat: no-repeat;
-	background-position: right;
-	background-size: 25px;
-}*/
-
-
 
 .schedule-nav-tabs li{
 	width: 20%;
@@ -1157,7 +1360,7 @@ table.table thead tr .headerSortDown {
 	border-bottom-color: transparent;
 	background-color: #234681 !important;
 	outline: none;
-} 
+}
 
 .disabled{
 	pointer-events: none !important;
@@ -1420,8 +1623,8 @@ table.table thead tr .headerSortDown {
   height: 40px;
   width: 40px;
   position: absolute;
-  left: calc(50% - 40px);
-  top: calc(50% - 40px);
+  left: calc(50% - 20px);
+  top: calc(50% - 20px);
 }
 @keyframes animate {
   0% { 

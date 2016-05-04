@@ -31,12 +31,14 @@ import string
 import smtplib
 from email.mime.text import MIMEText as text
 import os
+import schedule
 
 
 app = flask.Flask(__name__)
-db = SQLAlchemy(app)
 app.secret_key = '0129383hfldcndidvs98r9t9438953894534k545lkn3kfnac98'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+db = SQLAlchemy(app)
 
 API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
 SMS_URL = 'https://post.chikka.com/smsapi/request'
@@ -44,7 +46,7 @@ CLIENT_ID = 'ef8cf56d44f93b6ee6165a0caa3fe0d1ebeee9b20546998931907edbb266eb72'
 SECRET_KEY = 'c4c461cc5aa5f9f89b701bc016a73e9981713be1bf7bb057c875dbfacff86e1d'
 SHORT_CODE = '29290420420'
 CONNECT_TIMEOUT = 5.0
-CALENDAR_URL = 'http://ravenclock.herokuapp.com%s'
+CALENDAR_URL = 'http://tmtc.attendance.net:7000%s'
 IPP_URL = 'https://devapi.globelabs.com.ph/smsmessaging/v1/outbound/%s/requests'
 IPP_SHORT_CODE = 21587460
 
@@ -106,8 +108,8 @@ class AdminUser(db.Model):
     password = db.Column(db.String(20))
     first_name = db.Column(db.String(30))
     last_name = db.Column(db.String(30))
-    middle_name = db.Column(db.String(30))
     status = db.Column(db.String(8))
+    is_super_admin = db.Column(Boolean, unique=False)
     added_by = db.Column(db.Integer)
     timestamp = db.Column(db.String(50))
 
@@ -212,20 +214,25 @@ class Schedule(db.Model):
     twelfth_grade_afternoon_start = db.Column(db.String(30))
     twelfth_grade_afternoon_end = db.Column(db.String(30))
 
-
 class Section(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     school_no = db.Column(db.String(32))
     name = db.Column(db.String(30))
 
+class Department(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    school_no = db.Column(db.String(32))
+    name = db.Column(db.String(30))
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     school_no = db.Column(db.String(32))
+    sender_id = db.Column(db.Integer())
+    sender_name = db.Column(db.String(60))
+    recipient = db.Column(db.Text)
     date = db.Column(db.String(20))
     time = db.Column(db.String(10))
-    content = db.Column(db.UnicodeText())
-
+    content = db.Column(db.Text)
 
 class Log(db.Model, Serializer):
     __public__ = ['id','school_no','date','id_no','name','level',
@@ -239,10 +246,12 @@ class Log(db.Model, Serializer):
     section = db.Column(db.String(30))
     department = db.Column(db.String(30))
     time_in = db.Column(db.String(10))
+    time_in_id = db.Column(db.Integer)
+    time_in_notification_status = db.Column(db.String(10), unique=False)
     time_out = db.Column(db.String(10),default=None)
+    time_out_id = db.Column(db.Integer)
+    time_out_notification_status = db.Column(db.String(10), unique=False)
     timestamp = db.Column(db.String(50))
-    notification_status = db.Column(db.String(10), unique=False, default='Pending')
-
 
 class Student(db.Model, Serializer):
     __public__ = ['id','school_no','id_no','first_name','last_name','middle_name',
@@ -260,7 +269,6 @@ class Student(db.Model, Serializer):
     lates = db.Column(db.String(3))
     parent_contact = db.Column(db.String(12))
 
-
 class Late(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     school_no = db.Column(db.String(32))
@@ -273,7 +281,6 @@ class Late(db.Model):
     department = db.Column(db.String(30))
     timestamp = db.Column(db.String(50))
 
-
 class Absent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     school_no = db.Column(db.String(32))
@@ -285,7 +292,6 @@ class Absent(db.Model):
     department = db.Column(db.String(30))
     time_of_day = db.Column(db.String(20))
     timestamp = db.Column(db.String(50))
-
 
 class IngAdmin(sqla.ModelView):
     column_display_pk = True
@@ -367,6 +373,26 @@ def get_hour(time):
     return hour
 
 
+def admin_alert():
+    timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+    # sleep(10)
+    # print 'alerting admin...'
+    # message_options = {
+    #         'message': 'The Manila Times College Server turned on at exactly%s'%timestamp,
+    #         'address': '09183339068',
+    #         'access_token': 'Os-vcHVaxj6yQrjefuU4Z20tIkzyHxXom_AvK1GfLl0'
+    #     }
+    # try:
+    #     r = requests.post(SMS_URL,message_options) 
+    #     print "Sent"          
+    #     return
+
+    # except requests.exceptions.ConnectionError as e:
+    #     print "Failed"
+    #     return
+    return
+
+
 def get_student_data(id_no):
     return Student.query.filter_by(id_no=id_no).first()
 
@@ -397,6 +423,7 @@ def authenticate_user(school_no, email, password):
     session['api_key'] = school.api_key
     session['school_name'] = school.name
     session['user_id'] = user.id
+    session['is_super_admin'] = user.is_super_admin
     session['user_school_no'] = user.school_no
     session['user_name'] = user.first_name+' '+user.last_name
     session['department'] = 'student'
@@ -431,7 +458,7 @@ def mark_morning_absent(school_no,api_key):
             student.absences=Absent.query.filter_by(id_no=student.id_no, school_no=school_no).count()
             db.session.commit()
             absent_count = Absent.query.filter_by(school_no=school_no,date=time.strftime("%B %d, %Y"),time_of_day='morning').count()
-    return jsonify(status='Success', absent_count=absent_count),201
+    return schedule.CancelJob
 
 
 def mark_afternoon_absent(school_no,api_key):
@@ -576,7 +603,7 @@ def record_as_late(school_no, id_no, name, level, section,
     db.session.commit()
 
 
-def time_in(school_no,api_key,id_no,name,level,section,
+def time_in(school_no,api_key,log_id,id_no,name,level,section,
             date,department,time,timestamp):
 
     add_this = Log(
@@ -588,6 +615,8 @@ def time_in(school_no,api_key,id_no,name,level,section,
         section=section,
         department=department,
         time_in=time,
+        time_in_id=log_id,
+        time_in_notification_status='Pending',
         timestamp=timestamp
         )
 
@@ -603,10 +632,11 @@ def time_in(school_no,api_key,id_no,name,level,section,
     return jsonify(status='Success',type='entry',action='entered'), 201
 
 
-def time_out(id_no, time, school_no):
+def time_out(log_id, id_no, time, school_no):
     log = Log.query.filter_by(id_no=id_no,school_no=school_no).order_by(Log.timestamp.desc()).first()
-    log.time_out=time
-    log.notification_status='Pending'
+    log.time_out = time
+    log.time_out_id = log_id
+    log.time_out_notification_status = 'Pending'
     db.session.commit()
 
     compose_message(log.id,id_no,time,'left')
@@ -614,16 +644,17 @@ def time_out(id_no, time, school_no):
     return jsonify(status='Success',type='exit',action='left'), 201
 
 
-def compose_message(log_id,id_no,time,action):
+def compose_message(log_id,id_no,log_time,action):
     student = get_student_data(id_no)
-    message = 'Good day! We would like to inform you that '+student.first_name+' '+\
-                student.last_name+' has '+action+' the campus at exactly '+\
-                time+'.'
+    message = student.first_name+' '+\
+              student.last_name+' has '+action+' the campus on '+ \
+              time.strftime("%B %d, %Y") +' at exactly '+\
+              log_time+'.'
 
-    send_message(log_id,'log',message,student.parent_contact,SMS_URL)
+    send_message(log_id,'log',message,student.parent_contact,SMS_URL,action)
             
 
-def send_message(log_id, type, message, msisdn, request_url):
+def send_message(log_id, type, message, msisdn, request_url,action):
     log = Log.query.filter_by(id=log_id).first()
 
     # message_options = {
@@ -659,19 +690,29 @@ def send_message(log_id, type, message, msisdn, request_url):
         r = requests.post(request_url,message_options)           
         if r.status_code == 200:
             print str(r.status_code)
-            log.notification_status='Success'
+            if action == 'entered':
+                log.time_in_notification_status='Success'
+            else:
+                log.time_out_notification_status='Success'
             db.session.commit()
             return
-        log.notification_status='Failed'
+        if action == 'entered':
+            log.time_in_notification_status='Failed'
+        else:
+            log.time_out_notification_status='Failed'
         db.session.commit()
         print str(r.status_code)
         return
 
-    except requests.exceptions.ConnectionError as e:
+    except:
         print "Sending Failed!"
-        log.notification_status='Failed'
+        if action == 'entered':
+            log.time_in_notification_status='Failed'
+        else:
+            log.time_out_notification_status='Failed'
         db.session.commit()
         return
+    # return
 
 def prepare():
     global variable
@@ -822,9 +863,21 @@ def get_latest_schedule(api_key):
         afternoon_time= afternoon_time
         )
 
-
 def str2bool(v):
-  return v.lower() in ("yes", "true", "t", "1")
+    return v.lower() in ("yes", "true", "t", "1")
+
+def test_job(word):
+    print word
+
+def initialize_absent(school_no,api_key):
+    print 'initializing'
+    absent_time = "17:45"
+    print absent_time
+    schedule.every().day.at(absent_time).do(mark_morning_absent,school_no,api_key)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+    return
 
 
 def nocache(view):
@@ -841,32 +894,27 @@ def nocache(view):
 
 
 def send_email(new_user,email_address,user_name,school_name,password):
-    s = smtplib.SMTP('smtp.gmail.com', 587)
-    myGmail = 'parentlyinc@gmail.com'
-    myGMPasswd = 'ratmaxi8'
-    message = text(('Hi, %s!\r\n \r\nWelcome to Parent.ly! %s has added you as administrator for %s. '
-               'Please go to http://projectraven.herokuapp.com/ and login with your email. '
-               'Your temporary password is: %s. We strongly recommend that you change it '
-               'immediately.\r\n \r\nRegards,\r\nParent.ly Team')%(str(new_user),str(user_name), str(school_name), str(password)))
-    message['Subject'] = 'Welcome to Parent.ly'
-    message['From'] = 'Parent.ly'
-    message['To'] = email_address
-    s.starttls()
-    s.login(myGmail, myGMPasswd)
-    s.sendmail(myGmail,email_address,message.as_string())
-    s.quit()
+    # try:
+    #     s = smtplib.SMTP('smtp.gmail.com', 587)
+    #     myGmail = 'parentlyinc@gmail.com'
+    #     myGMPasswd = 'ratmaxi8'
+    #     message = text(('Hi, %s!\r\n \r\nWelcome to Parent.ly! %s has added you as administrator for %s. '
+    #                'Please go to http://projectraven.herokuapp.com/ and login with your email. '
+    #                'Your temporary password is: %s. We strongly recommend that you change it '
+    #                'immediately.\r\n \r\nRegards,\r\nParent.ly Team')%(str(new_user),str(user_name), str(school_name), str(password)))
+    #     message['Subject'] = 'Welcome to Parent.ly'
+    #     message['From'] = 'Parent.ly'
+    #     message['To'] = email_address
 
-    # message = PMMail(api_key = os.environ.get('POSTMARK_API_TOKEN'),
-    #              subject = "Welcome to Parent.ly",
-    #              sender = "parentlyinc@gmail.com",
-    #              to = email_address,
-    #              text_body = ('Hi, %s!\r\n \r\nWelcome to Parent.ly! %s has added you as administrator for %s. '
-    #            'Please go to http://projectraven.herokuapp.com/ and login with you email. '
-    #            'Your temporary password is: %s. We strongly recommend that you change it '
-    #            'immediately.\r\n \r\nRegards,\r\nParent.ly Team')%(str(new_user),str(user_name), str(school_name), str(password)),
-    #              tag = "welcome")
+    #     s.starttls()
+    #     s.login(myGmail, myGMPasswd)
+    #     s.sendmail(myGmail,email_address,message.as_string())
+    #     s.quit()
+    #     return True
 
-    # message.send()
+    # except:
+    #     return False
+    return True
 
 
 @app.route('/sched/get', methods=['GET', 'POST'])
@@ -879,7 +927,7 @@ def get_schedule():
 def index():
     if session:
         return redirect(url_for('dashboard'))
-    return flask.render_template('cover.html')
+    return redirect(url_for('login_page'))
 
 
 @app.route('/dashboard', methods=['GET', 'POST'])
@@ -899,6 +947,8 @@ def dashboard():
 
     school = School.query.filter_by(api_key=session['api_key']).first()
     sections = Section.query.filter_by(school_no=session['school_no']).all()
+    departments = Department.query.filter_by(school_no=session['school_no']).all()
+    user = AdminUser.query.filter_by(id=session['user_id']).first()
 
     first_set = fetch_first(session['logs_limit'],session['late_limit'],
         session['attendance_limit'],session['absent_limit'],session['school_no'],
@@ -914,8 +964,10 @@ def dashboard():
         absent=first_set['absent'], 
         view=session['department'],
         sections=sections,
+        departments=departments,
         tab=session['tab'],
         user_name=session['user_name'],
+        user = user,
         school_name=session['school_name']
         )
 
@@ -932,13 +984,19 @@ def reset_attendance():
 
 @app.route('/accounts', methods=['GET', 'POST'])
 def manage_accounts():
+    if not session['is_super_admin']:
+        return redirect('/')
     accounts = AdminUser.query.filter_by(school_no=session['school_no']).all()
     return flask.render_template('accounts.html', accounts=accounts, school_name=session['school_name'], user_name=session['user_name'])
 
 
 @app.route('/accounts/new', methods=['GET', 'POST'])
 def new_account():
+    if not session['is_super_admin']:
+        return redirect('/')
+
     account_info = flask.request.form.to_dict()
+
     email_account = AdminUser.query.filter_by(email=account_info['email']).first()
     if email_account or email_account != None:
         return jsonify(status='failed',error='Email already in use')
@@ -948,24 +1006,26 @@ def new_account():
         return jsonify(status='failed',error='You\'ve reached the limit of 5 accounts')
 
     temp_password = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(8))
-    new_account = AdminUser(
-        school_no='123456789',
-        email=account_info['email'],
-        password=temp_password,
-        first_name=account_info['first_name'],
-        last_name=account_info['last_name'],
-        status=account_info['status'],
-        added_by=session['user_id'],
-        timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
-        )
-    db.session.add(new_account)
-    db.session.commit()
 
-    email_thread = threading.Thread(target=send_email,args=[account_info['first_name'],account_info['email'],session['user_name'],session['school_name'], temp_password])
-    email_thread.start()
+    if send_email(account_info['first_name'],account_info['email'],session['user_name'],session['school_name'], temp_password):
+        new_account = AdminUser(
+            school_no=session['school_no'],
+            email=account_info['email'],
+            password=temp_password,
+            first_name=account_info['first_name'],
+            last_name=account_info['last_name'],
+            status='Active',
+            is_super_admin=True if account_info['is_super_admin'] == 'true' else False,
+            added_by=session['user_id'],
+            timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+            )
 
-    accounts = AdminUser.query.filter_by(school_no=session['school_no']).all()
-    return flask.render_template('account_table.html', accounts=accounts)
+        db.session.add(new_account)
+        db.session.commit()
+
+        accounts = AdminUser.query.filter_by(school_no=session['school_no']).all()
+        return flask.render_template('account_table.html', accounts=accounts)
+    return jsonify(status='failed',error='Could not connect to server.')
 
 
 @app.route('/schedule/irregular/get', methods=['GET', 'POST'])
@@ -1185,18 +1245,19 @@ def add_log():
 
     if not logged or logged.time_out != None:
 
-        return time_in(data['school_no'],data['api_key'],data['id_no'],data['name'],
+        return time_in(data['school_no'],data['api_key'],data['log_id'],data['id_no'],data['name'],
                 data['level'],data['section'],data['date'],data['department'],
                 data['time'],data['timestamp'])
 
-    return time_out(data['id_no'],data['time'],data['school_no'])    
+    return time_out(data['log_id'],data['id_no'],data['time'],data['school_no'])    
 
 
 @app.route('/blast',methods=['GET','POST'])
 def blast_message():
     password = flask.request.form.get('password')
     message = flask.request.form.get('message')
-    if not authenticate_user(session['school_no'], password):
+    user = User.query.filter_by(id=session['user_id'], password=password).first()
+    if not user or user == None:
         return flask.render_template('status.html', status='Unauthorized')
 
     for user in db.session.query(Student.parent_contact).filter\
@@ -1670,6 +1731,12 @@ def sync_schedule():
     schedule.twelfth_grade_afternoon_end = data['twelfth_grade_afternoon_end']
 
     db.session.commit()
+
+    # INITIALIZE PYSCHEDULER HERE
+    absent_thread = threading.Thread(target=initialize_absent,args=[data['school_no'],data['api_key']])
+    absent_thread.daemon = True
+    absent_thread.start()
+    
     return '',201
 
 
@@ -1682,6 +1749,13 @@ def favicon():
 def fetch_sent_messages():
     messages = Message.query.filter_by(school_no=session['school_no']).all()
     return flask.render_template('sent_messages.html',messages=messages)
+
+
+@app.route('/messages/view',methods=['GET','POST'])
+def view_sent_messages():
+    message_id = flask.request.form.get('message_id')
+    message = Message.query.filter_by(id=message_id).first()
+    return flask.render_template('message.html',message=message)
 
 
 @app.route('/messages/new',methods=['GET','POST'])
@@ -1750,29 +1824,29 @@ def rebuild_database():
     db.create_all()
 
     admin = AdminUser(
-        school_no = '123456789',
+        school_no = 'tmtc-sc2016',
         email = 'barcelona.jasperoliver@gmail.com',
         password = 'test',
         first_name = 'Jasper',
-        middle_name= 'Estrada',
         last_name = 'Barcelona',
         status = 'Active',
+        is_super_admin=True,
         timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
         )
 
     school = School(
-        school_no='123456789',
+        school_no='tmtc-sc2016',
         api_key='ecc67d28db284a2fb351d58fe18965f9',
         password='test',
-        name="Scuola Gesu Bambino",
-        address="10, Brgy Isabang",
-        city="Lucena City",
-        email="sgb.edu@gmail.com",
+        name="The Manila Times College",
+        address="Subic",
+        city="Subic",
+        email="hello@tmtc.edu.ph",
         contact="555-8898"
         )
 
     schedule = Schedule(
-        school_no=123456789,
+        school_no='tmtc-sc2016',
         junior_kinder_morning_class=False,
         junior_kinder_afternoon_class=False,
         senior_kinder_morning_class=False,
@@ -1864,277 +1938,81 @@ def rebuild_database():
     db.session.add(admin)
     db.session.commit()
 
-    # school = School(
-    #     id='123456789',
-    #     api_key='ecc67d28db284a2fb351d58fe18965f9',
-    #     password='test',
-    #     name="Scuola Gesu Bambino",
-    #     url='scuolagesubambino',
-    #     address="10, Brgy Isabang",
-    #     city="Lucena City",
-    #     email="sgb.edu@gmail.com",
-    #     tel="555-8898",
-
-    #     kinder_morning_class = True,
-    #     kinder_afternoon_class = True,
-    #     primary_morning_class = True,
-    #     primary_afternoon_class = True,
-    #     junior_morning_class = True,
-    #     junior_afternoon_class = True,
-    #     senior_morning_class = True,
-    #     senior_afternoon_class = True,
-
-    #     kinder_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
-    #     kinder_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-    #     kinder_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-    #     kinder_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
-
-    #     primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
-    #     primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-    #     primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-    #     primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
-
-    #     junior_morning_start = str(now.replace(hour=12, minute=0, second=0))[11:16],
-    #     junior_morning_end = str(now.replace(hour=13, minute=0, second=0))[11:16],
-    #     junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-    #     junior_afternoon_end = str(now.replace(hour=13, minute=30, second=0))[11:16],
-
-    #     senior_morning_start = str(now.replace(hour=12, minute=0, second=0))[11:16],
-    #     senior_morning_end = str(now.replace(hour=13, minute=0, second=0))[11:16],
-    #     senior_afternoon_start = str(now.replace(hour=12, minute=30, second=0))[11:16],
-    #     senior_afternoon_end = str(now.replace(hour=13, minute=30, second=0))[11:16]
-    #     )
-    # db.session.add(school)
-    # db.session.commit()
-
-    # # school1 = School(
-    # #     id='4321',
-    # #     api_key='ecc67d28db284a2fb351d58fe18965f0',
-    # #     password='test',
-    # #     name="Sacred Heart College",
-    # #     url='sacredheartcollege',
-    # #     address="10, Brgy Isabang",
-    # #     city="Lucena City",
-    # #     email="sgb.edu@gmail.com",
-    # #     tel="555-8898",
-
-    # #     primary_morning_start = str(now.replace(hour=7, minute=0, second=0))[11:16],
-    # #     primary_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-    # #     primary_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-    # #     primary_afternoon_end = str(now.replace(hour=18, minute=0, second=0))[11:16],
-
-    # #     junior_morning_start = str(now.replace(hour=8, minute=0, second=0))[11:16],
-    # #     junior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-    # #     junior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-    # #     junior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16],
-
-    # #     senior_morning_start = str(now.replace(hour=9, minute=0, second=0))[11:16],
-    # #     senior_morning_end = str(now.replace(hour=12, minute=0, second=0))[11:16],
-    # #     senior_afternoon_start = str(now.replace(hour=13, minute=0, second=0))[11:16],
-    # #     senior_afternoon_end = str(now.replace(hour=16, minute=0, second=0))[11:16]
-    # #     )
-    # # # db.session.add(school1)
-
-    # a = Student(
-    #     school_id='123456789',
-    #     id_no='2011334281',
-    #     first_name='Jasper',
-    #     last_name='Barcelona',
-    #     middle_name='Estrada',
-    #     level='2nd Grade',
-    #     department='student',
-    #     section='Charity',
-    #     absences='0',
-    #     lates='0',
-    #     parent_contact='09183339068'
-    #     )
-    # b = Student(
-    #     school_id='123456789',
-    #     id_no='2011334282',
-    #     first_name='Janno',
-    #     last_name='Armamento',
-    #     middle_name='Nicolas',
-    #     level='1st Grade',
-    #     department='student',
-    #     section='Fidelity',
-    #     absences='0',
-    #     lates='0',
-    #     parent_contact='09183339068'
-    #     )
-
-    # c = Student(
-    #     school_id='123456789',
-    #     id_no='2011334283',
-    #     first_name='Joseph',
-    #     last_name='Sallao',
-    #     middle_name='Bear',
-    #     level='2nd Grade',
-    #     department='student',
-    #     section='Fidelity',
-    #     absences='0',
-    #     lates='0',
-    #     parent_contact='09183339068'
-    #     )
-
     d = Section(
-        school_no='123456789',
+        school_no='tmtc-sc2016',
         name='Benedict'
         )
 
     e = Section(
-        school_no='123456789',
+        school_no='tmtc-sc2016',
         name='Anthony'
         )
 
     f = Section(
-        school_no='123456789',
+        school_no='tmtc-sc2016',
         name='Ignatius'
         )
 
     g = Section(
-        school_no='123456789',
+        school_no='tmtc-sc2016',
         name='Louis'
         )
 
     h = Section(
-        school_no='123456789',
+        school_no='tmtc-sc2016',
         name='John'
         )
 
     i = Section(
-        school_no='123456789',
+        school_no='tmtc-sc2016',
         name='Francis'
         )
 
     j = Section(
-        school_no='123456789',
+        school_no='tmtc-sc2016',
         name='Lorenzo Ruiz'
         )
 
     k = Section(
-        school_no='123456789',
+        school_no='tmtc-sc2016',
         name='Augustine'
         )
 
     l = Section(
-        school_no='123456789',
+        school_no='tmtc-sc2016',
         name='Vincent'
         )
 
     m = Section(
-        school_no='123456789',
+        school_no='tmtc-sc2016',
         name='Thomas'
         )
 
     n = Section(
-        school_no='123456789',
+        school_no='tmtc-sc2016',
         name='Jerome'
         )
 
-    # f = Section(
-    #     school_id='123456789',
-    #     name='Peace'
-    #     )
+    o = Department(
+        school_no='tmtc-sc2016',
+        name='Faculty'
+        )
 
-    # message = Message(
-    #     school_id='123456789',
-    #     date=time.strftime("%B %d, %Y"),
-    #     time=time.strftime("%I:%M %p"),
-    #     content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
-    #             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
-    #             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
-    #             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
-    #             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
-    #             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-    #     )
+    p = Department(
+        school_no='tmtc-sc2016',
+        name='Maintenance'
+        )
 
-    # message1 = Message(
-    #     school_id='123456789',
-    #     date=time.strftime("%B %d, %Y"),
-    #     time=time.strftime("%I:%M %p"),
-    #     content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
-    #             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
-    #             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
-    #             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
-    #             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
-    #             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-    #     )
+    q = Department(
+        school_no='tmtc-sc2016',
+        name='Guidance'
+        )
 
-    # message2 = Message(
-    #     school_id='123456789',
-    #     date=time.strftime("%B %d, %Y"),
-    #     time=time.strftime("%I:%M %p"),
-    #     content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
-    #             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
-    #             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
-    #             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
-    #             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
-    #             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-    #     )
+    r = Department(
+        school_no='tmtc-sc2016',
+        name='Student Affairs'
+        )
 
-    # message3 = Message(
-    #     school_id='123456789',
-    #     date=time.strftime("%B %d, %Y"),
-    #     time=time.strftime("%I:%M %p"),
-    #     content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
-    #             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
-    #             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
-    #             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
-    #             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
-    #             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-    #     )
-
-    # message4 = Message(
-    #     school_id='123456789',
-    #     date=time.strftime("%B %d, %Y"),
-    #     time=time.strftime("%I:%M %p"),
-    #     content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
-    #             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
-    #             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
-    #             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
-    #             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
-    #             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-    #     )
-
-    # message5 = Message(
-    #     school_id='123456789',
-    #     date=time.strftime("%B %d, %Y"),
-    #     time=time.strftime("%I:%M %p"),
-    #     content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
-    #             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
-    #             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
-    #             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
-    #             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
-    #             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-    #     )
-
-    # message6 = Message(
-    #     school_id='123456789',
-    #     date=time.strftime("%B %d, %Y"),
-    #     time=time.strftime("%I:%M %p"),
-    #     content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
-    #             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
-    #             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
-    #             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
-    #             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
-    #             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-    #     )
-
-    # message7 = Message(
-    #     school_id='123456789',
-    #     date=time.strftime("%B %d, %Y"),
-    #     time=time.strftime("%I:%M %p"),
-    #     content='Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\
-    #             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\
-    #             quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\
-    #             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse\
-    #             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non\
-    #             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-    #     )
-
-    # db.session.add(a)
-    # db.session.add(b)
-    # db.session.add(c)
     db.session.add(d)
     db.session.add(e)
     db.session.add(f)
@@ -2146,15 +2024,10 @@ def rebuild_database():
     db.session.add(l)
     db.session.add(m)
     db.session.add(n)
-    # db.session.add(f)
-    # db.session.add(message)
-    # db.session.add(message1)
-    # db.session.add(message2)
-    # db.session.add(message3)
-    # db.session.add(message4)
-    # db.session.add(message5)
-    # db.session.add(message6)
-    # db.session.add(message7)
+    db.session.add(o)
+    db.session.add(p)
+    db.session.add(q)
+    db.session.add(r)
     db.session.commit()
 
     return jsonify(status='Success'),201
@@ -2162,6 +2035,7 @@ def rebuild_database():
 
 if __name__ == '__main__':
     app.debug = True
+    admin_alert()
     app.run(port=int(os.environ['PORT']), host='0.0.0.0',threaded=True)
 
     # port=int(os.environ['PORT']), host='0.0.0.0'

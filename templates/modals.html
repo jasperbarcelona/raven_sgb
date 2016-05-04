@@ -6,14 +6,24 @@
                         <div class="modal-header">
                                 <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">Sent Messages</h4>
                         </div>
+                        <div id="message-modal-preloader">
+                                <div class="loader"></div>
+                        </div>
+                        <div id="message-modal-cover"></div>
                         <div id="message-modal-body" class="modal-body">
-                                <div id="message-modal-preloader">
-                                        <img src="../static/images/assets/282.GIF">
+                                <div id="message-modal-body-left">
+                                
                                 </div>
+                                <div id="message-modal-right-preloader">
+                                        <div class="loader"></div>
+                                </div>
+                                <div id="message-modal-body-right">
+                                
+                                </div> 
                         </div>
                         <div class="modal-footer">
                                 <button type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
-                                <button id="new-message-btn" type="button" class="btn btn-primary" data-toggle="modal" data-target="#compose-message-modal">New Message</button>
+                                <button id="new-message-btn" type="button" class="btn btn-primary" onclick="compose_message()">New Message</button>
                         </div>
                 </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
@@ -129,6 +139,13 @@
                                 <input type="text" class="form-control" id="add_user_last_name" placeholder="Last Name" data-class="input-label" />
                                 <input type="text" class="form-control" id="add_user_first_name" placeholder="First Name" data-class="input-label" />
                                 <input type="text" class="form-control" id="add_user_middle_name" placeholder="Middle Name" data-class="input-label" />
+                                <input type="text" class="form-control" id="add_user_contact_no" placeholder="Contact Number" data-class="input-label" />
+                                <select class="form-control select" id="add_user_department" required>
+                                        <option value="" disabled selected>Department</option>
+                                        {% for department in departments %}
+                                        <option>{{department.name}}</option>
+                                        {% endfor %}
+                                </select>
                                 <input type="text" class="form-control" id="add_user_id_no" placeholder="ID Number" oninput="validate_user_id(this.value)" data-class="input-label" />
                                 <center>
                                         <span id="student-id-loader" class="id-loader"><img src="../static/images/assets/blue.GIF"></span>
