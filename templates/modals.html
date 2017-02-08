@@ -3,7 +3,7 @@
 <div class="modal fade" id="message-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog message-modal-dialog">
                 <div id="message-modal-conent" class="modal-content">
-                        <div class="modal-header">
+                        <div class="modal-header generic-background">
                                 <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">Sent Messages</h4>
                         </div>
                         <div id="message-modal-preloader">
@@ -32,7 +32,7 @@
 <div class="modal fade" id="compose-message-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog new-message-modal-dialog">
                 <div id="compose-message-modal-conent" class="modal-content">
-                        <div class="modal-header">
+                        <div class="modal-header generic-background">
                                 <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">New Message</h4>
                         </div>
                         <div id="compose-message-modal-body" class="modal-body">
@@ -74,52 +74,143 @@
         </div><!-- /.modal-dialog -->
 </div>
 
+<div class="modal fade add-modal" id="add-fee-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog add-fee-modal-dialog">
+                <div class="modal-content">
+                        <div class="modal-header user-modal-header generic-background">
+                                <h4 class="modal-title user-modal-title" id="gridSystemModalLabel">New Fee</h4>
+                        </div>
+                        <div class="modal-body add-fee-modal-body">
+                                <input type="text" class="form-control" id="add_fee_name" placeholder="Fee Name" data-class="input-label" />
+                                <select class="form-control select" id="add_fee_category" placeholder="Category" required>
+                                        <option value="" disabled selected>Category</option>
+                                        {% for category in fee_categories %}
+                                        <option>{{ category.name }}</option>
+                                        {% endfor %}
+                                </select>
+                                <input type="text" class="form-control" id="add_fee_price" placeholder="Price" data-class="input-label" onkeydown="return isNumberKey(event)" />
+                                <br />
+                                <textarea class="form-control" id="add_fee_desc" placeholder="Description (optional)" data-class="input-label" /></textarea> 
+                                <br />
+                                <h5 class="add-to-label">Automatically add this fee to:</h5>
+                                <select id="add_fee_to" class="appoint form-control selectpicker dropup" multiple data-live-search="false">
+                                        <option value="Junior Kinder">Junior Kinder</option>
+                                        <option value="Senior Kinder">Senior Kinder</option>
+                                        <option value="1st Grade">1st Grade</option>
+                                        <option value="2nd Grade">2nd Grade</option>
+                                        <option value="3rd Grade">3rd Grade</option>
+                                        <option value="4th Grade">4th Grade</option>
+                                        <option value="5th Grade">5th Grade</option>
+                                        <option value="6th Grade">6th Grade</option>
+                                        <option value="7th Grade">7th Grade</option>
+                                        <option value="8th Grade">8th Grade</option>
+                                        <option value="9th Grade">9th Grade</option>
+                                        <option value="10th Grade">10th Grade</option>
+                                        <option value="11th Grade">11th Grade</option>
+                                        <option value="12th Grade">12th Grade</option>
+                                </select>
+                                <br />
+                                <br />
+                        </div>
+                        <div class="modal-footer">
+                                <button id = "add-user-cancel" type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
+                                <button id="save-fee" type="button" class="btn btn-primary done-btn save-btn" disabled data-loading-text="Saving" data-complete-text="Save" autocomplete="off">Save</button>
+                        </div>
+                </div>
+        </div>
+</div>
+
 <div class="modal fade add-modal" id="add-student-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog add-user-modal-dialog">
                 <div class="modal-content">
-                        <div class="modal-header user-modal-header">
+                        <div class="modal-header user-modal-header generic-background">
                                 <h4 class="modal-title user-modal-title" id="gridSystemModalLabel">New Student</h4>
                         </div>
                         <div class="modal-body add-user-modal-body">
-                                <input type="text" class="form-control" id="add_student_id_no" placeholder="ID Number" data-class="input-label" oninput="validate_student_id(this.value)" />
-                                <input type="text" class="form-control" id="add_student_last_name" placeholder="Last Name" data-class="input-label" />
-                                <input type="text" class="form-control" id="add_student_first_name" placeholder="First Name" data-class="input-label" />
-                                <input type="text" class="form-control" id="add_student_middle_name" placeholder="Middle Name" data-class="input-label" />
-                                
-                                <input type="text" class="form-control" id="add_student_contact" placeholder="Guardian Contact Number" data-class="input-label" />
-                                
-
-                                <select class="form-control select" id="add_student_level" placeholder="Grade/Level" required>
-                                        <option value="" disabled selected>Grade/Level</option>
-                                        <option>Junior Kinder</option>
-                                        <option>Senior Kinder</option>
-                                        <option>1st Grade</option>
-                                        <option>2nd Grade</option>
-                                        <option>3rd Grade</option>
-                                        <option>4th Grade</option>
-                                        <option>5th Grade</option>
-                                        <option>6th Grade</option>
-                                        <option>7th Grade</option>
-                                        <option>8th Grade</option>
-                                        <option>9th Grade</option>
-                                        <option>10th Grade</option>
-                                        <option>11th Grade</option>
-                                        <option>12th Grade</option>
-                                </select>
-                                <select class="form-control select" id="add_student_section" required>
-                                        <option value="" disabled selected>Section</option>
-                                        {% for section in sections %}
-                                        <option>{{section.name}}</option>
-                                        {% endfor %}
-                                </select>
-                                <center>
-                                        <span id="student-id-loader" class="id-loader"><img src="../static/images/assets/blue.GIF"></span>
-                                        <span id="student-id-error"></span>
-                                </center>
+                                <div class="add-user-section student-info-section">
+                                        <h4>Student Information</h4>
+                                        <div class="left col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_student_last_name" placeholder="Last Name" data-class="input-label" />
+                                        </div>
+                                        <div class="right col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_student_first_name" placeholder="First Name" data-class="input-label" />
+                                        </div>
+                                        <div class="left col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_student_middle_name" placeholder="Middle Name" data-class="input-label" />
+                                        </div>
+                                        
+                                        <!-- <input type="text" class="form-control" id="add_student_contact" placeholder="Guardian Contact Number" data-class="input-label" /> -->
+                                        
+                                        <div class="right col-sm-6 col-xs-12">
+                                                <select class="form-control select" id="add_student_level" placeholder="Grade/Level" required>
+                                                        <option value="" disabled selected>Grade/Level</option>
+                                                        <option>Junior Kinder</option>
+                                                        <option>Senior Kinder</option>
+                                                        <option>1st Grade</option>
+                                                        <option>2nd Grade</option>
+                                                        <option>3rd Grade</option>
+                                                        <option>4th Grade</option>
+                                                        <option>5th Grade</option>
+                                                        <option>6th Grade</option>
+                                                        <option>7th Grade</option>
+                                                        <option>8th Grade</option>
+                                                        <option>9th Grade</option>
+                                                        <option>10th Grade</option>
+                                                        <option>11th Grade</option>
+                                                        <option>12th Grade</option>
+                                                </select>
+                                        </div>
+                                        <div class="left col-sm-6 col-xs-12">
+                                                <select class="form-control select" id="add_student_section" required>
+                                                        <option value="" disabled selected>Section</option>
+                                                        {% for section in sections %}
+                                                        <option>{{section.name}}</option>
+                                                        {% endfor %}
+                                                </select>
+                                        </div>
+                                        <div class="right col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_student_id_no" placeholder="ID Number" data-class="input-label" oninput="validate_student_id(this.value)" />
+                                        </div>
+                                        <center>
+                                                <div class="id-loader-container">
+                                                        <span id="student-id-loader" class="id-loader"><img src="../static/images/assets/blue.GIF"></span>
+                                                        <span id="student-id-error"></span>
+                                                </div>
+                                        </center>
+                                </div>
+                                <div class="add-user-section guardian-info-section">
+                                        <div id="guardianInfoLoading" class="loading">
+                                                <div class="loader"></div>
+                                        </div>
+                                        <h4>Guardian Information</h4>
+                                        <div class="parent-mobile-container col-xs-12">
+                                                <div class="left col-sm-6 col-xs-12">
+                                                        <input type="text" class="form-control" id="add_guardian_mobile" placeholder="Mobile Number" data-class="input-label" />
+                                                </div>
+                                        </div>
+                                        <div class="left col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_guardian_last_name" placeholder="Last Name" data-class="input-label" />
+                                        </div>
+                                        <div class="right col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_guardian_first_name" placeholder="First Name" data-class="input-label" />
+                                        </div>
+                                        <div class="left col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_guardian_middle_name" placeholder="Middle Name" data-class="input-label" />
+                                        </div>
+                                        <div class="right col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_guardian_email" placeholder="Email" data-class="input-label" />
+                                        </div>
+                                        <div class="left col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_guardian_address" placeholder="Address" data-class="input-label" />
+                                        </div>
+                                        <div class="right col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_guardian_relation" placeholder="Relation" data-class="input-label" />
+                                        </div>
+                                </div>
                         </div>
                         <div class="modal-footer">
                                 <div class="add-user-footer-left">
-                                        <i class="material-icons save-status-success md-28">done</i>
+                                        <i class="material-icons save-status-success">done</i>
                                 </div>
 
                                 <button id = "add-user-cancel" type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
@@ -132,25 +223,40 @@
 <div class="modal fade add-modal" id="add-user-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog add-user-modal-dialog">
                 <div class="modal-content">
-                        <div class="modal-header user-modal-header">
+                        <div class="modal-header user-modal-header generic-background">
                                 <span class="modal-title user-modal-title" id="gridSystemModalLabel">New User</span>
                         </div>
                         <div class="modal-body add-user-modal-body">
-                                <input type="text" class="form-control" id="add_user_last_name" placeholder="Last Name" data-class="input-label" />
-                                <input type="text" class="form-control" id="add_user_first_name" placeholder="First Name" data-class="input-label" />
-                                <input type="text" class="form-control" id="add_user_middle_name" placeholder="Middle Name" data-class="input-label" />
-                                <input type="text" class="form-control" id="add_user_contact_no" placeholder="Contact Number" data-class="input-label" />
-                                <select class="form-control select" id="add_user_department" required>
-                                        <option value="" disabled selected>Department</option>
-                                        {% for department in departments %}
-                                        <option>{{department.name}}</option>
-                                        {% endfor %}
-                                </select>
-                                <input type="text" class="form-control" id="add_user_id_no" placeholder="ID Number" oninput="validate_user_id(this.value)" data-class="input-label" />
-                                <center>
-                                        <span id="student-id-loader" class="id-loader"><img src="../static/images/assets/blue.GIF"></span>
-                                        <span id="user-id-error"></span>
-                                </center>
+                                <div class="add-user-section student-info-section">
+                                        <h4>User Information</h4>
+                                        <div class="left col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_user_last_name" placeholder="Last Name" data-class="input-label" />
+                                        </div>
+                                        <div class="right col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_user_first_name" placeholder="First Name" data-class="input-label" />
+                                        </div>
+                                        <div class="left col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_user_middle_name" placeholder="Middle Name" data-class="input-label" />
+                                        </div>
+                                        <div class="right col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_user_contact_no" placeholder="Contact Number" data-class="input-label" />
+                                        </div>
+                                        <div class="left col-sm-6 col-xs-12">
+                                                <select class="form-control select" id="add_user_department" required>
+                                                        <option value="" disabled selected>Department</option>
+                                                        {% for department in departments %}
+                                                        <option>{{department.name}}</option>
+                                                        {% endfor %}
+                                                </select>
+                                        </div>
+                                        <div class="right col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_user_id_no" placeholder="ID Number" oninput="validate_user_id(this.value)" data-class="input-label" />
+                                        </div>
+                                        <div class="id-loader-container">
+                                                <span id="user-id-loader" class="id-loader"><img src="../static/images/assets/blue.GIF"></span>
+                                                <span id="user-id-error"></span>
+                                        </div>
+                                </div>
                         </div>
                         <div class="modal-footer">
                                 <div class="add-user-footer-left">
@@ -159,6 +265,126 @@
 
                                 <button id = "add-user-cancel" type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
                                 <button id="save-user" type="button" class="btn btn-primary done-btn save-btn" disabled data-loading-text="Saving" data-complete-text="Save" autocomplete="off"><span>Save</span></button>
+                        </div>
+                </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade add-modal" id="add-college-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog add-user-modal-dialog">
+                <div class="modal-content">
+                        <div class="modal-header user-modal-header generic-background">
+                                <h4 class="modal-title user-modal-title" id="gridSystemModalLabel">New Student</h4>
+                        </div>
+                        <div class="modal-body add-user-modal-body">
+                                <div class="add-user-section student-info-section">
+                                        <h4>Student Information</h4>
+                                        <div class="left col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_college_last_name" placeholder="Last Name" data-class="input-label" />
+                                        </div>
+                                        <div class="right col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_college_first_name" placeholder="First Name" data-class="input-label" />
+                                        </div>
+                                        <div class="left col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_college_middle_name" placeholder="Middle Name" data-class="input-label" />
+                                        </div>
+                                        <div class="right col-sm-6 col-xs-12">
+                                                <select class="form-control select" id="add_college_level" placeholder="Year" required>
+                                                        <option value="" disabled selected>Year</option>
+                                                        <option value="1st Year">1st Year</option>
+                                                        <option value="2nd Year">2nd Year</option>
+                                                        <option value="3rd Year">3rd Year</option>
+                                                        <option value="4th Year">4th Year</option>
+                                                        <option value="5th year">5th year</option>
+                                                </select>
+                                        </div>
+                                        <div class="left col-sm-6 col-xs-12">
+                                                <select class="form-control select" id="add_college_department" required>
+                                                        <option value="" disabled selected>Department</option>
+                                                        {% for department in college_departments %}
+                                                        <option>{{department.name}}</option>
+                                                        {% endfor %}
+                                                </select>
+                                        </div>
+                                        <div class="right col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_college_email" placeholder="Email" data-class="input-label" />
+                                        </div>
+                                        <div class="left col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_college_mobile" placeholder="Mobile Number" data-class="input-label" />
+                                        </div>
+                                        <div class="right col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_college_id_no" placeholder="ID Number" data-class="input-label" oninput="validate_college_id(this.value)" />
+                                        </div>
+                                        <center>
+                                                <div class="id-loader-container">
+                                                        <span id="college-id-loader" class="id-loader"><img src="../static/images/assets/blue.GIF"></span>
+                                                        <span id="college-id-error"></span>
+                                                </div>
+                                        </center>
+                                </div>
+                        </div>
+                        <div class="modal-footer">
+                                <div class="add-user-footer-left">
+                                        <i class="material-icons save-status-success md-28">done</i>
+                                </div>
+
+                                <button id = "add-user-cancel" type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
+                                <button id="save-college" type="button" class="btn btn-primary done-btn save-btn" disabled data-loading-text="Saving" data-complete-text="Save" autocomplete="off">Save</button>
+                        </div>
+                </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade add-modal" id="add-staff-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog add-user-modal-dialog">
+                <div class="modal-content">
+                        <div class="modal-header user-modal-header generic-background">
+                                <h4 class="modal-title user-modal-title" id="gridSystemModalLabel">New Student</h4>
+                        </div>
+                        <div class="modal-body add-user-modal-body">
+                                <div class="add-user-section student-info-section">
+                                        <h4>Staff Information</h4>
+                                        <div class="left col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_staff_last_name" placeholder="Last Name" data-class="input-label" />
+                                        </div>
+                                        <div class="right col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_staff_first_name" placeholder="First Name" data-class="input-label" />
+                                        </div>
+                                        <div class="left col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_staff_middle_name" placeholder="Middle Name" data-class="input-label" />
+                                        </div>
+                                        <div class="right col-sm-6 col-xs-12">
+                                                <select class="form-control select" id="add_staff_department" required>
+                                                        <option value="" disabled selected>Department</option>
+                                                        {% for department in staff_departments %}
+                                                        <option>{{department.name}}</option>
+                                                        {% endfor %}
+                                                </select>
+                                        </div>
+                                        <div class="left col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_staff_email" placeholder="Email" data-class="input-label" />
+                                        </div>
+                                        <div class="right col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_staff_mobile" placeholder="Mobile Number" data-class="input-label" />
+                                        </div>
+                                        <div class="left col-sm-6 col-xs-12">
+                                                <input type="text" class="form-control" id="add_staff_id_no" placeholder="ID Number" data-class="input-label" oninput="validate_staff_id(this.value)" />
+                                        </div>
+                                        <center>
+                                                <div class="id-loader-container">
+                                                        <span id="staff-id-loader" class="id-loader"><img src="../static/images/assets/blue.GIF"></span>
+                                                        <span id="staff-id-error"></span>
+                                                </div>
+                                        </center>
+                                </div>
+                        </div>
+                        <div class="modal-footer">
+                                <div class="add-user-footer-left">
+                                        <i class="material-icons save-status-success md-28">done</i>
+                                </div>
+
+                                <button id = "add-user-cancel" type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
+                                <button id="save-staff" type="button" class="btn btn-primary done-btn save-btn" disabled data-loading-text="Saving" data-complete-text="Save" autocomplete="off">Save</button>
                         </div>
                 </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
@@ -202,7 +428,7 @@
                                         <div class="tab-pane fade in" id="{{day}}-tab">
                                                 <div class="sched-group col-md-6">
                                                         <div class="sched-group-header">
-                                                                <span class="sched-label">Junior Kinder {{day}}</span>
+                                                                <span class="sched-label">Junior Kinder</span>
                                                         </div>
                                                         <div class="sched-group-body">
                                                                 <div class="group-time-label morning">
@@ -210,7 +436,7 @@
                                                                 </div>
                                                                 <div id="junior_kinder_morning_class_sched" class="sched">                   
                                                                         <div class="input-group clockpicker schedule-text">
-                                                                        <input id="{{day}}_junior_kinder_morning_start" type="text" disabled class="form-control time">
+                                                                        <input id="{{day}}_junior_kinder_morning_start" type="text" readonly class="form-control time">
                                                                         <span class="input-group-addon">
                                                                         <span class="glyphicon glyphicon-time"></span>
                                                                         </span>
@@ -847,7 +1073,7 @@
                         <div id="calendar-loading" class="loading">
                                 <div class="loader"></div>
                         </div>
-                        <div id="calendar-modal-header" class="modal-header">
+                        <div id="calendar-modal-header" class="modal-header generic-background">
                                 <select id="calendar-month" class="form-control">
                                         <option class="calendar-options" value='1'>January</option>
                                         <option class="calendar-options" value='2'>February</option>
@@ -918,7 +1144,7 @@
                         <div id="calendar-schedule-loading" class="loading">
                                 <div class="loader"></div>
                         </div>
-                        <div id="calendar-schedule-modal-header" class="modal-header">
+                        <div id="calendar-schedule-modal-header" class="modal-header generic-background">
                         </div>
                         <div class="modal-body calendar-schedule-modal-body">
                                 <div class="sched-group col-md-6">
@@ -1582,6 +1808,25 @@
                         <div id="calendar-schedule-modal-footer" class="modal-footer">
                                 <button type="button" id="sched-cancel" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
                                 <button id="save-calendar-sched" type="button" class="btn btn-primary" data-toggle="modal" disabled onclick="save_calendar_sched()" data-loading-text="Saving" data-complete-text="Save Changes" autocomplete="off">Save Changes</button>
+                        </div>
+                </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="collect-payment-modal" role="dialog" aria-hidden="true">
+        <div class="modal-dialog cash-transaction-modal-dialog">
+                <div class="modal-content">
+                        <div class="cash-transaction-modal-header modal-header generic-background">
+                                Payment
+                        </div>
+                        <div class="cash-transaction-modal-body modal-body">
+                                <span>Balance:</span>
+                                <span>Php </span><span id="cashTotal"></span><br /><br />
+                                <input type="text" id="amountPaid" class="form-control" placeholder="Amount Paid" onkeydown="return isNumberKey(event)"/>
+                        </div>  
+                        <div class="cash-transaction-modal-footer modal-footer">
+                                <button type="button" data-dismiss="modal" id="cancelQtyBtn" class="btn btn-danger">Cancel</button>
+                                <button type="button" id="tenderedDoneBtn" class="btn btn-primary" data-loading-text="Collecting" data-complete-text="Collect" disabled>Collect</button>
                         </div>
                 </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->

@@ -1,0 +1,17 @@
+{% if data[0] %}
+{% for log in data %}
+<tr id="{{log.id}}" class="rows">
+    <td class="xs">{{loop.index+limit}}</td> 
+    <td class="short">{{log.date}}</td>
+    <td class="short">{{log.id_no}}</td>   
+    <td class="long">{{log.name}}</td> 
+    <td class="short">{{log.group}}</td>
+    <td class="short">{{log.time_in}}</td>
+    <td class="short">{{log.time_out}}</td>                
+</tr>
+{% endfor %}
+{% else %}
+<tr>
+	<td class="no-records">NO RECORDS</td>	
+</tr>
+{% endif %}

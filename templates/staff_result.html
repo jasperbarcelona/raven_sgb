@@ -1,0 +1,16 @@
+{% if data[0] %}
+{% for person in data %}
+<tr id="{{person.id}}" class="rows">
+    <td class="xs">{{loop.index}}</td> 
+    <td class="short">{{person.id_no}}</td>   
+    <td class="short">{{person.last_name}}</td>                 
+    <td class="short">{{person.first_name}}</td>                 
+    <td class="short">{{person.middle_name}}</td>                
+    <td class="short">{{person.department}}</td>                
+</tr>
+{% endfor %}
+{% else %}
+<tr>
+<td class="no-records">NO RECORDS</td>	
+</tr>
+{% endif %}

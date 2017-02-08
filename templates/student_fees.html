@@ -1,0 +1,86 @@
+<div class="info-fee-container">
+    <div class="fee-title-container">
+    <h3 class="fee-label">Fees</h3>
+    </div>
+    <div class="fee-btn-container">
+        <button type="button" class="btn fee-action-btn" data-toggle="modal" data-target="#add-fees-modal">Add Fees</button>
+        <button type="button" class="btn fee-action-btn" data-toggle="modal" data-target="#collect-payment-modal" onclick="display_balance({{total_fees - total_paid}})">Collect Payment</button>
+    </div>
+</div>
+<table class="table additional-info-table">
+    <thead>
+        <tr>
+            <th class="xs"></th>
+            <th class="short">Fee</th>
+            <th class="short">Category</th>
+            <th class="short">Price</th>
+        </tr>
+    </thead>
+    <tbody class="fees-table">
+        {% for fee in student_fees %}
+        <tr class="fee-row" id="{{fee.id}}">
+            <td id="{{fee.id}}" class="xs" onclick="remove_fee(this.id,{{student.id}})">
+                <span class="glyphicon glyphicon-remove remove-fee"></span>
+            </td>
+            <td class="short">{{fee.fee_name}}</td>
+            <td class="short">{{fee.fee_category}}</td>
+            <td class="short">Php {{fee.fee_price}}</td>
+        </tr>
+        {% endfor %}
+        <tr class="total-row-label">
+            <td class="xs"></td>
+            <td class="short"></td>
+            <td class="short"></td>
+            <td class="short total-label">Total Fee:</td>
+        </tr>
+        <tr class="total-row-data">
+            <td class="xs"></td>
+            <td class="short"></td>
+            <td class="short"></td>
+            <td class="short total-fee-data">Php {{total_fees}}</td>
+        </tr>
+        <tr class="total-row-label">
+            <td class="xs"></td>
+            <td class="short"></td>
+            <td class="short"></td>
+            <td class="short total-label">Paid Amount:</td>
+        </tr>
+
+        {% if collected_payments[0] %}
+        {% for payment in collected_payments %}
+        <tr class="total-row-data">
+            <td class="xs"></td>
+            <td class="short"></td>
+            <td class="short"></td>
+            <td class="short">Php {{payment.amount}} - {{ payment.date }}</td>
+        </tr>
+        {% endfor %}
+        <tr class="total-row-data">
+            <td class="xs"></td>
+            <td class="short"></td>
+            <td class="short"></td>
+            <td class="short total-paid-data">Php {{total_paid}}</td>
+        </tr>
+        {% else %}
+        <tr class="total-row-data">
+            <td class="xs"></td>
+            <td class="short"></td>
+            <td class="short"></td>
+            <td class="short">--</td>
+        </tr>
+        {% endif %}
+        
+        <tr class="total-row-label">
+            <td class="xs"></td>
+            <td class="short"></td>
+            <td class="short"></td>
+            <td class="short total-label">Remaining Balance:</td>
+        </tr>
+        <tr class="total-row-data">
+            <td class="xs"></td>
+            <td class="short"></td>
+            <td class="short"></td>
+            <td class="short remaining-balance-data">Php {{total_fees - total_paid}}</td>
+        </tr>
+    </tbody>
+</table>

@@ -46,7 +46,7 @@ CLIENT_ID = 'ef8cf56d44f93b6ee6165a0caa3fe0d1ebeee9b20546998931907edbb266eb72'
 SECRET_KEY = 'c4c461cc5aa5f9f89b701bc016a73e9981713be1bf7bb057c875dbfacff86e1d'
 SHORT_CODE = '29290420420'
 CONNECT_TIMEOUT = 5.0
-CALENDAR_URL = 'http://tmtc.attendance.net:7000%s'
+CALENDAR_URL = 'http://0.0.0.0:7000%s'
 IPP_URL = 'https://devapi.globelabs.com.ph/smsmessaging/v1/outbound/%s/requests'
 IPP_SHORT_CODE = 21587460
 
@@ -224,6 +224,16 @@ class Department(db.Model):
     school_no = db.Column(db.String(32))
     name = db.Column(db.String(30))
 
+class CollegeDepartment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    school_no = db.Column(db.String(32))
+    name = db.Column(db.String(30))
+
+class StaffDepartment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    school_no = db.Column(db.String(32))
+    name = db.Column(db.String(30))
+
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     school_no = db.Column(db.String(32))
@@ -235,16 +245,14 @@ class Message(db.Model):
     content = db.Column(db.Text)
 
 class Log(db.Model, Serializer):
-    __public__ = ['id','school_no','date','id_no','name','level',
-                  'department','section','time_in','time_out','timestamp']
+    __public__ = ['id','school_no','date','id_no','name',
+                  'group','time_in','time_out','timestamp']
     id = db.Column(db.Integer, primary_key=True)
     school_no = db.Column(db.String(32))
     date = db.Column(db.String(20))
     id_no = db.Column(db.String(20))
     name = db.Column(db.String(60))
-    level = db.Column(db.String(10))
-    section = db.Column(db.String(30))
-    department = db.Column(db.String(30))
+    group = db.Column(db.String(30))
     time_in = db.Column(db.String(10))
     time_in_id = db.Column(db.Integer)
     time_in_notification_status = db.Column(db.String(10), unique=False)
@@ -253,9 +261,27 @@ class Log(db.Model, Serializer):
     time_out_notification_status = db.Column(db.String(10), unique=False)
     timestamp = db.Column(db.String(50))
 
-class Student(db.Model, Serializer):
+class K12(db.Model, Serializer):
     __public__ = ['id','school_no','id_no','first_name','last_name','middle_name',
-                  'level','department','section','absences','lates','parent_contact']
+                  'level','group','section','absences','lates','parent_contact']
+    id = db.Column(db.Integer, primary_key=True)
+    school_no = db.Column(db.String(32))
+    id_no = db.Column(db.String(20))
+    first_name = db.Column(db.String(30))
+    last_name = db.Column(db.String(30))
+    middle_name = db.Column(db.String(30))
+    level = db.Column(db.String(30), default='None')
+    group = db.Column(db.String(30))
+    section = db.Column(db.String(30), default='None')
+    absences = db.Column(db.String(3))
+    lates = db.Column(db.String(3))
+    parent_id = db.Column(db.Integer)
+    parent_relation = db.Column(db.String(30))
+    parent_contact = db.Column(db.String(12))
+
+class College(db.Model, Serializer):
+    __public__ = ['id','school_no','id_no','first_name','last_name','middle_name',
+                  'level','department','group','email','mobile']
     id = db.Column(db.Integer, primary_key=True)
     school_no = db.Column(db.String(32))
     id_no = db.Column(db.String(20))
@@ -264,17 +290,40 @@ class Student(db.Model, Serializer):
     middle_name = db.Column(db.String(30))
     level = db.Column(db.String(30), default='None')
     department = db.Column(db.String(30))
-    section = db.Column(db.String(30), default='None')
-    absences = db.Column(db.String(3))
-    lates = db.Column(db.String(3))
-    parent_contact = db.Column(db.String(12))
+    group = db.Column(db.String(30))
+    email = db.Column(db.String(30))
+    mobile = db.Column(db.String(12))
+
+class Staff(db.Model, Serializer):
+    __public__ = ['id','school_no','id_no','first_name','last_name','middle_name',
+                  'department','group','email','mobile']
+    id = db.Column(db.Integer, primary_key=True)
+    school_no = db.Column(db.String(32))
+    id_no = db.Column(db.String(20))
+    first_name = db.Column(db.String(30))
+    last_name = db.Column(db.String(30))
+    middle_name = db.Column(db.String(30))
+    department = db.Column(db.String(30))
+    group = db.Column(db.String(30))
+    email = db.Column(db.String(30))
+    mobile = db.Column(db.String(12))
+
+class Parent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    school_no = db.Column(db.String(32))
+    mobile_number = db.Column(db.String(12))
+    first_name = db.Column(db.String(30))
+    last_name = db.Column(db.String(30))
+    middle_name = db.Column(db.String(30))
+    email = db.Column(db.String(30))
+    address = db.Column(db.Text())
 
 class Late(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     school_no = db.Column(db.String(32))
     date = db.Column(db.String(20))
     id_no = db.Column(db.String(20))
-    name = db.Column(db.String(60))
+    name = db.Column(db.String(100))
     level = db.Column(db.String(30))
     section = db.Column(db.String(30))
     time_in = db.Column(db.String(10))
@@ -286,12 +335,52 @@ class Absent(db.Model):
     school_no = db.Column(db.String(32))
     date = db.Column(db.String(20))
     id_no = db.Column(db.String(20))
-    name = db.Column(db.String(60))
+    name = db.Column(db.String(100))
     level = db.Column(db.String(30))
     section = db.Column(db.String(30))
     department = db.Column(db.String(30))
     time_of_day = db.Column(db.String(20))
     timestamp = db.Column(db.String(50))
+
+class Fee(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    school_no = db.Column(db.String(32))
+    name = db.Column(db.String(60))
+    category = db.Column(db.String(60))
+    desc = db.Column(db.Text())
+    price = db.Column(db.Float())
+    timestamp = db.Column(db.String(50))
+
+class StudentFee(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    school_no = db.Column(db.String(32))
+    student_id = db.Column(db.Integer)
+    fee_id = db.Column(db.Integer)
+    student_name =  db.Column(db.String(100))
+    fee_name = db.Column(db.String(60))
+    fee_category = db.Column(db.String(60))
+    fee_price = db.Column(db.Float())
+    timestamp = db.Column(db.String(50))
+
+class FeeGroup(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    school_no = db.Column(db.String(32))
+    fee_id = db.Column(db.Integer)
+    level = db.Column(db.String(30))
+
+class Collected(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    school_no = db.Column(db.String(32))
+    student_id = db.Column(db.Integer)
+    amount = db.Column(db.Float())
+    date = db.Column(db.String(20))
+    time = db.Column(db.String(10))
+    timestamp = db.Column(db.String(50))
+
+class FeeCategory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    school_no = db.Column(db.String(32))
+    name = db.Column(db.String(60))
 
 class IngAdmin(sqla.ModelView):
     column_display_pk = True
@@ -310,11 +399,20 @@ admin = Admin(app, name='raven')
 admin.add_view(SchoolAdmin(School, db.session))
 admin.add_view(IngAdmin(Section, db.session))
 admin.add_view(IngAdmin(Log, db.session))
-admin.add_view(StudentAdmin(Student, db.session))
+admin.add_view(StudentAdmin(K12, db.session))
+admin.add_view(IngAdmin(Parent, db.session))
+admin.add_view(IngAdmin(Staff, db.session))
 admin.add_view(IngAdmin(Late, db.session))
 admin.add_view(IngAdmin(Absent, db.session))
 admin.add_view(IngAdmin(Message, db.session))
 admin.add_view(IngAdmin(Schedule, db.session))
+admin.add_view(IngAdmin(Fee, db.session))
+admin.add_view(IngAdmin(CollegeDepartment, db.session))
+admin.add_view(IngAdmin(StaffDepartment, db.session))
+admin.add_view(IngAdmin(FeeCategory, db.session))
+admin.add_view(IngAdmin(StudentFee, db.session))
+admin.add_view(IngAdmin(Collected, db.session))
+admin.add_view(IngAdmin(FeeGroup, db.session))
 admin.add_view(IngAdmin(AdminUser, db.session))
 
 
@@ -394,7 +492,7 @@ def admin_alert():
 
 
 def get_student_data(id_no):
-    return Student.query.filter_by(id_no=id_no).first()
+    return K12.query.filter_by(id_no=id_no).first()
 
 
 def message_options(message, msisdn):
@@ -431,10 +529,10 @@ def authenticate_user(school_no, email, password):
     return jsonify(status='success', error=''),200
 
 
-def mark_morning_absent(school_no,api_key):
-    all_students = Student.query.filter_by(school_no=school_no).all()
+def mark_morning_absent(school_no,api_key,level):
+    students = K12.query.filter_by(school_no=school_no,level=level).all()
 
-    for student in all_students:
+    for student in students:
         logged = Log.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no).order_by(Log.timestamp.desc()).first()
         print 'xxxxxxxxxxxxxxxxxxxxx'
         print student.id_no
@@ -462,7 +560,7 @@ def mark_morning_absent(school_no,api_key):
 
 
 def mark_afternoon_absent(school_no,api_key):
-    all_students = Student.query.filter_by(school_no=school_no).all()
+    all_students = K12.query.filter_by(school_no=school_no).all()
 
     for student in all_students:
         print 'xxxxxxxxxxxxxxxxxxxxx'
@@ -491,7 +589,7 @@ def mark_afternoon_absent(school_no,api_key):
     return jsonify(status='Success', absent_count=absent_count),201
 
 def mark_specific_absent(school_no,id_no,time_of_day):
-    student = Student.query.filter_by(school_no=school_no,id_no=id_no).first()
+    student = K12.query.filter_by(school_no=school_no,id_no=id_no).first()
     student_name = student.last_name+', '+student.first_name
     if student.middle_name:
         student_name += ' '+student.middle_name[:1]+'.'
@@ -513,8 +611,10 @@ def mark_specific_absent(school_no,id_no,time_of_day):
     db.session.commit()
 
 
-def check_if_late(school_no,api_key,id_no,name,level,
-                section,date,department,time,timestamp):
+def check_if_late(school_no,api_key,id_no,name,level,section,date,group,time,timestamp):
+
+    print 'xxxxxxxxxxxxxxxxxxxxxxxx'
+    print 'happening'
 
     time_now = str(now.replace(hour=get_hour(time), minute=int(time[3:5])))[11:16]
     schedule = Schedule.query.filter_by(school_no=school_no).first()
@@ -558,6 +658,9 @@ def check_if_late(school_no,api_key,id_no,name,level,
     afternoon_start = eval(query+'_afternoon_start')
     afternoon_end = eval(query+'_afternoon_end')
 
+    print 'time now: %s' % parse_date(time_now)
+    print 'morning start: %s' % parse_date(morning_start)
+
     # if ((parse_date(time_now) >= parse_date(morning_start) and parse_date(time_now) < parse_date(morning_end)) or \
     #     (parse_date(time_now) >= parse_date(afternoon_start) and parse_date(time_now) < parse_date(afternoon_end))) and\
     #     Absent.query.filter_by(school_id=school_id,id_no=id_no,date=date).first() == None:
@@ -573,7 +676,7 @@ def check_if_late(school_no,api_key,id_no,name,level,
                 mark_specific_absent(school_no,id_no,'morning')
             else:
                 record_as_late(school_no, id_no, name, level, section, 
-                            date, department, time, timestamp)
+                            date, group, time, timestamp)
 
     elif (parse_date(time_now) >= parse_date(afternoon_start) and\
         parse_date(time_now) < parse_date(afternoon_end)) and\
@@ -583,7 +686,7 @@ def check_if_late(school_no,api_key,id_no,name,level,
                 mark_specific_absent(school_no,id_no,'afternoon')
             else:
                 record_as_late(school_no, id_no, name, level, section, 
-                            date, department, time, timestamp)
+                            date, group, time, timestamp)
 
 
 def record_as_late(school_no, id_no, name, level, section, 
@@ -598,22 +701,19 @@ def record_as_late(school_no, id_no, name, level, section,
     db.session.add(late)
     db.session.commit()
 
-    student=Student.query.filter_by(id_no=id_no, school_no=school_no).one()
+    student=K12.query.filter_by(id_no=id_no, school_no=school_no).one()
     student.lates=Late.query.filter_by(id_no=id_no, school_no=school_no).count()
     db.session.commit()
 
 
-def time_in(school_no,api_key,log_id,id_no,name,level,section,
-            date,department,time,timestamp):
+def time_in(school_no,api_key,log_id,id_no,name,date,group,time,timestamp,level,section):
 
     add_this = Log(
         school_no=school_no,
         date=date,
         id_no=id_no,
         name=name,
-        level=level,
-        section=section,
-        department=department,
+        group=group,
         time_in=time,
         time_in_id=log_id,
         time_in_notification_status='Pending',
@@ -622,24 +722,22 @@ def time_in(school_no,api_key,log_id,id_no,name,level,section,
 
     db.session.add(add_this)
     db.session.commit()
-
-    compose_message(add_this.id,id_no,time,'entered')
-
-    if department != 'faculty':
-        check_if_late(school_no, api_key, id_no,name,level,
-                  section, date, department, time, timestamp)
+    if group == 'k12':
+        compose_message(add_this.id,id_no,time,'entered')
+        check_if_late(school_no,api_key,id_no,name,level,section,date,group,time,timestamp)
 
     return jsonify(status='Success',type='entry',action='entered'), 201
 
 
-def time_out(log_id, id_no, time, school_no):
+def time_out(log_id, id_no, time, school_no, group):
     log = Log.query.filter_by(id_no=id_no,school_no=school_no).order_by(Log.timestamp.desc()).first()
     log.time_out = time
     log.time_out_id = log_id
     log.time_out_notification_status = 'Pending'
     db.session.commit()
 
-    compose_message(log.id,id_no,time,'left')
+    if group == 'k12':
+        compose_message(log.id,id_no,time,'left')
 
     return jsonify(status='Success',type='exit',action='left'), 201
 
@@ -725,28 +823,28 @@ def prepare():
                       session['department'])).get()
 
 
-def fetch_first(logs_limit, late_limit, attendance_limit, absent_limit, school_no, department):
-     logs = Log.query.filter_by(
-        school_no=school_no,
-        department=department
-        ).order_by(Log.timestamp.desc()).slice((logs_limit-100),logs_limit)
+# def fetch_first(logs_limit, late_limit, attendance_limit, absent_limit, school_no, department):
+#      logs = Log.query.filter_by(
+#         school_no=school_no,
+#         department=department
+#         ).order_by(Log.timestamp.desc()).slice((logs_limit-100),logs_limit)
 
-     late = Late.query.filter_by(
-        school_no=school_no,
-        department=department
-        ).order_by(Late.timestamp.desc()).slice((late_limit-100),late_limit)
+#      late = Late.query.filter_by(
+#         school_no=school_no,
+#         department=department
+#         ).order_by(Late.timestamp.desc()).slice((late_limit-100),late_limit)
 
-     attendance = Student.query.filter_by(
-        school_no=school_no,
-        department=department)\
-        .order_by(Student.last_name).slice((attendance_limit-100),attendance_limit)
+#      attendance = Student.query.filter_by(
+#         school_no=school_no,
+#         department=department)\
+#         .order_by(Student.last_name).slice((attendance_limit-100),attendance_limit)
 
-     absent = Absent.query.filter_by(
-        school_no=school_no,
-        department=department)\
-        .order_by(Absent.date.desc()).slice((absent_limit-100),absent_limit)
+#      absent = Absent.query.filter_by(
+#         school_no=school_no,
+#         department=department)\
+#         .order_by(Absent.date.desc()).slice((absent_limit-100),absent_limit)
 
-     return {'logs':logs, 'late':late, 'attendance':attendance, 'absent':absent}
+#      return {'logs':logs, 'late':late, 'attendance':attendance, 'absent':absent}
 
 
 def fetch_next(needed):
@@ -754,17 +852,39 @@ def fetch_next(needed):
 
     if needed == 'logs':
         search_table = 'Log'
+        template = 'logs_result.html'
         sort_by = 'timestamp'
         sort_type='.desc()'
 
     elif needed == 'late':
         search_table = 'Late'
+        template = 'late.html'
         sort_by = 'timestamp'
         sort_type='.desc()'
 
-    elif needed == 'attendance':
-        search_table = 'Student'
+    elif needed == 'k12':
+        search_table = 'K12'
         sort_by = 'last_name'
+        template = 'k12.html'
+        sort_type=''
+
+    if needed == 'fees':
+        search_table = 'Fee'
+        template = 'fees_result.html'
+        sort_by = 'timestamp'
+        sort_type='.desc()'
+
+
+    elif needed == 'college':
+        search_table = 'College'
+        sort_by = 'last_name'
+        template = 'college.html'
+        sort_type=''
+
+    elif needed == 'staff':
+        search_table = 'Staff'
+        sort_by = 'last_name'
+        template = 'staff_result.html'
         sort_type=''
 
     elif needed == 'absent':
@@ -772,19 +892,17 @@ def fetch_next(needed):
         sort_by = 'timestamp'
         sort_type='.desc()'
 
-    result = eval(search_table+'.query.filter_by(school_no=session[\'school_no\'],department=session[\'department\']).order_by('+search_table+'.'+sort_by+sort_type+').slice('+str(session[needed+'_limit']-100)+','+str(session[needed+'_limit'])+')')
-
+    result = eval(search_table+'.query.filter_by(school_no=session[\'school_no\']).order_by('+search_table+'.'+sort_by+sort_type+').slice('+str(session[needed+'_limit']-100)+','+str(session[needed+'_limit'])+')')
 
     return flask.render_template(
-        needed+'.html',
+        template,
         data=result,
-        limit=session[needed+'_limit']-100,
-        view=session['department']
+        limit=session[needed+'_limit']-100
         )
 
 
 def search_logs(*args, **kwargs):
-    query = 'Log.query.filter(Log.department.ilike("'+session['department']+'"),Log.school_no.ilike("'+session['school_no']+'"),'
+    query = 'Log.query.filter(Log.school_no.ilike("'+session['school_no']+'"),'
     for arg_name in kwargs:
         if kwargs[arg_name]:
             query += 'Log.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
@@ -794,13 +912,24 @@ def search_logs(*args, **kwargs):
     return eval(query)
 
 
-def search_attendance(*args, **kwargs):
-    query = 'Student.query.filter(Student.department.ilike("'+session['department']+'"),Student.school_no.ilike("'+session['school_no']+'"),'
+def search_fees(*args, **kwargs):
+    query = 'Fee.query.filter(Fee.school_no.ilike("'+session['school_no']+'"),'
     for arg_name in kwargs:
         if kwargs[arg_name]:
-            query += 'Student.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
-    query += ').order_by(Student.last_name).slice(('+str(args[0])+'-100),'+str(args[0])+')'
-    session['attendance_search_limit']+=100
+            query += 'Fee.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
+    query += ').order_by(Fee.name).slice(('+str(args[0])+'-100),'+str(args[0])+')'
+    session['fees_search_limit']+=100
+    print query
+    return eval(query)
+
+
+def search_k12(*args, **kwargs):
+    query = 'K12.query.filter(K12.school_no.ilike("'+session['school_no']+'"),'
+    for arg_name in kwargs:
+        if kwargs[arg_name]:
+            query += 'K12.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
+    query += ').order_by(K12.last_name).slice(('+str(args[0])+'-100),'+str(args[0])+')'
+    session['k12_search_limit']+=100
     return eval(query)
 
 
@@ -870,10 +999,56 @@ def test_job(word):
     print word
 
 def initialize_absent(school_no,api_key):
-    print 'initializing'
-    absent_time = "17:45"
-    print absent_time
-    schedule.every().day.at(absent_time).do(mark_morning_absent,school_no,api_key)
+    school = School.query.filter_by(school_no=school_no,api_key=api_key).first()
+    class_schedule = Schedule.query.filter_by(school_no=school.school_no).first()
+
+    time_format = '{:%H:%M}'
+
+    junior_kinder_morning_start = time_format.format(parse_date(class_schedule.junior_kinder_morning_start) + timedelta(hours=1))
+    senior_kinder_morning_start = time_format.format(parse_date(class_schedule.senior_kinder_morning_start) + timedelta(hours=1))
+    first_grade_morning_start = time_format.format(parse_date(class_schedule.first_grade_morning_start) + timedelta(hours=1))
+    second_grade_morning_start = time_format.format(parse_date(class_schedule.second_grade_morning_start) + timedelta(hours=1))
+    third_grade_morning_start = time_format.format(parse_date(class_schedule.third_grade_morning_start) + timedelta(hours=1))
+    fourth_grade_morning_start = time_format.format(parse_date(class_schedule.fourth_grade_morning_start) + timedelta(hours=1))
+    fifth_grade_morning_start = time_format.format(parse_date(class_schedule.fifth_grade_morning_start) + timedelta(hours=1))
+    sixth_grade_morning_start = time_format.format(parse_date(class_schedule.sixth_grade_morning_start) + timedelta(hours=1))
+    seventh_grade_morning_start = time_format.format(parse_date(class_schedule.seventh_grade_morning_start) + timedelta(hours=1))
+    eight_grade_morning_start = time_format.format(parse_date(class_schedule.eight_grade_morning_start) + timedelta(hours=1))
+    ninth_grade_morning_start = time_format.format(parse_date(class_schedule.ninth_grade_morning_start) + timedelta(hours=1))
+    tenth_grade_morning_start = time_format.format(parse_date(class_schedule.tenth_grade_morning_start) + timedelta(hours=1))
+    eleventh_grade_morning_start = time_format.format(parse_date(class_schedule.eleventh_grade_morning_start) + timedelta(hours=1))
+    twelfth_grade_morning_start = time_format.format(parse_date(class_schedule.twelfth_grade_morning_start) + timedelta(hours=1))
+
+    print 'Junior Kinder: %s' % junior_kinder_morning_start
+    print 'Junior Kinder: %s' % senior_kinder_morning_start
+    print 'Junior Kinder: %s' % first_grade_morning_start
+    print 'Junior Kinder: %s' % second_grade_morning_start
+    print 'Junior Kinder: %s' % third_grade_morning_start
+    print 'Junior Kinder: %s' % fourth_grade_morning_start
+    print 'Junior Kinder: %s' % fifth_grade_morning_start
+    print 'Junior Kinder: %s' % sixth_grade_morning_start
+    print 'Junior Kinder: %s' % seventh_grade_morning_start
+    print 'Junior Kinder: %s' % eight_grade_morning_start
+    print 'Junior Kinder: %s' % ninth_grade_morning_start
+    print 'Junior Kinder: %s' % tenth_grade_morning_start
+    print 'Junior Kinder: %s' % eleventh_grade_morning_start
+    print 'Junior Kinder: %s' % twelfth_grade_morning_start
+
+    schedule.every().day.at(junior_kinder_morning_start).do(mark_morning_absent,school_no,api_key,'Junior Kinder')
+    schedule.every().day.at(senior_kinder_morning_start).do(mark_morning_absent,school_no,api_key,'Senior Kinder')
+    schedule.every().day.at(first_grade_morning_start).do(mark_morning_absent,school_no,api_key,'1st Grade')
+    schedule.every().day.at(second_grade_morning_start).do(mark_morning_absent,school_no,api_key,'2nd Grade')
+    schedule.every().day.at(third_grade_morning_start).do(mark_morning_absent,school_no,api_key,'3rd Grade')
+    schedule.every().day.at(fourth_grade_morning_start).do(mark_morning_absent,school_no,api_key,'4th Grade')
+    schedule.every().day.at(fifth_grade_morning_start).do(mark_morning_absent,school_no,api_key,'5th Grade')
+    schedule.every().day.at(sixth_grade_morning_start).do(mark_morning_absent,school_no,api_key,'6th Grade')
+    schedule.every().day.at(seventh_grade_morning_start).do(mark_morning_absent,school_no,api_key,'7th Grade')
+    schedule.every().day.at(eight_grade_morning_start).do(mark_morning_absent,school_no,api_key,'8th Grade')
+    schedule.every().day.at(ninth_grade_morning_start).do(mark_morning_absent,school_no,api_key,'9th Grade')
+    schedule.every().day.at(tenth_grade_morning_start).do(mark_morning_absent,school_no,api_key,'10th Grade')
+    schedule.every().day.at(eleventh_grade_morning_start).do(mark_morning_absent,school_no,api_key,'11th Grade')
+    schedule.every().day.at(twelfth_grade_morning_start).do(mark_morning_absent,school_no,api_key,'12th Grade')
+
     while True:
         schedule.run_pending()
         time.sleep(1)
@@ -924,64 +1099,193 @@ def get_schedule():
 
 
 @app.route('/', methods=['GET', 'POST'])
-def index():
-    if session:
-        return redirect(url_for('dashboard'))
-    return redirect(url_for('login_page'))
-
-
-@app.route('/dashboard', methods=['GET', 'POST'])
 @nocache
 def dashboard():
     if not session:
         return redirect('/login')
-    session['logs_limit'] = 100
-    session['late_limit'] = 100
-    session['attendance_limit'] = 100
-    session['absent_limit'] = 100
-    session['logs_search_limit'] = 100
-    session['attendance_search_limit'] = 100
-    session['late_search_limit'] = 100
-    session['absent_search_limit'] = 100
-    session['attendance_search_status'] = False
+    session['logs_limit'] = 0
+    session['late_limit'] = 0
+    session['k12_limit'] = 0
+    session['college_limit'] = 0
+    session['staff_limit'] = 0
+    session['absent_limit'] = 0
+    session['logs_search_limit'] = 0
+    session['fees_search_limit'] = 0
+    session['k12_search_limit'] = 0
+    session['late_search_limit'] = 0
+    session['absent_search_limit'] = 0
+    session['k12_search_status'] = False
 
     school = School.query.filter_by(api_key=session['api_key']).first()
-    sections = Section.query.filter_by(school_no=session['school_no']).all()
-    departments = Department.query.filter_by(school_no=session['school_no']).all()
+    sections = Section.query.filter_by(school_no=school.school_no).order_by(Section.name).all()
+    departments = Department.query.filter_by(school_no=school.school_no).order_by(Department.name).all()
+    fee_categories = FeeCategory.query.order_by(FeeCategory.name).all()
+    college_departments = CollegeDepartment.query.filter_by(school_no=school.school_no).order_by(CollegeDepartment.name).all()
+    staff_departments = StaffDepartment.query.filter_by(school_no=school.school_no).order_by(StaffDepartment.name).all()
     user = AdminUser.query.filter_by(id=session['user_id']).first()
-
-    first_set = fetch_first(session['logs_limit'],session['late_limit'],
-        session['attendance_limit'],session['absent_limit'],session['school_no'],
-        session['department'])
 
     # prepare()
 
     return flask.render_template(
         'index.html',
-        log=first_set['logs'],
-        late=first_set['late'],
-        attendance=first_set['attendance'],
-        absent=first_set['absent'], 
-        view=session['department'],
-        sections=sections,
-        departments=departments,
-        tab=session['tab'],
         user_name=session['user_name'],
         user = user,
+        sections=sections,
+        fee_categories=fee_categories,
+        college_departments=college_departments,
+        staff_departments=staff_departments,
+        departments=departments,
         school_name=session['school_name']
         )
 
 
+@app.route('/students', methods=['GET', 'POST'])
+@nocache
+def students():
+    session['k12_limit']+=100
+    session['college_limit']+=100
+    school = School.query.filter_by(api_key=session['api_key']).first()
+    k12 = K12.query.order_by(K12.last_name).slice((session['k12_limit']-100),session['k12_limit'])
+    college = College.query.order_by(College.last_name).slice((session['college_limit']-100),session['college_limit'])
+    college_departments = CollegeDepartment.query.filter_by(school_no=school.school_no).order_by(CollegeDepartment.name).all()
+    sections = Section.query.filter_by(school_no=school.school_no).order_by(Section.name).all()
+    return flask.render_template(
+        'students.html',
+        k12=k12,
+        college=college,
+        sections=sections,
+        k12_limit=session['k12_limit'],
+        college_limit=session['college_limit']
+        )
+
+
+@app.route('/staff', methods=['GET', 'POST'])
+@nocache
+def staff():
+    session['staff_limit']+=100
+    school = School.query.filter_by(api_key=session['api_key']).first()
+    staff = Staff.query.order_by(Staff.last_name).slice((session['staff_limit']-100),session['staff_limit'])
+    staff_departments = StaffDepartment.query.filter_by(school_no=school.school_no).order_by(StaffDepartment.name).all()
+    return flask.render_template(
+        'staff.html',
+        staff=staff,
+        staff_departments=staff_departments,
+        staff_limit=session['staff_limit']
+        )
+
+
+@app.route('/logs', methods=['GET', 'POST'])
+@nocache
+def logs():
+    session['logs_limit']+=100
+    logs = Log.query.order_by(Log.timestamp.desc()).slice((session['logs_limit']-100),session['logs_limit'])
+    return flask.render_template(
+        'logs.html',
+        logs=logs,
+        logs_limit=session['logs_limit']
+        )
+
+
+@app.route('/attendance', methods=['GET', 'POST'])
+@nocache
+def attendance():
+    session['absent_limit']+=100
+    session['late_limit']+=100
+    absent = Absent.query.order_by(Absent.timestamp.desc()).slice((session['absent_limit']-100),session['absent_limit'])
+    late = Late.query.order_by(Late.timestamp.desc()).slice((session['late_limit']-100),session['late_limit'])
+    return flask.render_template(
+        'attendance.html',
+        absent=absent,
+        late=late,
+        attendance_limit=session['absent_limit'],
+        late_limit=session['late_limit']
+        )
+
+
+@app.route('/fees', methods=['GET', 'POST'])
+@nocache
+def fees():
+    session['fees_limit']+=100
+    fees = Fee.query.order_by(Fee.name).all()
+    fee_categories = FeeCategory.query.order_by(FeeCategory.name).all()
+    return flask.render_template('fees.html',fees=fees, fee_categories=fee_categories)
+
+
+@app.route('/fees/new', methods=['GET', 'POST'])
+@nocache
+def save_new_fee():
+    data = flask.request.form.to_dict()
+    if data.get('desc'):
+        new_fee = Fee(
+            school_no=session['school_no'],
+            name=data['name'],
+            category=data['category'],
+            price=data['price'],
+            desc=data['desc'],
+            timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+            )
+    else:
+        new_fee = Fee(
+            school_no=session['school_no'],
+            name=data['name'],
+            category=data['category'],
+            price=data['price'],
+            timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+            )
+    db.session.add(new_fee)
+    db.session.commit()
+
+    add_to = flask.request.form.getlist('add_to[]')
+    if add_to != []:
+        for level in add_to:
+            fee_group = FeeGroup(
+                school_no=session['school_no'],
+                fee_id=new_fee.id,
+                level=level
+                )
+            db.session.add(fee_group)
+            db.session.commit()
+
+        fees_thread = threading.Thread(target=add_fees,args=[session['school_no'],add_to,new_fee.id])
+        fees_thread.start()
+
+    session['fees_limit'] = 0;
+    session['fees_search_limit'] = 0;
+    return fetch_next('fees')
+
+def add_fees(school_no,add_to,fee_id):
+    fee = Fee.query.filter_by(id=fee_id).first()
+    for level in add_to:
+        students = K12.query.filter_by(level=level).all()
+        for student in students:
+            student_name = student.last_name+', '+student.first_name
+            if student.middle_name:
+                student_name += ' '+student.middle_name[:1]+'.'
+            new_student_fee = StudentFee(
+                school_no = school_no,
+                student_id = student.id,
+                student_name = student_name,
+                fee_id = fee.id,
+                fee_name = fee.name,
+                fee_category = fee.category,
+                fee_price = fee.price,
+                timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+                )
+            db.session.add(new_student_fee)
+            db.session.commit()
+    return
+
+
 @app.route('/attendance/reset', methods=['GET', 'POST'])
 def reset_attendance():
-    students = Student.query.all()
+    students = K12.query.all()
     for student in students:
         student.absences = 0
         student.lates = 0
     db.session.commit()
     return jsonify(status='Success'),200
 
-
+65
 @app.route('/accounts', methods=['GET', 'POST'])
 def manage_accounts():
     if not session['is_super_admin']:
@@ -1133,14 +1437,14 @@ def get_irregular_schedule():
 @nocache
 def login_page():
     if session:
-        return redirect('/dashboard')
+        return redirect('/')
     return flask.render_template('login.html')
 
 
 @app.route('/user/authenticate', methods=['GET', 'POST'])
 def login():
     if session:
-        return redirect('/dashboard')
+        return redirect('/')
     login_data = flask.request.form.to_dict()
     return authenticate_user(login_data['school_no'], login_data['user_email'], login_data['user_password'])
 
@@ -1221,9 +1525,64 @@ def sms_retry():
 @app.route('/student/info/get', methods=['GET', 'POST'])
 def get_student_info():
     student_id = flask.request.form.get('student_id')
-    student = Student.query.filter_by(id=student_id).first()
+    session['student_id'] = student_id
+    student = K12.query.filter_by(id=student_id).first()
+    guardian = Parent.query.filter_by(id=student.parent_id).first()
     sections = Section.query.filter_by(school_no=session['school_no']).all()
-    return flask.render_template('student_info.html', student=student, sections=sections)
+    departments = Department.query.filter_by(school_no=session['school_no']).all()
+    student_fees = StudentFee.query.filter_by(student_id=student.id).order_by(StudentFee.fee_name).all()
+    total_fees = sum(fee.fee_price for fee in student_fees)
+    collected_payments = Collected.query.filter_by(student_id=student.id).order_by(Collected.timestamp).all()
+    total_paid = sum(payment.amount for payment in collected_payments)
+    return flask.render_template(
+            'student_info.html',
+            student=student,
+            guardian=guardian,
+            sections=sections,
+            departments=departments,
+            student_fees=student_fees,
+            total_fees=total_fees,
+            collected_payments=collected_payments,
+            total_paid=total_paid
+            )
+
+
+@app.route('/fees/collect', methods=['GET', 'POST'])
+def collect_fees():
+    student = K12.query.filter_by(id=session['student_id']).first()
+    amount = flask.request.form.get('amount')
+    collection = Collected(
+        school_no=session['school_no'],
+        student_id=session['student_id'],
+        amount=amount,
+        date=time.strftime("%B %d, %Y"),
+        time=time.strftime("%I:%M %p"),
+        timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+        )
+    db.session.add(collection)
+    db.session.commit()
+
+    student_fees = StudentFee.query.filter_by(student_id=session['student_id']).order_by(StudentFee.fee_name).all()
+    total_fees = sum(fee.fee_price for fee in student_fees)
+    collected_payments = Collected.query.filter_by(student_id=session['student_id']).order_by(Collected.timestamp).all()
+    total_paid = sum(payment.amount for payment in collected_payments)
+
+    return flask.render_template(
+        'student_fees.html',
+        student=student,
+        student_fees=student_fees,
+        total_fees=total_fees,
+        collected_payments=collected_payments,
+        total_paid=total_paid
+        )
+
+
+@app.route('/college/info/get', methods=['GET', 'POST'])
+def get_college_info():
+    student_id = flask.request.form.get('student_id')
+    student = College.query.filter_by(id=student_id).first()
+    departments = CollegeDepartment.query.filter_by(school_no=session['school_no']).all()
+    return flask.render_template('college_info.html', student=student, college_departments=departments)
 
 
 @app.route('/tab/change', methods=['GET', 'POST'])
@@ -1246,10 +1605,10 @@ def add_log():
     if not logged or logged.time_out != None:
 
         return time_in(data['school_no'],data['api_key'],data['log_id'],data['id_no'],data['name'],
-                data['level'],data['section'],data['date'],data['department'],
-                data['time'],data['timestamp'])
+               data['date'],data['group'],
+               data['time'],data['timestamp'],data['level'],data['section'])
 
-    return time_out(data['log_id'],data['id_no'],data['time'],data['school_no'])    
+    return time_out(data['log_id'],data['id_no'],data['time'],data['school_no'],data['group'])    
 
 
 @app.route('/blast',methods=['GET','POST'])
@@ -1281,14 +1640,15 @@ def blast_message():
 def sync_database():
     school_no = flask.request.args.get('school_no')
     return SWJsonify({
-        'Records': Student.query.filter_by(school_no=school_no).all()
+        'k12': K12.query.filter_by(school_no=school_no).all(),
+        'college': College.query.filter_by(school_no=school_no).all()
         }), 201
 
 
 @app.route('/data/receive',methods=['GET','POST'])
 def receive_records():
     data = flask.request.form.to_dict()
-    if Student.query.filter_by(id_no=data['id_no']).first() or Student.query.filter_by(id_no=data['id_no']).first() != None:
+    if K12.query.filter_by(id_no=data['id_no']).first() or K12.query.filter_by(id_no=data['id_no']).first() != None:
         return jsonify(status='success'),201
 
     if data.get('middle_name'):
@@ -1323,134 +1683,244 @@ def receive_records():
     return jsonify(status='success'),201
 
 
+@app.route('/guardians/info',methods=['GET','POST'])
+def get_guardian_info():
+    mobile_number = flask.request.form.get('mobile_number')
+    guardian = Parent.query.filter_by(mobile_number=mobile_number).first()
+    if guardian or guardian != None:
+        return jsonify(
+            status='success',
+            last_name=guardian.last_name,
+            first_name=guardian.first_name,
+            middle_name=guardian.middle_name,
+            email=guardian.email,
+            address=guardian.address,
+            ),200
+    return jsonify(
+        status='failed',
+        message='not found'
+        )
+
+
 @app.route('/user/new',methods=['GET','POST'])
 def add_user():
     student_data = flask.request.form.to_dict()
-    if student_data['department'] == 'student':
-        user = Student(
+    if student_data['department'] == 'k12':
+        guardian = Parent.query.filter_by(mobile_number=student_data['guardian_mobile']).first()
+        if guardian or guardian != None:
+            parent_id = guardian.id
+        else:
+            new_guardian = Parent(
+                school_no = session['school_no'],
+                mobile_number = student_data['guardian_mobile'],
+                last_name = student_data['guardian_last_name'].title(),
+                first_name = student_data['guardian_first_name'].title(),
+                middle_name = student_data['guardian_middle_name'].title(),
+                email = student_data['guardian_email'],
+                address = student_data['guardian_address'].title()
+                )
+            db.session.add(new_guardian)
+            db.session.commit()
+
+        guardian = Parent.query.filter_by(mobile_number=student_data['guardian_mobile']).first()
+        parent_id = guardian.id
+
+        user = K12(
             school_no = session['school_no'],
             id_no = student_data['id_no'],
-            first_name = student_data['first_name'],
-            last_name = student_data['last_name'],
-            middle_name = student_data['middle_name'],
+            first_name = student_data['first_name'].title(),
+            last_name = student_data['last_name'].title(),
+            middle_name = student_data['middle_name'].title(),
             level = student_data['level'],
-            department = student_data['department'],
-            section = student_data['section'],
+            section = student_data['section'].title(),
+            group = 'k12',
             absences = 0,
             lates = 0,
-            parent_contact = student_data['contact']
+            parent_id = parent_id,
+            parent_relation = student_data['guardian_relation'].title(),
+            parent_contact = student_data['guardian_mobile']
             )
-    else:
-        user = Student(
+
+        db.session.add(user)
+        db.session.commit()
+
+        fees_to_add = FeeGroup.query.filter_by(level=user.level).all()
+        if fees_to_add != None:
+            student_name = user.last_name+', '+user.first_name
+            if user.middle_name:
+                student_name += ' '+user.middle_name[:1]+'.'
+
+            for item in fees_to_add:
+                fee = Fee.query.filter_by(id=item.fee_id).first()
+                new_student_fee = StudentFee(
+                    school_no = session['school_no'],
+                    student_id = user.id,
+                    student_name = student_name,
+                    fee_id = fee.id,
+                    fee_name = fee.name,
+                    fee_category = fee.category,
+                    fee_price = fee.price,
+                    timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+                    )
+                db.session.add(new_student_fee)
+                db.session.commit()
+    elif student_data['department'] == 'college':
+        user = College(
             school_no = session['school_no'],
             id_no = student_data['id_no'],
-            first_name = student_data['first_name'],
-            last_name = student_data['last_name'],
-            middle_name = student_data['middle_name'],
-            department = student_data['department']
+            first_name = student_data['first_name'].title(),
+            last_name = student_data['last_name'].title(),
+            middle_name = student_data['middle_name'].title(),
+            level = student_data['level'],
+            department = student_data['college_department'],
+            email = student_data['email'],
+            mobile = student_data['mobile'],
+            group = 'college'
             )
 
-    db.session.add(user)
-    db.session.commit()
+    elif student_data['department'] == 'staff':
+        user = Staff(
+            school_no = session['school_no'],
+            id_no = student_data['id_no'],
+            first_name = student_data['first_name'].title(),
+            last_name = student_data['last_name'].title(),
+            middle_name = student_data['middle_name'].title(),
+            department = student_data['staff_department'],
+            email = student_data['email'],
+            mobile = student_data['mobile'],
+            group = 'college'
+            )
 
-    session['attendance_limit'] = 0
+        db.session.add(user)
+        db.session.commit()
+
+    session[student_data['department']+'_limit'] = 0
     
-    session['attendance_search_limit'] = 100
+    session[student_data['department']+'_search_limit'] = 0
 
-    return fetch_next('attendance')
+    return fetch_next(student_data['department'])
 
     # prepare()
 
 
-@app.route('/user/edit',methods=['GET','POST'])
+@app.route('/student/edit',methods=['GET','POST'])
 def edit_user():
 
-    last_name = flask.request.form.get('last_name')
-    first_name = flask.request.form.get('first_name')
-    middle_name = flask.request.form.get('middle_name')
-    level = flask.request.form.get('level')
-    section = flask.request.form.get('section')
-    contact = flask.request.form.get('contact')
-    id_no = flask.request.form.get('id_no')
-    user_id = flask.request.form.get('user_id')
+    data = flask.request.form.to_dict()
 
-    user = Student.query.filter_by(id=user_id).first()
-    user.last_name = last_name
-    user.first_name = first_name
-    user.middle_name = middle_name
-    user.level = level
-    user.section = section
-    user.parent_contact = contact
-    user.id_no = id_no
+    user = K12.query.filter_by(id=data['user_id']).first()
+    user.last_name = data['last_name']
+    user.first_name = data['first_name']
+    user.middle_name = data['middle_name']
+    user.level = data['level']
+    user.section = data['section']
+    user.id_no = data['id_no']
 
     db.session.commit()
 
-    session['attendance_limit'] = 0
-    
-    session['attendance_search_limit'] = 100
+    parent = Parent.query.filter_by(mobile_number=data['guardian_mobile']).first()
+    if parent or parent != None:
+        parent.first_name = data['guardian_first_name']
+        parent.last_name = data['guardian_last_name']
+        parent.middle_name = data['guardian_middle_name']
+        parent.email = data['guardian_email']
+        parent.address = data['guardian_address']
+        user.parent_id = parent.id
 
-    if session['attendance_search_status']:
-        result = search_attendance(session['attendance_search_limit'],last_name=session['attendance_data']['last_name'], first_name=session['attendance_data']['first_name'],
+    else:
+        new_parent = Parent(
+            mobile_number = data['guardian_mobile'],
+            first_name = data['guardian_first_name'],
+            last_name = data['guardian_first_name'],
+            middle_name = data['guardian_first_name'],
+            email = data['guardian_email'],
+            address = data['guardian_address']
+            )
+        db.session.add(new_parent)
+        db.session.commit()
+        parent = Parent.query.filter_by(mobile_number=data['guardian_mobile']).first()
+        user.parent_id = parent.id
+        user.parent_contact = parent.mobile_number
+
+    user.parent_relation = data['guardian_relation']
+    db.session.commit()
+
+    session['k12_limit'] = 0
+    
+    session['k12_search_limit'] = 0
+
+    if session['k12_search_status']:
+        result = search_k12(session['k12_search_limit'],last_name=session['attendance_data']['last_name'], first_name=session['attendance_data']['first_name'],
                 middle_name=session['attendance_data']['middle_name'], id_no=session['attendance_data']['id_no'], level=session['attendance_data']['level'], section=session['attendance_data']['section'])
         return flask.render_template(
         session['attendance_data']['needed']+'.html',
         data=result,
         view=session['department'],
-        limit=session['attendance_search_limit']-100
+        limit=session['k12_search_limit']
         )
 
-    return fetch_next('attendance')
+    return fetch_next('k12')
 
     # prepare()
 
 
 @app.route('/search/logs',methods=['GET','POST'])
 def search_student_logs():
-    data = flask.request.form.to_dict()
+    session['logs_data'] = flask.request.form.to_dict()
+    session['logs_search_status'] = True
 
-    if data['reset'] == 'yes':
-        session['logs_search_limit']=100
+    if session['logs_data']['reset'] == 'yes':
+        session['logs_search_limit']=0
     
-    limit = session['logs_search_limit']-100
+    limit = session['logs_search_limit']
 
-    if session['department'] == 'student':
-        result = search_logs(session['logs_search_limit'],date=data['date'], id_no=data['id_no'],
-                       name=data['name'], level=data['level'],section=data['section'])
-    else:
-        result = search_logs(session['logs_search_limit'],date=data['date'], id_no=data['id_no'],
-                       name=data['name'])
-
+    result = search_logs(session['logs_search_limit'],date=session['logs_data']['date'], id_no=session['logs_data']['id_no'],
+                       name=session['logs_data']['name'], group=session['logs_data']['department'])
+    
     return flask.render_template(
-        data['needed']+'.html',
+        'logs_result.html',
         data=result,
-        view=session['department'],
         limit=limit
         )
 
 
-@app.route('/search/attendance',methods=['GET','POST'])
-def search_student_attendance():
+@app.route('/search/fees',methods=['GET','POST'])
+def search_student_fees():
+    session['fees_data'] = flask.request.form.to_dict()
+    session['fees_search_status'] = True
+
+    if session['fees_data']['reset'] == 'yes':
+        session['fees_search_limit'] = 0
+    
+    limit = session['fees_search_limit']
+
+    result = search_fees(session['fees_search_limit'],name=session['fees_data']['name'], category=session['fees_data']['category'])
+    print 'xxxxxxxxxxxxxxxxxxxxx'
+    print result 
+    return flask.render_template(
+        'fees_result.html',
+        data=result,
+        limit=limit
+        )
+
+
+@app.route('/search/k12',methods=['GET','POST'])
+def search_students_k12():
     session['attendance_data'] = flask.request.form.to_dict()
-    session['attendance_search_status'] = True
+    session['k12_search_status'] = True
 
     if session['attendance_data']['reset'] == 'yes':
-        session['attendance_search_limit']=100
+        session['k12_search_limit'] = 0
     
-    limit = session['attendance_search_limit']-100
+    limit = session['k12_search_limit']
 
-    if session['department'] == 'student':
-        result = search_attendance(session['attendance_search_limit'],last_name=session['attendance_data']['last_name'], first_name=session['attendance_data']['first_name'],
-                middle_name=session['attendance_data']['middle_name'], id_no=session['attendance_data']['id_no'], level=session['attendance_data']['level'], section=session['attendance_data']['section'])
-
-    else:
-        result = search_attendance(session['attendance_search_limit'],last_name=session['attendance_data']['last_name'], first_name=session['attendance_data']['first_name'],
-                middle_name=session['attendance_data']['middle_name'], id_no=session['attendance_data']['id_no'])
+    result = search_k12(session['k12_search_limit'],last_name=session['attendance_data']['last_name'], first_name=session['attendance_data']['first_name'],
+            middle_name=session['attendance_data']['middle_name'], level=session['attendance_data']['level'], section=session['attendance_data']['section'], id_no=session['attendance_data']['id_no'])
 
 
     return flask.render_template(
         session['attendance_data']['needed']+'.html',
         data=result,
-        view=session['department'],
         limit=limit
         )
 
@@ -1540,9 +2010,35 @@ def change_irregular_sched():
 @app.route('/id/validate',methods=['GET','POST'])
 def validate_id():
     id_no = flask.request.form.get('id_no')
-    student = Student.query.filter_by(id_no=id_no).first()
-    if student != None:
+    k12 = K12.query.filter_by(id_no=id_no).first()
+    college = College.query.filter_by(id_no=id_no).first()
+    staff = Staff.query.filter_by(id_no=id_no).first()
+    if k12 == None and college == None and staff == None:
+        return ''
+    else:
         return 'Duplicate ID Number'
+
+
+@app.route('/id/validate/edit',methods=['GET','POST'])
+def validate_id_edit():
+    id_no = flask.request.form.get('id_no')
+    group = flask.request.form.get('group')
+    student_id = flask.request.form.get('student_id')
+    k12 = K12.query.filter_by(id=student_id,group=group).first()
+    college = College.query.filter_by(id=student_id,group=group).first()
+    k12_id_no = K12.query.filter_by(id_no=id_no).first()
+    college_id_no = College.query.filter_by(id_no=id_no).first()
+    if k12_id_no != None or college_id_no != None:
+        if k12 != None:
+            if k12.id_no != id_no:
+                return 'Duplicate ID Number'
+            else:
+                return ''
+        elif college != None:
+            if college.id_no != id_no:
+                return 'Duplicate ID Number'
+            else:
+                return ''
     else:
         return ''
 
@@ -1734,9 +2230,7 @@ def sync_schedule():
 
     # INITIALIZE PYSCHEDULER HERE
     absent_thread = threading.Thread(target=initialize_absent,args=[data['school_no'],data['api_key']])
-    absent_thread.daemon = True
     absent_thread.start()
-    
     return '',201
 
 
@@ -2013,6 +2507,16 @@ def rebuild_database():
         name='Student Affairs'
         )
 
+    s = CollegeDepartment(
+        school_no='tmtc-sc2016',
+        name='CFAD'
+        )
+
+    t = CollegeDepartment(
+        school_no='tmtc-sc2016',
+        name='IABF'
+        )
+
     db.session.add(d)
     db.session.add(e)
     db.session.add(f)
@@ -2028,6 +2532,8 @@ def rebuild_database():
     db.session.add(p)
     db.session.add(q)
     db.session.add(r)
+    db.session.add(s)
+    db.session.add(t)
     db.session.commit()
 
     return jsonify(status='Success'),201
@@ -2036,6 +2542,6 @@ def rebuild_database():
 if __name__ == '__main__':
     app.debug = True
     admin_alert()
-    app.run(port=int(os.environ['PORT']), host='0.0.0.0',threaded=True)
+    app.run(port=int(os.environ['PORT']),host='0.0.0.0',threaded=True)
 
     # port=int(os.environ['PORT']), host='0.0.0.0'

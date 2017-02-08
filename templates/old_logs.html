@@ -1,0 +1,16 @@
+{% for i in data %}
+<tr class="rows">
+	<td class="xs">{{loop.index+limit}}</td>
+	<td class="short">{{i.date}}</td>
+	<td class="short">{{i.id_no}}</td>
+	<td class="long">{{i.name}}</td>
+	{% if view=='student' %}
+	<td class="short">{{i.level}}</td>
+	<td class="short">{{i.section}}</td>
+	{% endif %}
+	<td class="short">{{i.time_in}}</td>
+	<td class="short">{{i.time_out}}</td>
+</tr>
+{% endfor %}
+
+

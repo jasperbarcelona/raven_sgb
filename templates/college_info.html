@@ -1,0 +1,106 @@
+<div class="modal-header colored-bg">
+        <span class="modal-title user-modal-title" id="gridSystemModalLabel">Student Information</span>
+</div>
+<div class="modal-body edit-user-modal-body">
+        <div class="add-user-section student-info-section">
+            <h4>Student Information</h4>
+            <div class="left col-sm-6 col-xs-12">
+                    <input type="text" value="{{student.last_name}}" class="form-control" id="edit_college_last_name" placeholder="Last Name" data-class="input-label" />
+            </div>
+            <div class="right col-sm-6 col-xs-12">
+                    <input type="text" value="{{student.first_name}}" class="form-control" id="edit_college_first_name" placeholder="First Name" data-class="input-label" />
+            </div>
+            <div class="left col-sm-6 col-xs-12">
+                    <input type="text" value="{{student.middle_name}}" class="form-control" id="edit_college_middle_name" placeholder="Middle Name" data-class="input-label" />
+            </div>
+            <div class="right col-sm-6 col-xs-12">
+                    <select class="form-control select" id="edit_college_level" placeholder="Year" required>
+                            <option selected>{{student.level}}</option>
+                            <option>1st Year</option>
+                            <option>2nd Year</option>
+                            <option>3rd Year</option>
+                            <option>4th Year</option>
+                            <option>5th year</option>
+                    </select>
+            </div>
+            <div class="left col-sm-6 col-xs-12">
+                    <select class="form-control select" id="edit_college_department" required>
+                            <option selected>{{student.department}}</option>
+                            {% for department in college_departments %}
+                            <option>{{department.name}}</option>
+                            {% endfor %}
+                    </select>
+            </div>
+            <div class="right col-sm-6 col-xs-12">
+                    <input type="text" value="{{student.email}}" class="form-control" id="edit_college_email" placeholder="Email" data-class="input-label" />
+            </div>
+            <div class="left col-sm-6 col-xs-12">
+                    <input type="text" value="{{student.mobile}}" class="form-control" id="edit_college_mobile" placeholder="Mobile Number" data-class="input-label" />
+            </div>
+            <div class="right col-sm-6 col-xs-12">
+                    <input type="text" value="{{student.id_no}}" class="form-control" id="edit_college_id_no" placeholder="ID Number" data-class="input-label" oninput="validate_college_id_edit(this.value,{{student.id}})" />
+            </div>
+            <center>
+                    <div class="id-loader-container">
+                            <span id="edit-college-id-loader" class="id-loader"><img src="../static/images/assets/blue.GIF"></span>
+                            <span id="edit-college-id-error"></span>
+                    </div>
+            </center>
+    </div>
+</div>
+<div class="modal-footer edit-user-modal-footer">
+        <button id = "edit-user-cancel" type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
+        <button id="{{student.id}}" type="button" class="btn btn-primary edit-college-done-btn" disabled data-loading-text="Saving" data-complete-text="Save" autocomplete="off">Save</button>
+</div>
+
+<script type="text/javascript">
+
+$('.loading').hide();
+$('.id-loader').hide();
+
+$('.edit-user-modal-body .form-control').floatlabel({
+    labelStartTop:'30px',
+    labelEndTop:'-2px'
+});
+
+$('.form-control').on('input propertychange paste', function () {
+var re = /[A-Za-z]+$/;
+if (($('#edit_college_last_name').val() != "") && ($('#edit_college_first_name').val() != "") &&
+(re.test($('#edit_college_last_name').val())) && (re.test($('#edit_college_first_name').val())) &&
+($('#edit_college_level').val() != null) && ($('#edit_college_department').val() != null) &&
+($('#edit_college_mobile').val() != null) && (!isNaN($('#edit_college_mobile').val())) && 
+($('#edit_college_mobile').val().length == 11) && ($('#edit_college_email').val() != null)){
+    validate_college_form_edit(true);
+}
+else{
+    validate_college_form_edit(false);
+}
+});
+
+$('.form-control').on('change', function () {
+var re = /[A-Za-z]+$/;
+if (($('#edit_college_last_name').val() != "") && ($('#edit_college_first_name').val() != "") &&
+(re.test($('#edit_college_last_name').val())) && (re.test($('#edit_college_first_name').val())) &&
+($('#edit_college_level').val() != null) && ($('#edit_college_department').val() != null) &&
+($('#edit_college_mobile').val() != null) && (!isNaN($('#edit_college_mobile').val())) && 
+($('#edit_college_mobile').val().length == 11) && ($('#edit_college_email').val() != null)){
+    validate_college_form_edit(true);
+}
+else{
+    validate_college_form_edit(false);
+}
+});
+
+$('.edit-user-modal-footer .edit-college-done-btn').on('click', function(){
+    $(this).button('loading');
+    var last_name = $('#edit_last_name').val();
+    var first_name = $('#edit_first_name').val();
+    var middle_name = $('#edit_middle_name').val();
+    var level = $('#edit_level').val();
+    var college_department = $('#edit_college_department').val();
+    var contact = $('#edit_mobile').val();
+    var id_no = $('#edit_id_no').val();
+    var user_id = $(this).attr('id')
+    edit_college(last_name, first_name, middle_name, level, college_department, contact, id_no, user_id);
+});
+</script>

@@ -1,0 +1,17 @@
+{% if data[0] %}
+{% for index in data %}
+<tr id="{{index.id}}" class="rows" data-toggle="modal" data-target="#edit-user-modal" onclick="supply_data(this.id)">
+    <td class="xs">{{loop.index+limit}}</td> 
+    <td class="short">{{index.id_no}}</td>
+    <td class="short">{{index.last_name}}</td>   
+    <td class="short">{{index.first_name}}</td> 
+    <td class="short">{{index.middle_name}}</td>
+    <td class="short">{{index.level}}</td>
+    <td class="short">{{index.section}}</td>
+</tr>
+{% endfor %}
+{% else %}
+<tr>
+	<td class="no-records">NO RECORDS</td>	
+</tr>
+{% endif %}

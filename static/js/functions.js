@@ -1,10 +1,29 @@
-tab = $('#tab').val();
+tab = '';
 is_done = true;
 form_validated = false
 id_no_validated = false
 
+college_form_validated = false
+college_id_no_validated = false
+
+staff_form_validated = false
+staff_id_no_validated = false
+
+college_edit_form_validated = false
+college_edit_id_no_validated = true
+
+staff_edit_form_validated = true
+staff_edit_id_no_validated = true
+
+edit_form_validated = false
+edit_id_no_validated = true
+
 logsSearchStatus = 'off'
-attendanceSearchStatus = 'off'
+k12SearchStatus = 'off'
+collegeSearchStatus = 'off'
+feesSearchStatus = 'off'
+staffSearchStatus = 'off'
+
 absentSearchStatus = 'off'
 lateSearchStatus = 'off'
 
@@ -12,6 +31,8 @@ logs_result = false;
 attendance_result = false;
 absent_result = false;
 late_result = false;
+fees_result = false;
+staff_result = false;
 
 if (tab == 'attendance'){
     $('#add-user-btn').show();
@@ -19,6 +40,66 @@ if (tab == 'attendance'){
   else{
     $('#add-user-btn').hide();
   }
+
+function show_students(){
+    tab = 'k12';
+    $.post('/students',
+    function(data){
+      $('.content').html(data);
+      $('.menu-container').fadeOut(800);
+      setTimeout(function(){ 
+        $('.content').fadeIn(800);
+      }, 800);
+    });
+}
+
+function show_logs(){
+    tab = 'logs';
+    $.post('/logs',
+    function(data){
+      $('.content').html(data);
+      $('.menu-container').fadeOut(800);
+      setTimeout(function(){ 
+        $('.content').fadeIn(800);
+      }, 800);
+    });
+}
+
+function show_staff(){
+    tab = 'staff';
+    $.post('/staff',
+    function(data){
+      $('.content').html(data);
+      $('.menu-container').fadeOut(800);
+      setTimeout(function(){ 
+        $('.content').fadeIn(800);
+      }, 800);
+    });
+}
+
+function show_fees(){
+    tab = 'fees';
+    $.post('/fees',
+    function(data){
+      $('.content').html(data);
+      $('.menu-container').fadeOut(800);
+      setTimeout(function(){ 
+        $('.content').fadeIn(800);
+      }, 800);
+    });
+}
+
+function show_attendance(){
+    tab = 'absent';
+    $.post('/attendance',
+    function(data){
+      $('.content').html(data);
+      $('.menu-container').fadeOut(800);
+      setTimeout(function(){ 
+        $('.content').fadeIn(800);
+      }, 800);
+    });
+}
 
 function view_message(message_id){
   $('.message-row').removeClass('active-message');
@@ -88,13 +169,53 @@ function validate_student_form(status){
   }
 }
 
-function validate_user_form(status){
-  form_validated = status;
-  if ((form_validated == true) && (id_no_validated == true)){
-    $('#save-user').removeAttr('disabled');
+function validate_college_form(status){
+  college_form_validated = status;
+  if ((college_form_validated == true) && (college_id_no_validated == true)){
+    $('#save-college').removeAttr('disabled');
   }
   else{
-    $('#save-user').attr('disabled',true);
+    $('#save-college').attr('disabled',true);
+  }
+}
+
+function validate_staff_form(status){
+  staff_form_validated = status;
+  if ((staff_form_validated == true) && (staff_id_no_validated == true)){
+    $('#save-staff').removeAttr('disabled');
+  }
+  else{
+    $('#save-staff').attr('disabled',true);
+  }
+}
+
+function validate_college_form_edit(status){
+  college_edit_form_validated = status;
+  if ((college_edit_form_validated == true) && (college_edit_id_no_validated == true)){
+    $('.edit-college-done-btn').removeAttr('disabled');
+  }
+  else{
+    $('.edit-college-done-btn').attr('disabled',true);
+  }
+}
+
+function validate_staff_form_edit(status){
+  staff_edit_form_validated = status;
+  if ((staff_edit_form_validated == true) && (staff_edit_id_no_validated == true)){
+    $('.edit-staff-done-btn').removeAttr('disabled');
+  }
+  else{
+    $('.edit-staff-done-btn').attr('disabled',true);
+  }
+}
+
+function validate_student_form_edit(status){
+  edit_form_validated = status;
+  if ((edit_form_validated == true) && (edit_id_no_validated == true)){
+    $('.edit-done-btn').removeAttr('disabled');
+  }
+  else{
+    $('.edit-done-btn').attr('disabled',true);
   }
 }
 
@@ -110,6 +231,81 @@ function validate_student_id_no(){
   }
   else{
     $('#save-student').attr('disabled',true);
+  }
+}
+
+function validate_college_id_no(){
+  if (($('#college-id-error').text().length == 0) && ($('#add_college_id_no').val().length == 10)){
+    college_id_no_validated = true;
+  }
+  else{
+    college_id_no_validated = false;
+  }
+  if ((college_form_validated == true) && (college_id_no_validated == true)){
+    $('#save-college').removeAttr('disabled');
+  }
+  else{
+    $('#save-college').attr('disabled',true);
+  }
+}
+
+function validate_staff_id_no(){
+  if (($('#staff-id-error').text().length == 0) && ($('#add_staff_id_no').val().length == 10)){
+    staff_id_no_validated = true;
+  }
+  else{
+    staff_id_no_validated = false;
+  }
+  if ((staff_form_validated == true) && (staff_id_no_validated == true)){
+    $('#save-staff').removeAttr('disabled');
+  }
+  else{
+    $('#save-staff').attr('disabled',true);
+  }
+}
+
+function validate_student_id_no_edit(){
+  if (($('#edit-student-id-error').text().length == 0) && ($('#edit_id_no').val().length == 10)){
+    edit_id_no_validated = true;
+  }
+  else{
+    edit_id_no_validated = false;
+  }
+  if ((edit_form_validated == true) && (edit_id_no_validated == true)){
+    $('.edit-done-btn').removeAttr('disabled');
+  }
+  else{
+    $('.edit-done-btn').attr('disabled',true);
+  }
+}
+
+function validate_staff_id_no_edit(){
+  if (($('#edit-staff-id-error').text().length == 0) && ($('#edit_staff_id_no').val().length == 10)){
+    staff_edit_id_no_validated = true;
+  }
+  else{
+    staff_edit_id_no_validated = false;
+  }
+  if ((staff_edit_form_validated == true) && (staff_edit_id_no_validated == true)){
+    $('.edit-staff-done-btn').removeAttr('disabled');
+  }
+  else{
+    $('.edit-staff-done-btn').attr('disabled',true);
+  }
+}
+
+function validate_college_id_no_edit(){
+  if (($('#edit-college-id-error').text().length == 0) && ($('#edit_college_id_no').val().length == 10)){
+    college_edit_id_no_validated = true;
+  }
+  else{
+    college_edit_id_no_validated = false;
+  }
+  if ((college_edit_form_validated == true) && (college_edit_id_no_validated == true)){
+    $('.edit-college-done-btn').removeAttr('disabled');
+  }
+  else{
+    $('.edit-college-done-btn').attr('disabled',true);
   }
 }
 
@@ -130,12 +326,15 @@ function validate_user_id_no(){
 
 function change_tab(page){
   tab = page;
-  if (tab == 'attendance'){
-    $('#add-user-btn').show();
+  if (tab == 'k12'){
+    $('#add-student-btn').show();
+    $('#add-college-btn').hide();
   }
   else{
-    $('#add-user-btn').hide();
+    $('#add-student-btn').hide();
+    $('#add-college-btn').show();
   }
+
 
   if ((eval(tab+'SearchStatus') == 'on') && (eval(tab+'_result') == false)){
     $('#search-loading').show();
@@ -143,7 +342,6 @@ function change_tab(page){
   else{
     $('#search-loading').hide();
   }
-
   $.post('/tab/change',{
       tab:tab,
     });
@@ -163,6 +361,85 @@ function validate_student_id(id_no){
     });
 }
 
+function validate_college_id(id_no){
+  $('#college-id-error').hide();
+  $('#college-id-loader').show();
+  $.post('/id/validate',{
+        id_no:id_no,
+    },
+    function(data){
+        $('#college-id-error').html(data);
+        $('#college-id-loader').hide();
+        $('#college-id-error').show();
+        validate_college_id_no();
+    });
+}
+
+function validate_staff_id(id_no){
+  $('#staff-id-error').hide();
+  $('#staff-id-loader').show();
+  $.post('/id/validate',{
+        id_no:id_no,
+    },
+    function(data){
+        $('#staff-id-error').html(data);
+        $('#staff-id-loader').hide();
+        $('#staff-id-error').show();
+        validate_staff_id_no();
+    });
+}
+
+function validate_college_id_edit(id_no,student_id){
+  var group = 'college';
+  $('#edit-college-id-error').hide();
+  $('#edit-college-id-loader').show();
+  $.post('/id/validate/edit',{
+        id_no:id_no,
+        student_id:student_id,
+        group:group
+    },
+    function(data){
+        $('#edit-college-id-error').html(data);
+        $('#edit-college-id-loader').hide();
+        $('#edit-college-id-error').show();
+        validate_college_id_no_edit();
+    });
+}
+
+function validate_staff_id_edit(id_no,staff_id){
+  var group = 'staff';
+  $('#edit-staff-id-error').hide();
+  $('#edit-staff-id-loader').show();
+  $.post('/id/validate/edit',{
+        id_no:id_no,
+        staff_id:staff_id,
+        group:group
+    },
+    function(data){
+        $('#edit-staff-id-error').html(data);
+        $('#edit-staff-id-loader').hide();
+        $('#edit-staff-id-error').show();
+        validate_staff_id_no_edit();
+    });
+}
+
+function validate_student_id_edit(id_no,student_id){
+  var group = 'k12';
+  $('#edit-student-id-error').hide();
+  $('#edit-student-id-loader').show();
+  $.post('/id/validate/edit',{
+        id_no:id_no,
+        student_id:student_id,
+        group:group
+    },
+    function(data){
+        $('#edit-student-id-error').html(data);
+        $('#edit-student-id-loader').hide();
+        $('#edit-student-id-error').show();
+        validate_student_id_no_edit();
+    });
+}
+
 function validate_user_id(id_no){
   $('#user-id-error').hide();
   $('#user-id-loader').show();
@@ -179,6 +456,15 @@ function validate_user_id(id_no){
 
 function supply_data(studentId){
   $.post('/student/info/get',{
+        student_id:studentId,
+    },
+    function(data){
+        $('.edit-user-modal-dialog .modal-content').html(data);
+    });
+}
+
+function supply_college_data(studentId){
+  $.post('/college/info/get',{
         student_id:studentId,
     },
     function(data){
@@ -278,6 +564,12 @@ function clear_data(){
     $('#id-error').text('');
 }
 
+function clear_fee_data(){
+    input_fields = $('.add-fee-modal-body').find('.form-control');
+    input_fields.val('');
+    input_fields.change();
+}
+
 ;(function($){
   $.fn.extend({
     donetyping: function(callback,timeout){
@@ -305,7 +597,8 @@ function clear_data(){
 })(jQuery);
 
 
-function search_attendance(){
+function search_k12(){
+  show_search_load();
   var last_name = $('#attendance_search_last_name').val();
   var first_name = $('#attendance_search_first_name').val();
   var middle_name = $('#attendance_search_middle_name').val();
@@ -317,7 +610,7 @@ function search_attendance(){
   var lates = $('#attendance_search_lates').val();
   var reset = 'yes';
 
-  $.post('/search/attendance',{
+  $.post('/search/k12',{
       needed:tab,
       last_name:last_name,
       first_name:first_name,
@@ -335,6 +628,74 @@ function search_attendance(){
       $('#search-loading').hide();
       attendance_result = true;
       is_done = true;
+  });
+}
+
+function search_college(){
+  show_search_load();
+  var last_name = $('#attendance_search_last_name').val();
+  var first_name = $('#attendance_search_first_name').val();
+  var middle_name = $('#attendance_search_middle_name').val();
+  var id_no = $('#attendance_search_id_no').val();
+  var level = $('#attendance_search_level').val();
+  var department = $('#attendance_search_section').val();
+  var reset = 'yes';
+
+  $.post('/search/college',{
+      needed:tab,
+      last_name:last_name,
+      first_name:first_name,
+      middle_name:middle_name,
+      id_no:id_no,
+      level:level,
+      department:department,
+      reset:reset
+  },
+  function(data){
+      $('#'+tab).html(data);
+      $('#search-loading').hide();
+      attendance_result = true;
+      is_done = true;
+  });
+}
+
+function fill_guardian_data(mobile_number){
+  $('#guardianInfoLoading').show();
+  $.post('/guardians/info',{
+      mobile_number:mobile_number,
+  },
+  function(data){
+    if (data['status'] == 'success'){
+      $('#add_guardian_last_name').val(data['last_name']);
+      $('#add_guardian_first_name').val(data['first_name']);
+      $('#add_guardian_middle_name').val(data['middle_name']);
+      $('#add_guardian_email').val(data['email']);
+      $('#add_guardian_address').val(data['address']);
+      $('#add_guardian_relation').val('');
+      $('.guardian-info-section').find('div').find('.form-control').change();
+      $('#add_guardian_relation').focus();
+    }
+    $('#guardianInfoLoading').hide();
+  });
+}
+
+function fill_guardian_data_edit(mobile_number){
+  $('#guardianInfoLoadingEdit').show();
+  $.post('/guardians/info',{
+      mobile_number:mobile_number,
+  },
+  function(data){
+    if (data['status'] == 'success'){
+      $('#edit_guardian_last_name').val(data['last_name']);
+      $('#edit_guardian_first_name').val(data['first_name']);
+      $('#edit_guardian_middle_name').val(data['middle_name']);
+      $('#edit_guardian_email').val(data['email']);
+      $('#edit_guardian_address').val(data['address']);
+      $('#edit_guardian_relation').val('');
+      $('.guardian-info-section').find('div').find('.form-control').change();
+      $('#edit_guardian_relation').focus();
+    }
+    $('#guardianInfoLoadingEdit').hide();
   });
 }
 
@@ -374,8 +735,7 @@ function search_logs(){
   var date = $('#log_search_date').val();
   var id_no = $('#log_search_id_no').val();
   var name = $('#log_search_name').val();
-  var level = $('#log_search_level').val();
-  var section = $('#log_search_section').val();
+  var department = $('#log_search_department').val();
   var reset = 'yes';
   
   $.post('/search/logs',{
@@ -383,14 +743,33 @@ function search_logs(){
       date:date,
       id_no:id_no,
       name:name,
-      level:level,
-      section:section,
+      department:department,
       reset:reset
   },
   function(data){
       $('#'+tab).html(data);
       $('#search-loading').hide();
       logs_result = true;
+      is_done = true
+      isPreviousEventComplete = true
+  });
+}
+
+function search_fees(){
+  isPreviousEventComplete = false;
+  var name = $('#fee_search_name').val();
+  var category = $('#fee_search_category').val();
+  var reset = 'yes';
+  
+  $.post('/search/fees',{
+      name:name,
+      category:category,
+      reset:reset
+  },
+  function(data){
+      $('#'+tab).html(data);
+      $('#search-loading').hide();
+      fees_result = true;
       is_done = true
       isPreviousEventComplete = true
   });
@@ -945,23 +1324,29 @@ function save_calendar_sched(){
     });
 }
 
-function save_student(last_name, first_name, middle_name, level, section, contact, id_no){
-  department = 'student'
+function save_k12(last_name, first_name, middle_name, level, section, id_no, guardian_mobile, guardian_last_name, guardian_first_name, guardian_middle_name, guardian_email, guardian_address, guardian_relation){
+  department = 'k12';
   $.post('/user/new',{
       last_name:last_name,
       first_name:first_name,
       middle_name:middle_name,
       level:level,
       section:section,
-      contact:contact,
       id_no:id_no,
-      department:department
+      department:department,
+      guardian_mobile:guardian_mobile,
+      guardian_last_name:guardian_last_name,
+      guardian_first_name:guardian_first_name,
+      guardian_middle_name:guardian_middle_name,
+      guardian_email:guardian_email,
+      guardian_address:guardian_address,
+      guardian_relation:guardian_relation
   },
   function(data){
       clear_data();
       form_validated = false
       id_no_validated = false
-      $('#attendance').html(data);
+      $('#k12').html(data);
       $('#save-student').button('complete');
       setTimeout(function(){ 
           $('#save-student').attr('disabled',true);
@@ -974,29 +1359,79 @@ function save_student(last_name, first_name, middle_name, level, section, contac
   });
 }
 
-function save_user(last_name, first_name, middle_name, id_no){
-  department = 'faculty'
+function save_college(last_name, first_name, middle_name, level, college_department, email, mobile, id_no){
+  department = 'college';
   $.post('/user/new',{
+      department:department,
       last_name:last_name,
       first_name:first_name,
       middle_name:middle_name,
+      level:level,
       id_no:id_no,
-      department:department
+      college_department:college_department,
+      email:email,
+      mobile:mobile
   },
   function(data){
       clear_data();
-      form_validated = false
-      id_no_validated = false
-      $('#attendance').html(data);
-      $('#save-user').button('complete');
+      college_form_validated = false
+      college_id_no_validated = false
+      $('#college').html(data);
+      $('#save-college').button('complete');
       setTimeout(function(){ 
-          $('#save-user').attr('disabled',true);
-      }, 0);
+          $('#save-college').attr('disabled',true);
+      }, 0); 
       $('.add-user-footer-left').fadeIn();
       setTimeout(function() {
           $('.add-user-footer-left').fadeOut();
       }, 2000);
-      
+  });
+}
+
+function save_staff(last_name, first_name, middle_name, staff_department, email, mobile, id_no){
+  department = 'staff';
+  $.post('/user/new',{
+      department:department,
+      last_name:last_name,
+      first_name:first_name,
+      middle_name:middle_name,
+      id_no:id_no,
+      staff_department:staff_department,
+      email:email,
+      mobile:mobile
+  },
+  function(data){
+      clear_data();
+      staff_form_validated = false
+      staff_id_no_validated = false
+      $('#staff').html(data);
+      $('#save-staff').button('complete');
+      setTimeout(function(){ 
+          $('#save-staff').attr('disabled',true);
+      }, 0); 
+      $('.add-user-footer-left').fadeIn();
+      setTimeout(function() {
+          $('.add-user-footer-left').fadeOut();
+      }, 2000);
+  });
+}
+
+function save_fee(name,category,price,desc,add_to){ 
+  $.post('/fees/new',{
+      name:name,
+      category:category,
+      price:price,
+      desc:desc,
+      add_to:add_to
+  },
+  function(data){
+      $('#fees').html(data);
+      $('#save-fee').button('complete');
+      $('#add-fee-modal').modal('hide');
+      $('#snackbar').fadeIn();
+        setTimeout(function() {
+          $('#snackbar').fadeOut();
+      }, 2000);
   });
 }
 
@@ -1012,23 +1447,54 @@ function back_home(){
     });
 }
 
-function edit_user(last_name, first_name, middle_name, level, section, contact, id_no, user_id){
-    $.post('/user/edit',{
+function edit_student(last_name, first_name, middle_name, level, section, id_no, user_id, guardian_first_name , guardian_last_name, guardian_middle_name, guardian_address, guardian_mobile, guardian_email, guardian_relation){
+    $.post('/student/edit',{
         last_name:last_name,
         first_name:first_name,
         middle_name:middle_name,
         level:level,
         section:section,
+        id_no:id_no,
+        user_id:user_id,
+        guardian_first_name:guardian_first_name,
+        guardian_last_name:guardian_last_name,
+        guardian_middle_name:guardian_middle_name,
+        guardian_address:guardian_address,
+        guardian_mobile:guardian_mobile,
+        guardian_email:guardian_email,
+        guardian_relation:guardian_relation
+    },
+    function(data){
+        $('.edit-user-modal-footer .edit-done-btn').button('complete');
+        setTimeout(function(){ 
+            $('.edit-user-modal-footer .edit-done-btn').attr('disabled',true);
+        }, 0);
+        $('#k12').html(data);
+        $('#edit-user-modal').modal('hide');
+        $('#snackbar').fadeIn();
+        setTimeout(function() {
+          $('#snackbar').fadeOut();
+      }, 2000);
+    });
+}
+
+function edit_college(last_name, first_name, middle_name, level, college_department, contact, id_no, user_id){
+    $.post('/college/edit',{
+        last_name:last_name,
+        first_name:first_name,
+        middle_name:middle_name,
+        level:level,
+        college_department:college_department,
         contact:contact,
         id_no:id_no,
         user_id:user_id
     },
     function(data){
-        $('.edit-user-modal-footer .done-btn').button('complete');
+        $('.edit-user-modal-footer .edit-college-done-btn').button('complete');
         setTimeout(function(){ 
-            $('.edit-user-modal-footer .done-btn').attr('disabled',true);
+            $('.edit-user-modal-footer .edit-college-done-btn').attr('disabled',true);
         }, 0);
-        $('#attendance').html(data);
+        $('#college').html(data);
         $('#edit-user-modal').modal('hide');
         $('#snackbar').fadeIn();
         setTimeout(function() {
@@ -1597,5 +2063,30 @@ function save_admin(){
           $('.add-admin-footer-left').fadeOut();
       }, 2000);
     }
+  });
+}
+
+function isNumberKey(evt){
+    var charCode = (evt.which) ? evt.which : event.keyCode
+    if (charCode > 31 && (charCode < 48 || charCode > 57))
+        return false;
+    return true;
+}
+
+function display_balance(balance){
+  $('#cashTotal').html(balance);
+  setTimeout(function() {
+    $('#amountPaid').focus();
+  }, 500);
+}
+
+function collect_payment(amount){
+  $.post('/fees/collect',{
+      amount:amount
+  },
+  function(data){
+    $('#tenderedDoneBtn').button('complete');
+    $('#collect-payment-modal').modal('hide');
+    $('#studentFeesContainer').html(data);
   });
 }

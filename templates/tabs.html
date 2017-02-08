@@ -1,0 +1,99 @@
+<input type="hidden" id="tab" value="{{tab}}" />
+                <div id="intro-mask"></div>
+                <div id="intro">
+                        <div class="intro-loader"></div>
+                </div>
+                <div id="table-loading" class="loading">
+                        <div class="loader"></div>
+                </div>
+                <div id="search-loading" class="loading">
+                        <!-- <img src="../static/images/assets/282.GIF"> -->
+                        <div class="loader"></div>
+                </div>
+                <div id="snackbar">
+                        <span class="snackbar-status-message">Saved</span>
+                </div>
+                {% include 'header.html' %}
+                <div class="container">
+                        <div id="tabs">
+                                <ul class="nav main-nav-tabs nav-tabs">
+                                        {% if tab == 'logs'%}
+                                        <li class="active">
+                                        {% else %}
+                                        <li>
+                                        {% endif %} 
+                                                <a href="#logs-tab" class="tab-item" data-toggle="tab" onclick="change_tab('logs')">LOG</a>
+                                        </li>
+
+                                        {% if view=='student' %}
+                                        {% if tab == 'attendance' %}
+                                        <li class="active">
+                                        {% else %}
+                                        <li>
+                                        {% endif %} 
+                                                <a href="#attendance-tab" class="tab-item" data-toggle="tab" onclick="change_tab('attendance')">STUDENTS</a>
+                                        </li>
+
+                                        {% if tab == 'absent' %}
+                                        <li class="active">
+                                        {% else %}
+                                        <li>
+                                        {% endif %} 
+                                                <a href="#absent-tab" class="tab-item" data-toggle="tab" onclick="change_tab('absent')">ABSENT</a>
+                                        </li>
+
+                                        {% if tab == 'late' %}
+                                        <li class="active">
+                                        {% else %}
+                                        <li>
+                                        {% endif %} 
+                                                <a href="#late-tab" class="tab-item" data-toggle="tab" onclick="change_tab('late')">LATE</a>
+                                        </li>
+
+                                        {% endif %}
+                                        {% if view=='faculty' %}
+                                        {% if tab == 'attendance' %}
+                                        <li class="active">
+                                        {% else %}
+                                        <li>
+                                        {% endif %}
+                                                <a href="#attendance-tab" class="tab-item" data-toggle="tab" onclick="change_tab('attendance')">USERS</a>
+                                        </li>
+                                        {% endif %}
+                                        <div class="button-container">
+                                                {% if view == 'student' %}
+                                                <button class="btn" id="add-user-btn" data-toggle="modal" data-target="#add-student-modal"><i class="material-icons md-30">add</i></button>
+                                                {% else %}
+                                                <button class="btn" id="add-user-btn" data-toggle="modal" data-target="#add-user-modal"><i class="material-icons md-30">add</i></button>
+                                                {% endif %}
+                                                <div class="btn-group">
+                                                <button id="messages-btn" class="buttons btn" data-toggle="modal" data-target="#message-modal" onclick="open_messages()"><span class="glyphicon glyphicon-envelope"></span></button>
+                                                <button id="search-btn" class="buttons btn"><span class="glyphicon glyphicon-search"></span></button>
+                                                <button id="refresh-btn" class="buttons btn" onclick="back_home()"><span class="glyphicon glyphicon-repeat"></span></button>
+
+                                                        <button id="settings-btn" class="buttons btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                                <span class="glyphicon glyphicon-cog"></span>
+                                                        </button>
+                                                        <ul id="options" class="dropdown-menu" role="menu">
+                                                                <label>View:</label>
+                                                                <li onclick="change_tab('logs')"><a href="/view?view=student">Students{% if view=='student' %}<span class="glyphicon glyphicon-ok active-view"></span>{% endif %}</a></li>
+                                                                <li onclick="change_tab('logs')"><a href="/view?view=faculty">Staff{% if view=='faculty' %}<span class="glyphicon glyphicon-ok active-view"></span>{% endif %}</a></li>
+                                                                <li class="divider"></li>
+                                                                <label>Schedule:</label>
+                                                                <li><a href="#" data-toggle="modal" data-target="#calendar-modal" onclick="populate_calendar()">A.Y. Calendar</a></li>
+                                                                <li id="regular-schedule-btn"><a href="#" data-toggle="modal" data-target="#schedule-modal" onclick="populate_schedule()">Regular Schedule</a></li>
+                                                                {% if user.is_super_admin %}
+                                                                <li class="divider"></li>
+                                                                <li id="manage-accounts-btn"><a href="/accounts">Manage Accounts</a></li>
+                                                                {% endif %}
+                                                        </ul>
+                                                </div>
+                                        </div>          
+                                </ul>
+                        </div>
+                        <div id="main-content">
+                                {% block content %} 
+                                {% endblock %}
+                        </div> 
+                        {% include 'modals.html' %}
+                </div> 

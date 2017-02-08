@@ -1,0 +1,71 @@
+<div id="table-container">
+	<div id="tabs">
+	    <ul class="nav main-nav-tabs nav-tabs">
+	        <div class="button-container">
+	        	<button class="btn add-user-btn" id="add-fee-btn" data-toggle="modal" data-target="#add-fee-modal"><i class="material-icons md-30">add</i></button>
+	            <div class="btn-group">
+		            <button id="search-btn" onclick="toggle_search()" class="buttons btn"><span class="glyphicon glyphicon-search"></span></button>
+		            <button id="refresh-btn" class="buttons btn" onclick="back_home()"><span class="glyphicon glyphicon-repeat"></span></button>
+	            </div>
+	        </div>          
+	    </ul>
+	</div>
+	<div class="tab-content">
+		<div class="tab-pane active" id="feesTab">
+			<table class="table">
+				<thead>	
+					<tr>
+						<th class="xs">#</th>
+						<th class="short">Fee</th>
+						<th class="short">Category</th>
+						<th class="short fee-price">Price</th>
+					</tr>
+					<tr id="fees-search-panel" class="search-panel">
+						<td class="xs"></td>	
+						<td class="short">
+							<input type="text" id="fee_search_name" class="form-control search-text search-fees">
+						</td>	
+						<td class="short">
+							<select id="fee_search_category" class="form-control search-option search-fees-options">
+						        <option value="">All</option>
+						        {% for category in fee_categories %}
+						        <option>{{ category.name }}</option>
+						        {% endfor %}
+							</select>
+						</td>
+						<td class="short"></td>
+						<td class="short"></td>
+					</tr>
+				</thead>
+				<tbody id="fees" class="maximized">
+					{% if fees[0] %}
+					{% for fee in fees %}
+			        <tr id="{{fee.id}}" class="rows">
+			            <td class="xs">{{loop.index}}</td> 
+			            <td class="short">{{fee.name}}</td>
+			            <td class="short">{{fee.category}}</td>                  
+			            <td class="short fee-price">Php {{fee.price}}</td>               
+			        </tr>
+			        {% endfor %}
+					{% else %}
+					<tr>
+					<td class="no-records">NO RECORDS</td>	
+					</tr>
+					{% endif %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$('.search-fees').keypress(function(e){
+	    if (e.which == 13) {
+	        search_fees();
+	    }
+	});
+
+	$('.search-fees-options').on('change', function(){
+	    search_fees();
+	});
+</script>
