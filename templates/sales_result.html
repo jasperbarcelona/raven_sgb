@@ -1,0 +1,16 @@
+{% if data[0] %}
+{% for record in data %}
+<tr id="{{record.id}}" class="rows">
+    <td class="xs">{{loop.index}}</td> 
+    <td class="short">{{record.date}}</td>
+    <td class="short">{{record.vendor}}</td>
+    <td class="short">{{record.cash_total}}</td>   
+    <td class="short">{{record.wallet_total}}</td> 
+    <td class="short">{{record.grand_total}}</td>            
+</tr>
+{% endfor %}
+{% else %}
+<tr>
+<td class="no-records">NO RECORDS</td>	
+</tr>
+{% endif %}

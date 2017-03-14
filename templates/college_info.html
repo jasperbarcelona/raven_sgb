@@ -93,14 +93,15 @@ else{
 
 $('.edit-user-modal-footer .edit-college-done-btn').on('click', function(){
     $(this).button('loading');
-    var last_name = $('#edit_last_name').val();
-    var first_name = $('#edit_first_name').val();
-    var middle_name = $('#edit_middle_name').val();
-    var level = $('#edit_level').val();
+    var last_name = $('#edit_college_last_name').val();
+    var first_name = $('#edit_college_first_name').val();
+    var middle_name = $('#edit_college_middle_name').val();
+    var level = $('#edit_college_level').val();
     var college_department = $('#edit_college_department').val();
-    var contact = $('#edit_mobile').val();
-    var id_no = $('#edit_id_no').val();
+    var contact = $('#edit_college_mobile').val();
+    var email = $('#edit_college_email').val();
+    var id_no = $('#edit_college_id_no').val();
     var user_id = $(this).attr('id')
-    edit_college(last_name, first_name, middle_name, level, college_department, contact, id_no, user_id);
+    edit_college(last_name, first_name, middle_name, level, college_department, contact, email, id_no, user_id);
 });
 </script>

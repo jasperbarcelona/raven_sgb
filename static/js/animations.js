@@ -419,6 +419,18 @@ $('.search-late-options').on('change', function(){
     search_late()
 });
 
+$('.add-fee-row').on('click', function(){
+    if ($(this).find('.fee-check-td').html() == ''){
+        add_fee($(this).attr('id'));
+        $(this).find('.fee-check-td').html('<span class="glyphicon glyphicon-ok"></span>');
+    }
+    else{
+        remove_fee($(this).attr('id'));
+        $(this).find('.fee-check-td').html('');
+    }
+});
+
+
 $('.no-class-checkbox').change(function() {
         if($(this).is(":checked")) {
             $('#'+$(this).attr('id')+'_calendar_sched').find('.input-group-addon').css('background-color','#4485F5');

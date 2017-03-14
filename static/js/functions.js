@@ -34,12 +34,34 @@ late_result = false;
 fees_result = false;
 staff_result = false;
 
+fees_to_add = [];
+
 if (tab == 'attendance'){
     $('#add-user-btn').show();
   }
   else{
     $('#add-user-btn').hide();
   }
+
+function add_fee(fee_id){
+  fees_to_add.push(fee_id);
+  if (fees_to_add.length == 0){
+    $('#add-fee-btn').attr('disabled',true);
+  }
+  else{
+    $('#add-fee-btn').attr('disabled',false);
+  }
+}
+
+function remove_fee(fee_id){
+  fees_to_add.pop(fee_id);
+  if (fees_to_add.length == 0){
+    $('#add-fee-btn').attr('disabled',true);
+  }
+  else{
+    $('#add-fee-btn').attr('disabled',false);
+  }
+}
 
 function show_students(){
     tab = 'k12';
@@ -63,6 +85,26 @@ function show_logs(){
         $('.content').fadeIn(800);
       }, 800);
     });
+}
+
+function show_transactions(){
+    tab = 'transactions';
+    $.post('/transactions',
+    function(data){
+      $('.content').html(data);
+      $('.menu-container').fadeOut(800);
+      setTimeout(function(){ 
+        $('.content').fadeIn(800);
+      }, 800);
+    });
+}
+
+function show_home(){
+  $('.content').fadeOut(800);
+  setTimeout(function(){ 
+    $('.menu-container').fadeIn(800);
+    $('.content').html('');
+  }, 800);
 }
 
 function show_staff(){
@@ -472,6 +514,15 @@ function supply_college_data(studentId){
     });
 }
 
+function supply_staff_data(staffId){
+  $.post('/staff/info/get',{
+        staff_id:staffId,
+    },
+    function(data){
+        $('.edit-staff-modal-dialog .modal-content').html(data);
+    });
+}
+
 function textCounter(field,field2,maxlimit){
  var countfield = document.getElementById(field2);
   if( field.value.length > maxlimit ){
@@ -633,12 +684,12 @@ function search_k12(){
 
 function search_college(){
   show_search_load();
-  var last_name = $('#attendance_search_last_name').val();
-  var first_name = $('#attendance_search_first_name').val();
-  var middle_name = $('#attendance_search_middle_name').val();
-  var id_no = $('#attendance_search_id_no').val();
-  var level = $('#attendance_search_level').val();
-  var department = $('#attendance_search_section').val();
+  var last_name = $('#college_search_last_name').val();
+  var first_name = $('#college_search_first_name').val();
+  var middle_name = $('#college_search_middle_name').val();
+  var id_no = $('#college_search_id_no').val();
+  var level = $('#college_search_level').val();
+  var department = $('#college_search_department').val();
   var reset = 'yes';
 
   $.post('/search/college',{
@@ -658,6 +709,33 @@ function search_college(){
       is_done = true;
   });
 }
+
+function search_staff(){
+  show_search_load();
+  var last_name = $('#staff_search_last_name').val();
+  var first_name = $('#staff_search_first_name').val();
+  var middle_name = $('#staff_search_middle_name').val();
+  var id_no = $('#staff_search_id_no').val();
+  var department = $('#staff_search_department').val();
+  var reset = 'yes';
+
+  $.post('/search/staff',{
+      needed:tab,
+      last_name:last_name,
+      first_name:first_name,
+      middle_name:middle_name,
+      id_no:id_no,
+      department:department,
+      reset:reset
+  },
+  function(data){
+      $('#'+tab).html(data);
+      $('#search-loading').hide();
+      attendance_result = true;
+      is_done = true;
+  });
+}
+
 
 function fill_guardian_data(mobile_number){
   $('#guardianInfoLoading').show();
@@ -1478,7 +1556,7 @@ function edit_student(last_name, first_name, middle_name, level, section, id_no,
     });
 }
 
-function edit_college(last_name, first_name, middle_name, level, college_department, contact, id_no, user_id){
+function edit_college(last_name, first_name, middle_name, level, college_department, contact, email, id_no, user_id){
     $.post('/college/edit',{
         last_name:last_name,
         first_name:first_name,
@@ -1486,6 +1564,7 @@ function edit_college(last_name, first_name, middle_name, level, college_departm
         level:level,
         college_department:college_department,
         contact:contact,
+        email:email,
         id_no:id_no,
         user_id:user_id
     },
@@ -1496,6 +1575,31 @@ function edit_college(last_name, first_name, middle_name, level, college_departm
         }, 0);
         $('#college').html(data);
         $('#edit-user-modal').modal('hide');
+        $('#snackbar').fadeIn();
+        setTimeout(function() {
+          $('#snackbar').fadeOut();
+      }, 2000);
+    });
+}
+
+function edit_staff(last_name, first_name, middle_name, staff_department, contact, email, id_no, user_id){
+    $.post('/staff/edit',{
+        last_name:last_name,
+        first_name:first_name,
+        middle_name:middle_name,
+        staff_department:staff_department,
+        contact:contact,
+        email:email,
+        id_no:id_no,
+        user_id:user_id
+    },
+    function(data){
+        $('.edit-user-modal-footer .edit-staff-done-btn').button('complete');
+        setTimeout(function(){ 
+            $('.edit-staff-modal-footer .edit-staff-done-btn').attr('disabled',true);
+        }, 0);
+        $('#staff').html(data);
+        $('#edit-staff-modal').modal('hide');
         $('#snackbar').fadeIn();
         setTimeout(function() {
           $('#snackbar').fadeOut();
@@ -2089,4 +2193,21 @@ function collect_payment(amount){
     $('#collect-payment-modal').modal('hide');
     $('#studentFeesContainer').html(data);
   });
+}
+
+function add_fees_to_student(){
+  $('#add-fee-btn').button('loading');
+  $.post('/students/fees/add',{
+    fees_to_add:fees_to_add
+  },
+    function(data){
+      fees_to_add = [];
+      $('.add-fee-row').find('.fee-check-td').html('');
+      $('#add-fee-btn').button('complete');
+      $('#add-student-fee-modal').modal('hide');
+      $('#studentFeesContainer').html(data);
+      setTimeout(function() {
+        $('#add-fee-btn').attr('disabled',true);
+      }, 500);
+    });
 }

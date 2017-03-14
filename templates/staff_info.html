@@ -1,0 +1,96 @@
+<div class="modal-header colored-bg">
+        <span class="modal-title user-modal-title" id="gridSystemModalLabel">Staff Information</span>
+</div>
+<div class="modal-body edit-staff-modal-body">
+        <div class="add-user-section student-info-section">
+            <h4>Staff Information</h4>
+            <div class="left col-sm-6 col-xs-12">
+                    <input type="text" value="{{staff.last_name}}" class="form-control" id="edit_staff_last_name" placeholder="Last Name" data-class="input-label" />
+            </div>
+            <div class="right col-sm-6 col-xs-12">
+                    <input type="text" value="{{staff.first_name}}" class="form-control" id="edit_staff_first_name" placeholder="First Name" data-class="input-label" />
+            </div>
+            <div class="left col-sm-6 col-xs-12">
+                    <input type="text" value="{{staff.middle_name}}" class="form-control" id="edit_staff_middle_name" placeholder="Middle Name" data-class="input-label" />
+            </div>
+            <div class="right col-sm-6 col-xs-12">
+                    <select class="form-control select" id="edit_staff_department" required>
+                            <option selected>{{staff.department}}</option>
+                            {% for department in staff_departments %}
+                            <option>{{department.name}}</option>
+                            {% endfor %}
+                    </select>
+            </div>
+            <div class="left col-sm-6 col-xs-12">
+                    <input type="text" value="{{staff.email}}" class="form-control" id="edit_staff_email" placeholder="Email" data-class="input-label" />
+            </div>
+            <div class="right col-sm-6 col-xs-12">
+                    <input type="text" value="{{staff.mobile}}" class="form-control" id="edit_staff_mobile" placeholder="Mobile Number" data-class="input-label" />
+            </div>
+            <div class="left col-sm-6 col-xs-12">
+                    <input type="text" value="{{staff.id_no}}" class="form-control" id="edit_staff_id_no" placeholder="ID Number" data-class="input-label" oninput="validate_staff_id_edit(this.value,{{staff.id}})" />
+            </div>
+            <center>
+                    <div class="id-loader-container">
+                            <span id="edit-staff-id-loader" class="id-loader"><img src="../static/images/assets/blue.GIF"></span>
+                            <span id="edit-staff-id-error"></span>
+                    </div>
+            </center>
+    </div>
+</div>
+<div class="modal-footer edit-staff-modal-footer">
+        <button id = "edit-user-cancel" type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
+        <button id="{{staff.id}}" type="button" class="btn btn-primary done-btn edit-staff-done-btn" disabled data-loading-text="Saving" data-complete-text="Save" autocomplete="off">Save</button>
+</div>
+
+<script type="text/javascript">
+
+$('.loading').hide();
+$('.id-loader').hide();
+
+$('.edit-staff-modal-body .form-control').floatlabel({
+    labelStartTop:'30px',
+    labelEndTop:'-2px'
+});
+
+$('.form-control').on('input propertychange paste', function () {
+var re = /[A-Za-z]+$/;
+if (($('#edit_staff_last_name').val() != "") && ($('#edit_staff_first_name').val() != "") &&
+(re.test($('#edit_staff_last_name').val())) && (re.test($('#edit_staff_first_name').val())) &&
+($('#edit_staff_department').val() != null) && ($('#edit_staff_mobile').val() != null) && 
+(!isNaN($('#edit_staff_mobile').val())) && ($('#edit_staff_mobile').val().length == 11) && 
+($('#edit_staff_email').val() != null)){
+    validate_staff_form_edit(true);
+}
+else{
+    validate_staff_form_edit(false);
+}
+});
+
+$('.form-control').on('change', function () {
+var re = /[A-Za-z]+$/;
+if (($('#edit_staff_last_name').val() != "") && ($('#edit_staff_first_name').val() != "") &&
+(re.test($('#edit_staff_last_name').val())) && (re.test($('#edit_staff_first_name').val())) &&
+($('#edit_staff_department').val() != null) && ($('#edit_staff_mobile').val() != null) && 
+(!isNaN($('#edit_staff_mobile').val())) && ($('#edit_staff_mobile').val().length == 11) && 
+($('#edit_staff_email').val() != null)){
+    validate_staff_form_edit(true);
+}
+else{
+    validate_staff_form_edit(false);
+}
+});
+
+$('.edit-staff-modal-footer .edit-staff-done-btn').on('click', function(){
+    $(this).button('loading');
+    var last_name = $('#edit_staff_last_name').val();
+    var first_name = $('#edit_staff_first_name').val();
+    var middle_name = $('#edit_staff_middle_name').val();
+    var staff_department = $('#edit_staff_department').val();
+    var contact = $('#edit_staff_mobile').val();
+    var email = $('#edit_staff_email').val();
+    var id_no = $('#edit_staff_id_no').val();
+    var user_id = $(this).attr('id');
+    edit_staff(last_name, first_name, middle_name, staff_department, contact, email, id_no, user_id);
+});
+</script>

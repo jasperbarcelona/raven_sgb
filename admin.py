@@ -36,7 +36,7 @@ import schedule
 
 app = flask.Flask(__name__)
 app.secret_key = '0129383hfldcndidvs98r9t9438953894534k545lkn3kfnac98'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
@@ -50,10 +50,7 @@ CALENDAR_URL = 'http://0.0.0.0:7000%s'
 IPP_URL = 'https://devapi.globelabs.com.ph/smsmessaging/v1/outbound/%s/requests'
 IPP_SHORT_CODE = 21587460
 
-KINDERGARTEN = ['Junior Kinder', 'Senior Kinder']
-PRIMARY = ['1st Grade', '2nd Grade', '3rd Grade', '4th Grade', '5th Grade', '6th Grade']
-JUNIOR_HIGH = ['7th Grade', '8th Grade', '9th Grade', '10th Grade']
-SENIOR_HIGH = ['11th Grade', '12th Grade']
+SCHOOL_NO = 'tmtc-sc2016'
 # os.environ['DATABASE_URL']
 # 'sqlite:///local.db'
 
@@ -72,7 +69,6 @@ class Serializer(object):
         dict[public_key] = value
     return dict
 
-
 class SWEncoder(json.JSONEncoder):
   def default(self, obj):
     if isinstance(obj, Serializer):
@@ -81,12 +77,10 @@ class SWEncoder(json.JSONEncoder):
       return obj.isoformat()
     return json.JSONEncoder.default(self, obj)
 
-
 def SWJsonify(*args, **kwargs):
   return app.response_class(json.dumps(dict(*args, **kwargs), cls=SWEncoder, 
          indent=None if request.is_xhr else 2), mimetype='application/json')
         # from https://github.com/mitsuhiko/flask/blob/master/flask/helpers.py
-
 
 class School(db.Model, Serializer):
     __public__= ['id','api_key','password','id_no','name','address','city','email','tel']
@@ -100,7 +94,6 @@ class School(db.Model, Serializer):
     email = db.Column(db.String(60))
     contact = db.Column(db.String(15))
 
-
 class AdminUser(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     school_no = db.Column(db.String(32))
@@ -113,11 +106,9 @@ class AdminUser(db.Model):
     added_by = db.Column(db.Integer)
     timestamp = db.Column(db.String(50))
 
-
 class Schedule(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     school_no = db.Column(db.String(32))
-
     junior_kinder_morning_class = db.Column(Boolean, unique=False)
     junior_kinder_afternoon_class = db.Column(Boolean, unique=False)
     senior_kinder_morning_class = db.Column(Boolean, unique=False)
@@ -219,6 +210,28 @@ class Section(db.Model):
     school_no = db.Column(db.String(32))
     name = db.Column(db.String(30))
 
+class Wallet(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    school_no = db.Column(db.String(32))
+    student_id = db.Column(db.Integer())
+    student_name = db.Column(db.String(60))
+    id_no = db.Column(db.String(20))
+    credits = db.Column(db.Float(),default=0)
+
+class Device(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    school_no = db.Column(db.String(32))
+    app_key = db.Column(db.String(32))
+    name = db.Column(db.String(30))
+    vendor = db.Column(db.String(30),default=None)
+    device_type = db.Column(db.String(30))
+    added_by = db.Column(db.String(60))
+
+class Permission(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    ip_address = db.Column(db.String(32))
+    app_key = db.Column(db.String(32))
+
 class Department(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     school_no = db.Column(db.String(32))
@@ -278,6 +291,7 @@ class K12(db.Model, Serializer):
     parent_id = db.Column(db.Integer)
     parent_relation = db.Column(db.String(30))
     parent_contact = db.Column(db.String(12))
+    added_by = db.Column(db.String(60))
 
 class College(db.Model, Serializer):
     __public__ = ['id','school_no','id_no','first_name','last_name','middle_name',
@@ -293,6 +307,7 @@ class College(db.Model, Serializer):
     group = db.Column(db.String(30))
     email = db.Column(db.String(30))
     mobile = db.Column(db.String(12))
+    added_by = db.Column(db.String(60))
 
 class Staff(db.Model, Serializer):
     __public__ = ['id','school_no','id_no','first_name','last_name','middle_name',
@@ -307,6 +322,7 @@ class Staff(db.Model, Serializer):
     group = db.Column(db.String(30))
     email = db.Column(db.String(30))
     mobile = db.Column(db.String(12))
+    added_by = db.Column(db.String(60))
 
 class Parent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -394,6 +410,45 @@ class StudentAdmin(sqla.ModelView):
     column_display_pk = True
     column_searchable_list = ['first_name', 'last_name', 'middle_name', 'id_no']
 
+class Transaction(db.Model, Serializer):
+    id = db.Column(db.Integer, primary_key=True)
+    school_no = db.Column(db.String(32))
+    date = db.Column(db.String(30))
+    time = db.Column(db.String(10))
+    vendor_id = db.Column(db.Integer())
+    vendor_name = db.Column(db.String(30))
+    cashier_id = db.Column(db.Integer())
+    cashier_name = db.Column(db.String(60))
+    total = db.Column(db.Float())
+    amount_tendered = db.Column(db.Float(),default=0)
+    change = db.Column(db.Float(),default=0)
+    customer_name = db.Column(db.String(60))
+    customer_id_no = db.Column(db.Integer())
+    status = db.Column(db.String(60),default='Pending')
+    remarks = db.Column(db.String(60),default='Pending')
+    payed = db.Column(db.Boolean())
+    note = db.Column(db.Text())
+    timestamp = db.Column(db.String(50))
+    transaction_type = db.Column(db.String(10))
+
+class TransactionItem(db.Model, Serializer):
+    id = db.Column(db.Integer, primary_key=True)
+    transaction_id = db.Column(db.Integer)
+    item_id = db.Column(db.Integer)
+    item_name = db.Column(db.String(100))
+    item_qty = db.Column(db.Integer())
+    price = db.Column(db.Float())
+    done = db.Column(db.Boolean())
+    flavor_id = db.Column(db.Integer)
+
+class Sale(db.Model, Serializer):
+    id = db.Column(db.Integer, primary_key=True)
+    school_no = db.Column(db.String(32))
+    date = db.Column(db.String(30))
+    vendor = db.Column(db.String(30))
+    cash_total = db.Column(db.Float())
+    wallet_total = db.Column(db.Float())
+    grand_total = db.Column(db.Float())
 
 admin = Admin(app, name='raven')
 admin.add_view(SchoolAdmin(School, db.session))
@@ -414,6 +469,13 @@ admin.add_view(IngAdmin(StudentFee, db.session))
 admin.add_view(IngAdmin(Collected, db.session))
 admin.add_view(IngAdmin(FeeGroup, db.session))
 admin.add_view(IngAdmin(AdminUser, db.session))
+admin.add_view(IngAdmin(College, db.session))
+admin.add_view(IngAdmin(Wallet, db.session))
+admin.add_view(IngAdmin(Transaction, db.session))
+admin.add_view(IngAdmin(TransactionItem, db.session))
+admin.add_view(IngAdmin(Sale, db.session))
+admin.add_view(IngAdmin(Device, db.session))
+admin.add_view(IngAdmin(Permission, db.session))
 
 
 def crossdomain(origin=None, methods=None, headers=None,
@@ -469,6 +531,24 @@ def get_hour(time):
         return hour
     hour = int(time[:2])
     return hour
+
+
+def initialize_sales_record():
+    sale = Sale.query.filter_by(date=time.strftime("%m / %d / %Y")).first()
+    if not sale or sale == None:
+        pos = Device.query.filter_by(device_type='POS').all()
+        for i in pos:
+            sales_record = Sale(
+                school_no=SCHOOL_NO,
+                date=time.strftime("%m / %d / %Y"),
+                vendor=i.vendor,
+                cash_total=0,
+                wallet_total=0,
+                grand_total=0
+                )
+            db.session.add(sales_record)
+        db.session.commit()
+    return
 
 
 def admin_alert():
@@ -887,13 +967,25 @@ def fetch_next(needed):
         template = 'staff_result.html'
         sort_type=''
 
+    elif needed == 'transactions':
+        search_table = 'Transaction'
+        sort_by = 'timestamp'
+        template = 'transaction_result.html'
+        sort_type='.desc()'
+
+    elif needed == 'sales':
+        search_table = 'Sale'
+        sort_by = 'date'
+        template = 'sales_result.html'
+        sort_type='.desc()'
+
     elif needed == 'absent':
         search_table = 'Absent'
         sort_by = 'timestamp'
         sort_type='.desc()'
 
     result = eval(search_table+'.query.filter_by(school_no=session[\'school_no\']).order_by('+search_table+'.'+sort_by+sort_type+').slice('+str(session[needed+'_limit']-100)+','+str(session[needed+'_limit'])+')')
-
+    print session['college_limit']
     return flask.render_template(
         template,
         data=result,
@@ -930,6 +1022,26 @@ def search_k12(*args, **kwargs):
             query += 'K12.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
     query += ').order_by(K12.last_name).slice(('+str(args[0])+'-100),'+str(args[0])+')'
     session['k12_search_limit']+=100
+    return eval(query)
+
+
+def search_college(*args, **kwargs):
+    query = 'College.query.filter(College.school_no.ilike("'+session['school_no']+'"),'
+    for arg_name in kwargs:
+        if kwargs[arg_name]:
+            query += 'College.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
+    query += ').order_by(College.last_name).slice(('+str(args[0])+'-100),'+str(args[0])+')'
+    session['college_search_limit']+=100
+    return eval(query)
+
+
+def search_staff(*args, **kwargs):
+    query = 'Staff.query.filter(Staff.school_no.ilike("'+session['school_no']+'"),'
+    for arg_name in kwargs:
+        if kwargs[arg_name]:
+            query += 'Staff.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
+    query += ').order_by(Staff.last_name).slice(('+str(args[0])+'-100),'+str(args[0])+')'
+    session['staff_search_limit']+=100
     return eval(query)
 
 
@@ -1109,17 +1221,34 @@ def dashboard():
     session['college_limit'] = 0
     session['staff_limit'] = 0
     session['absent_limit'] = 0
+    session['fees_limit'] = 0
+    session['transactions_limit'] = 0
+    session['sales_limit'] = 0
+
     session['logs_search_limit'] = 0
     session['fees_search_limit'] = 0
     session['k12_search_limit'] = 0
     session['late_search_limit'] = 0
     session['absent_search_limit'] = 0
+    session['staff_search_limit'] = 0
+    session['transactions_search_limit'] = 0
+    session['sales_search_limit'] = 0
+
     session['k12_search_status'] = False
+    session['college_search_status'] = False
+    session['absent_search_status'] = False
+    session['late_search_status'] = False
+    session['logs_search_status'] = False
+    session['staff_search_status'] = False
+    session['fees_search_status'] = False
+    session['transactions_search_status'] = False
+    session['sales_search_status'] = False
 
     school = School.query.filter_by(api_key=session['api_key']).first()
     sections = Section.query.filter_by(school_no=school.school_no).order_by(Section.name).all()
     departments = Department.query.filter_by(school_no=school.school_no).order_by(Department.name).all()
     fee_categories = FeeCategory.query.order_by(FeeCategory.name).all()
+    fees = Fee.query.filter_by(school_no=session['school_no']).order_by(Fee.name).all()
     college_departments = CollegeDepartment.query.filter_by(school_no=school.school_no).order_by(CollegeDepartment.name).all()
     staff_departments = StaffDepartment.query.filter_by(school_no=school.school_no).order_by(StaffDepartment.name).all()
     user = AdminUser.query.filter_by(id=session['user_id']).first()
@@ -1131,6 +1260,7 @@ def dashboard():
         user_name=session['user_name'],
         user = user,
         sections=sections,
+        fees=fees,
         fee_categories=fee_categories,
         college_departments=college_departments,
         staff_departments=staff_departments,
@@ -1142,6 +1272,8 @@ def dashboard():
 @app.route('/students', methods=['GET', 'POST'])
 @nocache
 def students():
+    session['k12_limit']=0
+    session['college_limit']=0
     session['k12_limit']+=100
     session['college_limit']+=100
     school = School.query.filter_by(api_key=session['api_key']).first()
@@ -1154,14 +1286,55 @@ def students():
         k12=k12,
         college=college,
         sections=sections,
+        college_departments=college_departments,
         k12_limit=session['k12_limit'],
         college_limit=session['college_limit']
+        )
+
+
+@app.route('/students/fees/add', methods=['GET', 'POST'])
+@nocache
+def add_student_fee():
+    student = K12.query.filter_by(id=session['student_id']).first()
+    fees_to_add = flask.request.form.getlist('fees_to_add[]')
+    student_name = student.last_name+', '+student.first_name
+    if student.middle_name:
+        student_name += ' '+student.middle_name[:1]+'.'
+    print 'xxxxxxxxxxxxxxx'
+    print fees_to_add
+    for fee in fees_to_add:
+        fee = Fee.query.filter_by(id=fee).first()
+        student_fee = StudentFee(
+            school_no = session['school_no'],
+            student_id = student.id,
+            fee_id = fee.id,
+            student_name = student_name,
+            fee_name = fee.name,
+            fee_category = fee.category,
+            fee_price = fee.price,
+            timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+            )
+        db.session.add(student_fee)
+        db.session.commit()
+
+    student_fees = StudentFee.query.filter_by(student_id=student.id).order_by(StudentFee.fee_name).all()
+    total_fees = sum(fee.fee_price for fee in student_fees)
+    collected_payments = Collected.query.filter_by(student_id=student.id).order_by(Collected.timestamp).all()
+    total_paid = sum(payment.amount for payment in collected_payments)
+    return flask.render_template(
+        'student_fees.html',
+        student=student,
+        student_fees=student_fees,
+        total_fees=total_fees,
+        collected_payments=collected_payments,
+        total_paid=total_paid
         )
 
 
 @app.route('/staff', methods=['GET', 'POST'])
 @nocache
 def staff():
+    session['staff_limit']=0
     session['staff_limit']+=100
     school = School.query.filter_by(api_key=session['api_key']).first()
     staff = Staff.query.order_by(Staff.last_name).slice((session['staff_limit']-100),session['staff_limit'])
@@ -1177,6 +1350,7 @@ def staff():
 @app.route('/logs', methods=['GET', 'POST'])
 @nocache
 def logs():
+    session['logs_limit']=0
     session['logs_limit']+=100
     logs = Log.query.order_by(Log.timestamp.desc()).slice((session['logs_limit']-100),session['logs_limit'])
     return flask.render_template(
@@ -1186,9 +1360,29 @@ def logs():
         )
 
 
+@app.route('/transactions', methods=['GET', 'POST'])
+@nocache
+def transactions():
+    session['transactions_limit']=0
+    session['sales_limit']=0
+    session['transactions_limit']+=100
+    session['sales_limit']+=100
+    transactions = Transaction.query.order_by(Transaction.timestamp.desc()).slice((session['transactions_limit']-100),session['transactions_limit'])
+    sales = Sale.query.order_by(Sale.date.desc()).slice((session['sales_limit']-100),session['sales_limit'])
+    return flask.render_template(
+        'transactions.html',
+        transactions=transactions,
+        transactions_limit=session['transactions_limit'],
+        sales=sales,
+        sales_limit=session['sales_limit']
+        )
+
+
 @app.route('/attendance', methods=['GET', 'POST'])
 @nocache
 def attendance():
+    session['absent_limit']=0
+    session['late_limit']=0
     session['absent_limit']+=100
     session['late_limit']+=100
     absent = Absent.query.order_by(Absent.timestamp.desc()).slice((session['absent_limit']-100),session['absent_limit'])
@@ -1205,6 +1399,7 @@ def attendance():
 @app.route('/fees', methods=['GET', 'POST'])
 @nocache
 def fees():
+    session['fees_limit']=0
     session['fees_limit']+=100
     fees = Fee.query.order_by(Fee.name).all()
     fee_categories = FeeCategory.query.order_by(FeeCategory.name).all()
@@ -1451,8 +1646,8 @@ def login():
 
 @app.route('/home', methods=['GET', 'POST'])
 def start_again():
-    session['attendance_search_status'] = False
     needed = flask.request.form.get('tab') 
+    session[needed+'_search_status'] = False
     session[needed+'_limit'] = 0
     session[needed+'_search_limit'] = 100
     return fetch_next(needed)
@@ -1583,6 +1778,14 @@ def get_college_info():
     student = College.query.filter_by(id=student_id).first()
     departments = CollegeDepartment.query.filter_by(school_no=session['school_no']).all()
     return flask.render_template('college_info.html', student=student, college_departments=departments)
+
+
+@app.route('/staff/info/get', methods=['GET', 'POST'])
+def get_staff_info():
+    staff_id = flask.request.form.get('staff_id')
+    staff = Staff.query.filter_by(id=staff_id).first()
+    departments = StaffDepartment.query.filter_by(school_no=session['school_no']).all()
+    return flask.render_template('staff_info.html', staff=staff, staff_departments=departments)
 
 
 @app.route('/tab/change', methods=['GET', 'POST'])
@@ -1738,18 +1941,19 @@ def add_user():
             lates = 0,
             parent_id = parent_id,
             parent_relation = student_data['guardian_relation'].title(),
-            parent_contact = student_data['guardian_mobile']
+            parent_contact = student_data['guardian_mobile'],
+            added_by = session['user_name']
             )
 
         db.session.add(user)
         db.session.commit()
 
+        student_name = user.last_name+', '+user.first_name
+        if user.middle_name:
+            student_name += ' '+user.middle_name[:1]+'.'
+
         fees_to_add = FeeGroup.query.filter_by(level=user.level).all()
         if fees_to_add != None:
-            student_name = user.last_name+', '+user.first_name
-            if user.middle_name:
-                student_name += ' '+user.middle_name[:1]+'.'
-
             for item in fees_to_add:
                 fee = Fee.query.filter_by(id=item.fee_id).first()
                 new_student_fee = StudentFee(
@@ -1762,8 +1966,19 @@ def add_user():
                     fee_price = fee.price,
                     timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
                     )
+
                 db.session.add(new_student_fee)
                 db.session.commit()
+
+        wallet = Wallet(
+            school_no=session['school_no'],
+            student_id=user.id,
+            student_name=student_name,
+            id_no=user.id_no
+            )
+        db.session.add(wallet)
+        db.session.commit()
+
     elif student_data['department'] == 'college':
         user = College(
             school_no = session['school_no'],
@@ -1775,8 +1990,12 @@ def add_user():
             department = student_data['college_department'],
             email = student_data['email'],
             mobile = student_data['mobile'],
-            group = 'college'
+            group = 'college',
+            added_by = session['user_name']
             )
+
+        db.session.add(user)
+        db.session.commit()
 
     elif student_data['department'] == 'staff':
         user = Staff(
@@ -1788,7 +2007,8 @@ def add_user():
             department = student_data['staff_department'],
             email = student_data['email'],
             mobile = student_data['mobile'],
-            group = 'college'
+            group = 'staff',
+            added_by = session['user_name']
             )
 
         db.session.add(user)
@@ -1856,12 +2076,77 @@ def edit_user():
         session['attendance_data']['needed']+'.html',
         data=result,
         view=session['department'],
-        limit=session['k12_search_limit']
+        limit=session['k12_search_limit']-100
         )
 
     return fetch_next('k12')
 
-    # prepare()
+
+@app.route('/college/edit',methods=['GET','POST'])
+def edit_college():
+
+    data = flask.request.form.to_dict()
+
+    user = College.query.filter_by(id=data['user_id']).first()
+    user.last_name = data['last_name']
+    user.first_name = data['first_name']
+    user.middle_name = data['middle_name']
+    user.level = data['level']
+    user.department = data['college_department']
+    user.email = data['email']
+    user.mobile = data['contact']
+    user.id_no = data['id_no']
+
+    db.session.commit()
+
+    
+    session['college_limit'] = 0
+    
+    session['college_search_limit'] = 0
+
+    if session['college_search_status']:
+        result = search_college(session['college_search_limit'],last_name=session['college_data']['last_name'], first_name=session['college_data']['first_name'],
+                middle_name=session['college_data']['middle_name'], id_no=session['college_data']['id_no'], level=session['college_data']['level'], department=session['college_data']['department'])
+        return flask.render_template(
+        session['college_data']['needed']+'.html',
+        data=result,
+        limit=session['college_search_limit']-100
+        )
+
+    return fetch_next('college')
+
+
+@app.route('/staff/edit',methods=['GET','POST'])
+def edit_staff():
+
+    data = flask.request.form.to_dict()
+
+    user = Staff.query.filter_by(id=data['user_id']).first()
+    user.last_name = data['last_name']
+    user.first_name = data['first_name']
+    user.middle_name = data['middle_name']
+    user.department = data['staff_department']
+    user.email = data['email']
+    user.mobile = data['contact']
+    user.id_no = data['id_no']
+
+    db.session.commit()
+
+    
+    session['staff_limit'] = 0
+    
+    session['staff_search_limit'] = 0
+
+    if session['staff_search_status']:
+        result = search_staff(session['staff_search_limit'],last_name=session['staff_data']['last_name'], first_name=session['staff_data']['first_name'],
+                middle_name=session['staff_data']['middle_name'], id_no=session['staff_data']['id_no'], department=session['staff_data']['department'])
+        return flask.render_template(
+        'staff_result.html',
+        data=result,
+        limit=session['staff_search_limit']-100
+        )
+
+    return fetch_next('staff')
 
 
 @app.route('/search/logs',methods=['GET','POST'])
@@ -1923,6 +2208,49 @@ def search_students_k12():
         data=result,
         limit=limit
         )
+
+
+@app.route('/search/college',methods=['GET','POST'])
+def search_students_college():
+    session['college_data'] = flask.request.form.to_dict()
+    session['college_search_status'] = True
+
+    if session['college_data']['reset'] == 'yes':
+        session['college_search_limit'] = 0
+    
+    limit = session['college_search_limit']
+
+    result = search_college(session['college_search_limit'],last_name=session['college_data']['last_name'], first_name=session['college_data']['first_name'],
+            middle_name=session['college_data']['middle_name'], level=session['college_data']['level'], department=session['college_data']['department'], id_no=session['college_data']['id_no'])
+
+
+    return flask.render_template(
+        session['college_data']['needed']+'.html',
+        data=result,
+        limit=limit
+        )
+
+
+@app.route('/search/staff',methods=['GET','POST'])
+def search_user_staff():
+    session['staff_data'] = flask.request.form.to_dict()
+    session['staff_search_status'] = True
+
+    if session['staff_data']['reset'] == 'yes':
+        session['staff_search_limit'] = 0
+    
+    limit = session['staff_search_limit']
+
+    result = search_staff(session['staff_search_limit'],last_name=session['staff_data']['last_name'], first_name=session['staff_data']['first_name'],
+            middle_name=session['staff_data']['middle_name'], department=session['staff_data']['department'], id_no=session['staff_data']['id_no'])
+
+
+    return flask.render_template(
+        'staff_result.html',
+        data=result,
+        limit=limit
+        )
+
 
 
 @app.route('/search/absent',methods=['GET','POST'])
@@ -2239,6 +2567,99 @@ def favicon():
     return '',200
 
 
+@app.route('/wallet/info',methods=['GET','POST'])
+def get_wallet():
+    app_key = flask.request.args.get('app_key') 
+    id_no = flask.request.args.get('id_no')
+
+    ### ADD IP_ADDRESS TO QUERY
+    if not app_key or Device.query.filter_by(app_key=app_key).first() == None:
+        return jsonify(status='failed',message='Unauthorized'),401
+
+    wallet = Wallet.query.filter_by(id_no=id_no).first()
+    if not wallet:
+        return jsonify(status='failed',message='Invalid ID'),404
+
+    return jsonify(
+        status='success',
+        student_name=wallet.student_name,
+        credits=wallet.credits
+        ),200
+
+
+@app.route('/transaction/save',methods=['GET','POST'])
+def save_pos_transaction():
+    params = flask.request.args.to_dict()
+    data = flask.request.get_json()
+
+    ### ADD IP_ADDRESS TO QUERY
+    if not params['app_key'] or Device.query.filter_by(app_key=params['app_key']).first() == None:
+        return jsonify(status='failed',message='Unauthorized'),401
+
+    device = Device.query.filter_by(app_key=params['app_key']).first()
+
+    sale = Sale.query.filter_by(date=time.strftime("%m / %d / %Y"),vendor=device.vendor).first()
+
+    if data['transaction_type'] == 'Cash':
+        transaction = Transaction(
+        id = data['transaction_id'],
+        school_no = data['school_no'],
+        date = data['date'],
+        time = data['time'],
+        vendor_id = device.id,
+        vendor_name = device.vendor,
+        cashier_id = data['cashier_id'],
+        cashier_name = data['cashier_name'],
+        total = data['total'],
+        amount_tendered = data['amount_tendered'],
+        change = data['change'],
+        payed = data['payed'],
+        timestamp = data['timestamp'],
+        transaction_type = data['transaction_type']
+        )
+
+        sale.cash_total += data['total']
+
+    else:
+        transaction = Transaction(
+            id = data['transaction_id'],
+            school_no = data['school_no'],
+            date = data['date'],
+            time = data['time'],
+            vendor_id = device.id,
+            vendor_name = device.vendor,
+            cashier_id = data['cashier_id'],
+            cashier_name = data['cashier_name'],
+            customer_name = data['customer_name'],
+            customer_id_no = data['customer_id_no'],
+            total = data['total'],
+            payed = data['payed'],
+            timestamp = data['timestamp'],
+            transaction_type = data['transaction_type']
+            )
+
+        sale.wallet_total += data['total']
+
+    sale.grand_total += data['total']
+    db.session.add(transaction)
+    db.session.commit()
+
+    for item in data['items']:
+        transaction_item = TransactionItem(
+            transaction_id = item['transaction_id'],
+            item_id = item['item_id'],
+            item_name = item['item_name'],
+            item_qty = item['item_qty'],
+            price = item['price'],
+            flavor_id = item['flavor_id'],
+            done = False
+        )
+        db.session.add(transaction_item)
+    db.session.commit()
+
+    return '',201
+
+
 @app.route('/messages',methods=['GET','POST'])
 def fetch_sent_messages():
     messages = Message.query.filter_by(school_no=session['school_no']).all()
@@ -2316,6 +2737,39 @@ def rebuild_database():
 
     db.drop_all()
     db.create_all()
+
+    k12 = K12(
+        school_no = session['school_no'],
+        id_no = '2011334281',
+        first_name = 'Jasper Oliver',
+        last_name = 'Barcelona',
+        middle_name = 'Estrada',
+        level = '1st Grade',
+        group = 'k12',
+        section = 'St. Jerome',
+        parent_id = 1,
+        parent_relation = 'mother',
+        parent_contact = '09183339068',
+        added_by = 'Jasper Barcelona'
+        )
+
+    parent = Parent(
+        school_no = session['school_no'],
+        mobile_number = '09183339068',
+        first_name = 'Flora',
+        last_name = 'Barcelona',
+        middle_name = 'Estrada',
+        email = 'barcelona.jasperoliver@gmail.com',
+        address = 'Lucena City'
+        )
+
+    wallet = Wallet(
+        school_no = session['school_no'],
+        student_id = 1,
+        student_name = 'Barcelona, Jasper Oliver E.',
+        id_no = '2011334281',
+        credits = 100.0
+        )
 
     admin = AdminUser(
         school_no = 'tmtc-sc2016',
@@ -2517,6 +2971,15 @@ def rebuild_database():
         name='IABF'
         )
 
+    vendor = Device(
+        school_no = 'tmtc-sc2016',
+        app_key = '4tqgtah47riyk9475lbmho6847dyth6o',
+        name = 'Canteen POS Main',
+        device_type = 'POS',
+        vendor = 'Canteen',
+        added_by = 'Jasper Barcelona'
+        )
+
     db.session.add(d)
     db.session.add(e)
     db.session.add(f)
@@ -2534,14 +2997,18 @@ def rebuild_database():
     db.session.add(r)
     db.session.add(s)
     db.session.add(t)
+    db.session.add(vendor)
+    db.session.add(k12)
+    db.session.add(parent)
+    db.session.add(wallet)
     db.session.commit()
 
     return jsonify(status='Success'),201
 
 
 if __name__ == '__main__':
-    app.debug = True
+    initialize_sales_record()
     admin_alert()
-    app.run(port=int(os.environ['PORT']),host='0.0.0.0',threaded=True)
+    app.run(port=5000,debug=True,host='0.0.0.0')
 
     # port=int(os.environ['PORT']), host='0.0.0.0'

@@ -74,6 +74,44 @@
         </div><!-- /.modal-dialog -->
 </div>
 
+<div class="modal fade" id="add-student-fee-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog message-modal-dialog">
+                <div id="message-modal-conent" class="modal-content">
+                        <div class="modal-header generic-background">
+                                <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">Student Fees</h4>
+                        </div>
+                        <div id="message-modal-cover"></div>
+                        <div id="student-fee-modal-body" class="modal-body">
+                                <input type="text" id="student-fee-search" class="form-control" placeholder="Search Fee" / >
+                                <table class="table">
+                                        <thead>
+                                                <tr>
+                                                        <th class="long">Fee</th>
+                                                        <th class="short">Category</th>
+                                                        <th class="short">Price</th>
+                                                        <th class="xs"></th>
+                                                </tr>
+                                        </thead>
+                                        <tbody>
+                                                {% for fee in fees %}
+                                                <tr id="{{fee.id}}" class="rows add-fee-row">
+                                                        <td class="long">{{fee.name}}</td>
+                                                        <td class="short">{{fee.category}}</td>
+                                                        <td class="short">Php {{fee.price}}</td>
+                                                        <td class="xs fee-check-td"></td>
+                                                </tr>
+                                                {% endfor %}
+                                        </tbody>
+                                </table>
+                        </div>
+                        <div class="modal-footer">
+                                <button type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
+                                <button id="add-fee-btn" disabled data-loading-text="Adding" data-complete-text="Add" type="button" class="btn done-btn btn-primary" onclick="add_fees_to_student()">Add</button>
+                        </div>
+                </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+</div>
+
 <div class="modal fade add-modal" id="add-fee-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog add-fee-modal-dialog">
                 <div class="modal-content">
@@ -396,6 +434,11 @@
         </div><!-- /.modal-dialog -->
 </div>
 
+<div class="modal fade" id="edit-staff-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog edit-staff-modal-dialog">
+                <div class="modal-content"></div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+</div>
 
 <div class="modal fade" id="schedule-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog schedule-modal-dialog">
@@ -1089,8 +1132,8 @@
                                         <option class="calendar-options" value='12'>December</option>
                                 </select>
                                 <select id="calendar-year" class="form-control">
-                                        <option class="calendar-options" value='2015'>2015</option>
-                                        <option class="calendar-options" value='2016'>2016</option>
+                                        <option class="calendar-options" value='2015'>2016</option>
+                                        <option class="calendar-options" value='2016'>2017</option>
                                 </select>
                                 <button type="button" id="calendar-go" onclick="go_to_date()">Go</button>
                         </div>

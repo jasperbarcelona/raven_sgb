@@ -1,7 +1,7 @@
 {% if data[0] %}
 {% for person in data %}
-<tr id="{{person.id}}" class="rows">
-    <td class="xs">{{loop.index}}</td> 
+<tr id="{{person.id}}" class="rows" data-toggle="modal" data-target="#edit-staff-modal" onclick="supply_staff_data(this.id)">
+    <td class="xs">{{loop.index+limit}}</td> 
     <td class="short">{{person.id_no}}</td>   
     <td class="short">{{person.last_name}}</td>                 
     <td class="short">{{person.first_name}}</td>                 

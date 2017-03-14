@@ -65,6 +65,26 @@
 			</div>
 		</div>
 		<div class="menu-item-container col-md-2 col-sm-3 col-xs-4">
+			<div class="menu-item" onclick="show_transactions()">
+				<div class="menu-icon-container">
+					<i class="material-icons">history</i>
+				</div>
+				<div class="menu-text-container">
+					<span>Transactions</span>
+				</div>
+			</div>
+		</div>
+		<div class="menu-item-container col-md-2 col-sm-3 col-xs-4">
+			<div class="menu-item" onclick="show_fees()">
+				<div class="menu-icon-container">
+					<i class="material-icons">verified_user</i>
+				</div>
+				<div class="menu-text-container">
+					<span>Accounts</span>
+				</div>
+			</div>
+		</div>
+		<div class="menu-item-container col-md-2 col-sm-3 col-xs-4">
 			<div class="menu-item" data-toggle="modal" data-target="#message-modal" onclick="open_messages()">
 				<div class="menu-icon-container">
 					<i class="material-icons">announcement</i>
@@ -77,10 +97,20 @@
 		<div class="menu-item-container col-md-2 col-sm-3 col-xs-4">
 			<div class="menu-item" data-toggle="modal" data-target="#schedule-modal" onclick="populate_schedule()">
 				<div class="menu-icon-container">
+					<i class="material-icons">query_builder</i>
+				</div>
+				<div class="menu-text-container">
+					<span>Class Schedule</span>
+				</div>
+			</div>
+		</div>
+		<div class="menu-item-container col-md-2 col-sm-3 col-xs-4">
+			<div class="menu-item" data-toggle="modal" data-target="#calendar-modal" onclick="populate_calendar()">
+				<div class="menu-icon-container">
 					<i class="material-icons">&#xE916;</i>
 				</div>
 				<div class="menu-text-container">
-					<span>Schedule</span>
+					<span>Events</span>
 				</div>
 			</div>
 		</div>
@@ -90,7 +120,7 @@
 					<i class="material-icons">picture_in_picture</i>
 				</div>
 				<div class="menu-text-container">
-					<span>ID</span>
+					<span>Request ID</span>
 				</div>
 			</div>
 		</div>

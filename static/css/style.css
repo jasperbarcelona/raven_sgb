@@ -75,7 +75,7 @@ a, a:hover, a:active, a:focus{
 }
 
 .content{
-	height: calc(100vh - 78px);
+	height: calc(100vh - 80px);
 	padding: 0;
 	background-color: #337ab7;
 	display: none;
@@ -260,7 +260,8 @@ a, a:hover, a:active, a:focus{
 	border-radius: 0 !important;
 }
 
-.add-user-modal-body .add-user-section div .form-control, .edit-user-modal-body .add-user-section div .form-control{
+.add-user-modal-body .add-user-section div .form-control, .edit-user-modal-body .add-user-section div .form-control,
+.add-staff-modal-body .add-user-section div .form-control, .edit-staff-modal-body .add-user-section div .form-control{
 	outline: none !important;
 	height: 45px !important;
 	margin-bottom: 15px;
@@ -351,11 +352,44 @@ a, a:hover, a:active, a:focus{
 }
 
 .add-user-modal-body,
-.edit-user-modal-body{
+.edit-user-modal-body,
+.edit-staff-modal-body{
 	overflow-y: scroll;
 	height: calc(100% - 123px);
 	overflow-x:hidden;
 	padding: 20px 50px 20px 50px;
+}
+
+#student-fee-modal-body{
+	position: relative !important;
+	float: left;
+	width: 100%;
+	height: calc(100vh - 220px) !important;
+}
+
+#student-fee-search{
+	margin-bottom: 10px;
+}
+
+#student-fee-modal-body > table{
+	height: calc(100% - 100px) !important;
+	text-transform: capitalize;
+}
+
+#student-fee-modal-body > table > tbody{
+	height: 100%;
+}
+
+#add-student-fee-modal{
+	z-index: 100000 !important;
+}
+
+.fee-check-td{
+	padding-right: 20px !important;
+}
+
+.glyphicon-ok{
+	color: #5cb85c;
 }
 
 .parent-mobile-container{
@@ -376,13 +410,15 @@ a, a:hover, a:active, a:focus{
 }
 
 .add-user-modal-dialog,
-.edit-user-modal-dialog{
+.edit-user-modal-dialog,
+.edit-staff-modal-dialog{
 	width: 90%;
 	height: 90% !important;
 }
 
 .add-user-modal-dialog > .modal-content,
-.edit-user-modal-dialog > .modal-content{
+.edit-user-modal-dialog > .modal-content,
+.edit-staff-modal-dialog > .modal-content{
 	height: 100% !important;
 }
 
@@ -1154,10 +1190,10 @@ a, a:hover, a:active, a:focus{
 .no-records{
 	width: 100%;
 	text-align: center;
-	color: #545454;
-	font-size: 20px;
+	color: #999;
+	font-size: 22px;
 	border: none !important;
-	padding-top: 18% !important;
+	padding-top: 10% !important;
 	background-color: #FFFFFF;
 }
 
@@ -1170,7 +1206,7 @@ a, a:hover, a:active, a:focus{
 	z-index: 900;
 	left: 2.5%;
 	width: 95%;
-	height: calc(100% - 210px);
+	height: calc(100% - 252px);
 	background-color: #FFFFFF;
 }
 
@@ -1178,7 +1214,7 @@ a, a:hover, a:active, a:focus{
 	z-index: 900;
 	left: 2.5%;
 	width: 95%;
-	height: calc(100% - 280px);
+	height: calc(100% - 300px);
 	background-color: #FFFFFF;
 }
 
@@ -1313,7 +1349,7 @@ a, a:hover, a:active, a:focus{
 	position: relative !important;
 	height: 100% !important;
 	width: 100% !important;
-	padding: 0 !important;	
+	padding: 0 !important;
 	/*overflow: scroll;
 	overflow-x: hidden;*/
 }
@@ -1421,10 +1457,78 @@ a, a:hover, a:active, a:focus{
 
 #table-container{
 	position: relative;
-	height: 100% !important;
+	height: calc(100% - 98px) !important;
 	width: 100% !important;
-	padding: 60px 30px 0 30px;
+	padding: 0 30px 0 30px;
 	background-color: transparent;
+}
+
+.page-upper{
+	width: 100%;
+	height: 100px;
+	padding: 0 30px 0 30px;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: column;
+	flex-direction: column;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+}
+
+.page-upper > div{
+	width: 100%;
+	text-align: left;
+}
+
+.crumb{
+	height: 30px;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: left;
+	margin-bottom: 5px;
+}
+
+.back-btn{
+	height: 30px;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: left;
+	cursor: pointer;
+	float: left;
+}
+
+.back-btn > span{
+	color: #FFFFFF;
+	font-size: 18px !important;
+	text-transform: uppercase;
+	margin-top: 2px;
+}
+
+.back-btn > i{
+	color: #FFFFFF;
+	font-size: 28px !important;
+}
+
+.location-label{
+	color: #FFFFFF;
+	font-size: 22px;
+	text-transform: uppercase;
+}
+
+.crumb-separator > i{
+	margin: 0 10px 0 10px;
+	color: #FFFFFF;
+	font-size: 8px !important;
+	cursor: default;
 }
 
 .radio{
