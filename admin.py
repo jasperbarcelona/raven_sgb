@@ -533,24 +533,6 @@ def get_hour(time):
     return hour
 
 
-def initialize_sales_record():
-    sale = Sale.query.filter_by(date=time.strftime("%m / %d / %Y")).first()
-    if not sale or sale == None:
-        pos = Device.query.filter_by(device_type='POS').all()
-        for i in pos:
-            sales_record = Sale(
-                school_no=SCHOOL_NO,
-                date=time.strftime("%m / %d / %Y"),
-                vendor=i.vendor,
-                cash_total=0,
-                wallet_total=0,
-                grand_total=0
-                )
-            db.session.add(sales_record)
-        db.session.commit()
-    return
-
-
 def admin_alert():
     timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
     # sleep(10)
@@ -983,13 +965,15 @@ def fetch_next(needed):
         search_table = 'Absent'
         sort_by = 'timestamp'
         sort_type='.desc()'
+        template = 'absent.html'
 
     result = eval(search_table+'.query.filter_by(school_no=session[\'school_no\']).order_by('+search_table+'.'+sort_by+sort_type+').slice('+str(session[needed+'_limit']-100)+','+str(session[needed+'_limit'])+')')
     print session['college_limit']
     return flask.render_template(
         template,
         data=result,
-        limit=session[needed+'_limit']-100
+        limit=session[needed+'_limit']-100,
+        date=time.strftime("%m / %d / %Y")
         )
 
 
@@ -1003,6 +987,25 @@ def search_logs(*args, **kwargs):
     print query
     return eval(query)
 
+def search_transactions(*args, **kwargs):
+    query = 'Transaction.query.filter(Transaction.school_no.ilike("'+session['school_no']+'"),'
+    for arg_name in kwargs:
+        if kwargs[arg_name]:
+            query += 'Transaction.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
+    query += ').order_by(Transaction.timestamp.desc()).slice(('+str(args[0])+'-100),'+str(args[0])+')'
+    session['logs_search_limit']+=100
+    print query
+    return eval(query)
+
+def search_sales(*args, **kwargs):
+    query = 'Sale.query.filter(Sale.school_no.ilike("'+session['school_no']+'"),'
+    for arg_name in kwargs:
+        if kwargs[arg_name]:
+            query += 'Sale.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
+    query += ').order_by(Sale.date.desc()).slice(('+str(args[0])+'-100),'+str(args[0])+')'
+    session['logs_search_limit']+=100
+    print query
+    return eval(query)
 
 def search_fees(*args, **kwargs):
     query = 'Fee.query.filter(Fee.school_no.ilike("'+session['school_no']+'"),'
@@ -1014,7 +1017,6 @@ def search_fees(*args, **kwargs):
     print query
     return eval(query)
 
-
 def search_k12(*args, **kwargs):
     query = 'K12.query.filter(K12.school_no.ilike("'+session['school_no']+'"),'
     for arg_name in kwargs:
@@ -1023,7 +1025,6 @@ def search_k12(*args, **kwargs):
     query += ').order_by(K12.last_name).slice(('+str(args[0])+'-100),'+str(args[0])+')'
     session['k12_search_limit']+=100
     return eval(query)
-
 
 def search_college(*args, **kwargs):
     query = 'College.query.filter(College.school_no.ilike("'+session['school_no']+'"),'
@@ -1034,7 +1035,6 @@ def search_college(*args, **kwargs):
     session['college_search_limit']+=100
     return eval(query)
 
-
 def search_staff(*args, **kwargs):
     query = 'Staff.query.filter(Staff.school_no.ilike("'+session['school_no']+'"),'
     for arg_name in kwargs:
@@ -1044,7 +1044,6 @@ def search_staff(*args, **kwargs):
     session['staff_search_limit']+=100
     return eval(query)
 
-
 def search_absent(*args, **kwargs):
     query = 'Absent.query.filter(Absent.school_no.ilike("'+session['school_no']+'"),'
     for arg_name in kwargs:
@@ -1053,7 +1052,6 @@ def search_absent(*args, **kwargs):
     query += ').order_by(Absent.name).slice(('+str(args[0])+'-100),'+str(args[0])+')'
     session['absent_search_limit']+=100
     return eval(query)
-
 
 def search_late(*args, **kwargs):
     query = 'Late.query.filter(Late.school_no.ilike("'+session['school_no']+'"),'
@@ -1067,7 +1065,6 @@ def search_late(*args, **kwargs):
     print query
 
     return eval(query)
-
 
 def get_latest_schedule(api_key):
     school = School.query.filter_by(api_key=api_key).first()
@@ -1166,7 +1163,6 @@ def initialize_absent(school_no,api_key):
         time.sleep(1)
     return
 
-
 def nocache(view):
     @wraps(view)
     def no_cache(*args, **kwargs):
@@ -1178,7 +1174,6 @@ def nocache(view):
         return response
         
     return update_wrapper(no_cache, view)
-
 
 def send_email(new_user,email_address,user_name,school_name,password):
     # try:
@@ -1369,12 +1364,15 @@ def transactions():
     session['sales_limit']+=100
     transactions = Transaction.query.order_by(Transaction.timestamp.desc()).slice((session['transactions_limit']-100),session['transactions_limit'])
     sales = Sale.query.order_by(Sale.date.desc()).slice((session['sales_limit']-100),session['sales_limit'])
+    devices = Device.query.filter_by(device_type='POS').all()
     return flask.render_template(
         'transactions.html',
         transactions=transactions,
         transactions_limit=session['transactions_limit'],
         sales=sales,
-        sales_limit=session['sales_limit']
+        sales_limit=session['sales_limit'],
+        date = time.strftime("%B %d, %Y"),
+        devices = devices
         )
 
 
@@ -2169,6 +2167,45 @@ def search_student_logs():
         )
 
 
+@app.route('/search/transactions',methods=['GET','POST'])
+def search_school_transactions():
+    session['transactions_data'] = flask.request.form.to_dict()
+    session['transactions_search_status'] = True
+
+    if session['transactions_data']['reset'] == 'yes':
+        session['transactions_search_limit']=0
+    
+    limit = session['transactions_search_limit']
+
+    result = search_transactions(session['transactions_search_limit'],date=session['transactions_data']['date'], time=session['transactions_data']['time'], customer_id_no=session['transactions_data']['id_no'],
+                       customer_name=session['transactions_data']['customer_name'], transaction_type=session['transactions_data']['transaction_type'], vendor_name=session['transactions_data']['vendor_name'])
+    
+    return flask.render_template(
+        'transaction_result.html',
+        data=result,
+        limit=limit
+        )
+
+
+@app.route('/search/sales',methods=['GET','POST'])
+def search_school_sales():
+    session['sales_data'] = flask.request.form.to_dict()
+    session['sales_search_status'] = True
+
+    if session['sales_data']['reset'] == 'yes':
+        session['sales_search_limit']=0
+    
+    limit = session['sales_search_limit']
+
+    result = search_sales(session['sales_search_limit'],date=session['sales_data']['date'], vendor=session['sales_data']['vendor_name'])
+    
+    return flask.render_template(
+        'sales_result.html',
+        data=result,
+        limit=limit
+        )
+
+
 @app.route('/search/fees',methods=['GET','POST'])
 def search_student_fees():
     session['fees_data'] = flask.request.form.to_dict()
@@ -2598,13 +2635,24 @@ def save_pos_transaction():
 
     device = Device.query.filter_by(app_key=params['app_key']).first()
 
-    sale = Sale.query.filter_by(date=time.strftime("%m / %d / %Y"),vendor=device.vendor).first()
+    sale = Sale.query.filter_by(date=time.strftime("%B %d, %Y"),vendor=device.vendor).first()
+    if not sale or sale == None:
+        sale = Sale(
+        school_no=SCHOOL_NO,
+        date=time.strftime("%B %d, %Y"),
+        vendor=device.vendor,
+        cash_total=0,
+        wallet_total=0,
+        grand_total=0
+        )
+        db.session.add(sale)
+        db.session.commit()
 
     if data['transaction_type'] == 'Cash':
         transaction = Transaction(
         id = data['transaction_id'],
         school_no = data['school_no'],
-        date = data['date'],
+        date = datetime.datetime.strptime(data['date'], '%m / %d / %Y').strftime('%B %d, %Y'),
         time = data['time'],
         vendor_id = device.id,
         vendor_name = device.vendor,
@@ -2624,7 +2672,7 @@ def save_pos_transaction():
         transaction = Transaction(
             id = data['transaction_id'],
             school_no = data['school_no'],
-            date = data['date'],
+            date = datetime.datetime.strptime(data['date'], '%m / %d / %Y').strftime('%B %d, %Y'),
             time = data['time'],
             vendor_id = device.id,
             vendor_name = device.vendor,
@@ -3007,7 +3055,6 @@ def rebuild_database():
 
 
 if __name__ == '__main__':
-    initialize_sales_record()
     admin_alert()
     app.run(port=5000,debug=True,host='0.0.0.0')
 

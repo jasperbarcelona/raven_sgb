@@ -54,14 +54,23 @@ $('.add-fee-modal-body .form-control').floatlabel({
 
 $('.search-panel').hide();
 
-$('.clockpicker').clockpicker({
-    autoclose: true
-});
-
 $('.clockpicker-top').clockpicker({
-    autoclose: true,
+    twelvehour: true,
+    donetext: 'Done',
+    autoclose: false,
     placement: 'top'
 });
+
+$('.clockpicker').clockpicker({
+    twelvehour: true,
+    donetext: 'Done',
+    autoclose: false
+    });
+
+/*$('.clockpicker').on('click', function () {
+    $('.modal').modal('hide');
+});*/
+
 
 $('#confirm-send').attr('disabled',true);
 

@@ -827,15 +827,9 @@ a, a:hover, a:active, a:focus{
 
 .schedule-modal-dialog,
 .schedule-modal-content {
-    /* 80% of window height */
-    	position: absolute;
-	    position: fixed;
-	    height: 100%;
-	    left: 0;
-	    right: 0;
+    	position: fixed;
+	    height: 100vh;
 	    padding: 0 !important;
-	    margin-left: auto;
-	    margin-right: auto;
 	    margin-top: 0 !important;
 }
 
@@ -854,7 +848,7 @@ a, a:hover, a:active, a:focus{
 
 .schedule-modal-body{
 	padding: 0 !important;
-	height: calc(100% - 104px) !important;
+	height: calc(100% - 113px) !important;
 	overflow-y: scroll;
 	overflow-x: hidden; 
 	border-top: none !important;
@@ -865,7 +859,6 @@ a, a:hover, a:active, a:focus{
 .schedule-modal-body, #schedule-modal-footer{
 	background-color: #FFFFFF;
 }
-
 
 .sched{
 	display: -webkit-flex;
@@ -1324,11 +1317,13 @@ a, a:hover, a:active, a:focus{
 	width: 100% !important;
 }
 
-
 .table tbody tr td{
 	padding-top: 20px;
 	padding-bottom: 20px;
-	border: none;
+	border-left: none;
+	border-right: none;
+	border-top: none;
+	border-bottom: 1px solid #ddd;
 }
 
 .total-row-label > td{
@@ -2193,4 +2188,9 @@ table.table thead tr th, table.table tfoot tr th {
 	border: 1px solid #ccc;
 	outline: none;
 	box-shadow: none;
+}
+
+tr.today > td {
+	background-color: rgba(51,122,183,.3) !important;
+	font-weight: bold;
 }

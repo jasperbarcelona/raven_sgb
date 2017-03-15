@@ -23,6 +23,8 @@ k12SearchStatus = 'off'
 collegeSearchStatus = 'off'
 feesSearchStatus = 'off'
 staffSearchStatus = 'off'
+transactionsSearchStatus = 'off'
+salesSearchStatus = 'off'
 
 absentSearchStatus = 'off'
 lateSearchStatus = 'off'
@@ -33,6 +35,8 @@ absent_result = false;
 late_result = false;
 fees_result = false;
 staff_result = false;
+transactions_result = false;
+sales_result = false;
 
 fees_to_add = [];
 
@@ -706,6 +710,53 @@ function search_college(){
       $('#'+tab).html(data);
       $('#search-loading').hide();
       attendance_result = true;
+      is_done = true;
+  });
+}
+
+function search_transactions(){
+  show_search_load();
+  var date = $('#transactions_search_date').val();
+  var time = $('#transactions_search_time').val();
+  var vendor_name = $('#transactions_search_vendor').val();
+  var transaction_type = $('#transactions_search_transaction_type').val();
+  var id_no = $('#transactions_search_id_no').val();
+  var customer_name = $('#transactions_search_customer_name').val();
+  var reset = 'yes';
+
+  $.post('/search/transactions',{
+      needed:tab,
+      date:date,
+      time:time,
+      vendor_name:vendor_name,
+      transaction_type:transaction_type,
+      id_no:id_no,
+      customer_name:customer_name,
+      reset:reset
+  },
+  function(data){
+      $('#'+tab).html(data);
+      $('#search-loading').hide();
+      transactions_result = true;
+      is_done = true;
+  });
+}
+
+function search_sales(){
+  show_search_load();
+  var date = $('#sales_search_date').val();
+  var vendor_name = $('#sales_search_vendor_name').val();
+  var reset = 'yes';
+
+  $.post('/search/sales',{
+      date:date,
+      vendor_name:vendor_name,
+      reset:reset,
+  },
+  function(data){
+      $('#'+tab).html(data);
+      $('#search-loading').hide();
+      sales_result = true;
       is_done = true;
   });
 }
@@ -1667,6 +1718,7 @@ function toggle_search(){
         $('#'+tab).addClass('maximized');
         $('#'+tab).removeClass('minimized');
         $('#'+tab+'-search-panel .search-text').val('');
+        $('#'+tab+'-search-panel .search-option').val('');
         window[tab+'SearchStatus'] = 'off';
         window[tab+'_result'] = false;
         back_home();
@@ -2049,8 +2101,8 @@ function populate_schedule(){
   $('.schedule-nav-tabs li').addClass('disabled');
   $.post('/schedule/regular/get',
     function(data){
-      $('#monday-tab').addClass('active');
       $('.schedule-nav-tabs li').removeClass('disabled');
+      $(".schedule-nav-tabs li:eq(0) a").tab('show');
       
       for (var i = 0; i <= days.length - 1; i++) {
         $('#'+days[i]+'_junior_kinder_morning_start').val(data[days[i]]['junior_kinder_morning_start']);

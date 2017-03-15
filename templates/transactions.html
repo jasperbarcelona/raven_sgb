@@ -44,27 +44,28 @@
 						<th class="long">Name</th>
 						<th class="short">Amount</th>
 					</tr>
-					<tr id="k12-search-panel" class="search-panel">
+					<tr id="transactions-search-panel" class="search-panel">
 						<td class="xs"></td>
-						<td class="short"><input id="attendance_search_id_no" type="text" class="form-control search-text search-students"></td>
-						<td class="short"><input id="attendance_search_last_name" type="text" class="form-control search-text search-students"></td>
-						<td class="short"><input id="attendance_search_first_name" type="text" class="form-control search-text search-students"></td>
-						<td class="short"><input id="attendance_search_middle_name" type="text" class="form-control search-text search-students"></td>
+						<td class="short"><input id="transactions_search_date" type="text" class="form-control search-text search-transactions datepicker"></td>
+						<td class="short"><input id="transactions_search_time" type="text" class="form-control search-text search-transactions"></td>
 						<td class="short">
-							<select class="form-control search-option search-students-options" id="attendance_search_level">
+							<select class="form-control search-option search-transactions-options" id="transactions_search_vendor">
 							        <option value="">All</option>
-							        <option value="Cash">Cash</option>
-							        <option value="E-Wallet">E-Wallet</option>
+							        {% for pos in devices %}
+							        <option value="{{pos.vendor}}">{{pos.vendor}}</option>
+							        {% endfor %}
 							</select>
 						</td>
 						<td class="short">
-							<select class="form-control search-option search-students-options" id="attendance_search_section">
+							<select class="form-control search-option search-transactions-options" id="transactions_search_transaction_type">
 							        <option value="">All</option>
-							        {% for section in sections %}
-							        <option>{{section.name}}</option>
-							        {% endfor %}
+							        <option value="Cash">Cash</option>
+							        <option value="E-Wallet">E-Wallet</option>
 							</select><br />
 						</td>
+						<td class="short"><input id="transactions_search_id_no" type="text" class="form-control search-text search-transactions"></td>
+						<td class="long"><input id="transactions_search_customer_name" type="text" class="form-control search-text search-transactions"></td>
+						<td class="short"></td>
 					</tr>
 				</thead>
 				<tbody id="transactions" class="maximized">
@@ -101,33 +102,30 @@
 						<th class="short">Total E-Wallet</th>	
 						<th class="short">Grand Total</th>
 					</tr>
-					<tr id="k12-search-panel" class="search-panel">
+					<tr id="sales-search-panel" class="search-panel">
 						<td class="xs"></td>
-						<td class="short"><input id="attendance_search_id_no" type="text" class="form-control search-text search-students"></td>
-						<td class="short"><input id="attendance_search_last_name" type="text" class="form-control search-text search-students"></td>
-						<td class="short"><input id="attendance_search_first_name" type="text" class="form-control search-text search-students"></td>
-						<td class="short"><input id="attendance_search_middle_name" type="text" class="form-control search-text search-students"></td>
+						<td class="short"><input id="sales_search_date" type="text" class="form-control search-text search-sales datepicker"></td>
 						<td class="short">
-							<select class="form-control search-option search-students-options" id="attendance_search_level">
+							<select class="form-control search-option search-sales-options" id="sales_search_vendor_name">
 							        <option value="">All</option>
-							        <option value="Cash">Cash</option>
-							        <option value="E-Wallet">E-Wallet</option>
+							        {% for pos in devices %}
+							        <option value="{{pos.vendor}}">{{pos.vendor}}</option>
+							        {% endfor %}
 							</select>
 						</td>
-						<td class="short">
-							<select class="form-control search-option search-students-options" id="attendance_search_section">
-							        <option value="">All</option>
-							        {% for section in sections %}
-							        <option>{{section.name}}</option>
-							        {% endfor %}
-							</select><br />
-						</td>
+						<td class="short"></td>
+						<td class="short"></td>
+						<td class="short"></td>
 					</tr>
 				</thead>
 				<tbody id="sales" class="maximized">
 					{% if sales[0] %}
 					{% for record in sales %}
+					{% if record.date == date %}
+			        <tr id="{{record.id}}" class="rows today">
+			        {% else %}
 			        <tr id="{{record.id}}" class="rows">
+			        {% endif %}
 			            <td class="xs">{{loop.index}}</td> 
 			            <td class="short">{{record.date}}</td>
 			            <td class="short">{{record.vendor}}</td>
@@ -148,23 +146,27 @@
 </div>
 
 <script type="text/javascript">
-	$('.search-students').keypress(function(e){
+	$(".datepicker").datepicker({
+	    dateFormat: "MM dd, yy"
+	});
+
+	$('.search-transactions').keypress(function(e){
 	    if (e.which == 13) {
-	        search_k12();
+	        search_transactions();
 	    }
 	});
 
-	$('.search-students-options').on('change', function(){
-	    search_k12();
+	$('.search-transactions-options').on('change', function(){
+	    search_transactions();
 	});
 
-	$('.search-college').keypress(function(e){
+	$('.search-sales').keypress(function(e){
 	    if (e.which == 13) {
-	        search_college();
+	        search_sales();
 	    }
 	});
 
-	$('.search-college-options').on('change', function(){
-	    search_college();
+	$('.search-sales-options').on('change', function(){
+	    search_sales();
 	});
 </script>
