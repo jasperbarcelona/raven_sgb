@@ -256,6 +256,18 @@ class Message(db.Model):
     date = db.Column(db.String(20))
     time = db.Column(db.String(10))
     content = db.Column(db.Text)
+    timestamp = db.Column(db.String(50))
+
+class Topup(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    school_no = db.Column(db.String(32))
+    date = db.Column(db.String(20))
+    time = db.Column(db.String(10))
+    student_id = db.Column(db.Integer())
+    student_name = db.Column(db.String(60))
+    id_no = db.Column(db.String(20))
+    amount = db.Column(db.Float())
+    timestamp = db.Column(db.String(50))
 
 class Log(db.Model, Serializer):
     __public__ = ['id','school_no','date','id_no','name',
@@ -1219,6 +1231,7 @@ def dashboard():
     session['fees_limit'] = 0
     session['transactions_limit'] = 0
     session['sales_limit'] = 0
+    session['wallet_limit'] = 0
 
     session['logs_search_limit'] = 0
     session['fees_search_limit'] = 0
@@ -1228,6 +1241,7 @@ def dashboard():
     session['staff_search_limit'] = 0
     session['transactions_search_limit'] = 0
     session['sales_search_limit'] = 0
+    session['wallet_search_limit'] = 0
 
     session['k12_search_status'] = False
     session['college_search_status'] = False
@@ -1238,6 +1252,7 @@ def dashboard():
     session['fees_search_status'] = False
     session['transactions_search_status'] = False
     session['sales_search_status'] = False
+    session['wallet_search_status'] = False
 
     school = School.query.filter_by(api_key=session['api_key']).first()
     sections = Section.query.filter_by(school_no=school.school_no).order_by(Section.name).all()
@@ -1352,6 +1367,19 @@ def logs():
         'logs.html',
         logs=logs,
         logs_limit=session['logs_limit']
+        )
+
+
+@app.route('/wallet', methods=['GET', 'POST'])
+@nocache
+def wallet():
+    session['wallet_limit']=0
+    session['wallet_limit']+=100
+    topups = Topup.query.order_by(Topup.timestamp.desc()).slice((session['wallet_limit']-100),session['wallet_limit'])
+    return flask.render_template(
+        'ewallet.html',
+        topups=topups,
+        wallet_limit=session['wallet_limit']
         )
 
 

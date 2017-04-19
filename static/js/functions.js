@@ -91,6 +91,18 @@ function show_logs(){
     });
 }
 
+function show_wallet(){
+    tab = 'wallet';
+    $.post('/wallet',
+    function(data){
+      $('.content').html(data);
+      $('.menu-container').fadeOut(800);
+      setTimeout(function(){ 
+        $('.content').fadeIn(800);
+      }, 800);
+    });
+}
+
 function show_transactions(){
     tab = 'transactions';
     $.post('/transactions',

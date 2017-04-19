@@ -1,17 +1,20 @@
 <div class="page-upper">
-	<div>
-		<div class="crumb">
-			<span class="location-label" onclick="show_home()">Dashboard</span>
-			<span class="crumb-separator"><i class="material-icons">lens</i></span>
-			<span class="location-label">Transactions</span>
+	<div class="page-upper-left">
+		<div>
+			<div class="crumb">
+				<span class="location-label" onclick="show_home()">Dashboard</span>
+				<span class="crumb-separator"><i class="material-icons">lens</i></span>
+				<span class="location-label">Transactions</span>
+			</div>
+		</div>
+		<div>
+			<div class="back-btn" onclick="show_home()">
+				<i class="material-icons">&#xE5C4;</i>
+				<span>Back</span>
+			</div>
 		</div>
 	</div>
-	<div>
-		<div class="back-btn" onclick="show_home()">
-			<i class="material-icons">&#xE5C4;</i>
-			<span>Back</span>
-		</div>
-	</div>
+	<div class="page-upper-right"></div>
 </div>
 <div id="table-container">
 	<div id="tabs">
@@ -79,7 +82,7 @@
 			            <td class="short">{{transaction.transaction_type}}</td> 
 			            <td class="short">{{transaction.customer_id_no}}</td>
 			            <td class="long">{{transaction.customer_name}}</td>
-			            <td class="short">{{transaction.total}}</td>                
+			            <td class="short">&#8369; {{transaction.total}}</td>                
 			        </tr>
 			        {% endfor %}
 					{% else %}
@@ -129,9 +132,9 @@
 			            <td class="xs">{{loop.index}}</td> 
 			            <td class="short">{{record.date}}</td>
 			            <td class="short">{{record.vendor}}</td>
-			            <td class="short">{{record.cash_total}}</td>   
-			            <td class="short">{{record.wallet_total}}</td> 
-			            <td class="short">{{record.grand_total}}</td>            
+			            <td class="short">&#8369; {{record.cash_total}}</td>   
+			            <td class="short">&#8369; {{record.wallet_total}}</td> 
+			            <td class="short">&#8369; {{record.grand_total}}</td>            
 			        </tr>
 			        {% endfor %}
 					{% else %}

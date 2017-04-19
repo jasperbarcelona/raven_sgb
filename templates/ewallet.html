@@ -14,7 +14,18 @@
 			</div>
 		</div>
 	</div>
-	<div class="page-upper-right"></div>
+	<div class="page-upper-right">
+		<div class="wallet-data-container">
+			<div class="wallet-data">
+				<span class="available-credits-label">Available Credits</span>
+				<span class="available-credits">&#8369; 1,234</span>
+			</div>
+			<div class="wallet-options-container">
+				<button id="topUpBtn" type="button" class="btn wallet-options" data-toggle="modal" data-target="#topup-modal">Top Up</button>
+				<button id="inquireBalanceBtn" type="button" class="btn wallet-options">Inquire Balance</button>
+			</div>
+		</div>
+	</div>
 </div>
 <div id="table-container">
 	<div id="tabs">
@@ -34,40 +45,30 @@
 					<tr>
 						<th class="xs">#</th>
 						<th class="short">DATE</th>
+						<th class="short">Time</th>
 						<th class="short">ID NUMBER</th>	
 						<th class="long">NAME</th>
-						<th class="short">Department</th>
-						<th class="short">IN</th>
-						<th class="short">OUT</th>
+						<th class="short">Amount</th>
 					</tr>
 					<tr id="logs-search-panel" class="search-panel">
 						<td class="xs"></td>	
 						<td class="short"><input type="text" id="log_search_date" class="form-control search-text search-logs datepicker"></td>	
 						<td class="short"><input type="text" id="log_search_id_no" class="form-control search-text search-logs"></td>
-						<td class="long"><input type="text" id="log_search_name" class="form-control search-text search-logs"></td>
-						<td class="short">
-							<select id="log_search_department" class="form-control search-option search-logs-options">
-							        <option value="">All</option>
-							        <option>K12</option>
-							        <option>College</option>
-							        <option>Staff</option>
-							</select>
-						</td>
 						<td class="short"></td>
+						<td class="long"><input type="text" id="log_search_name" class="form-control search-text search-logs"></td>
 						<td class="short"></td>
 					</tr>
 				</thead>
 				<tbody id="logs" class="maximized">
-					{% if logs[0] %}
-					{% for log in logs %}
-			        <tr id="{{log.id}}" class="rows">
+					{% if topups[0] %}
+					{% for item in topups %}
+			        <tr id="{{item.id}}" class="rows">
 			            <td class="xs">{{loop.index}}</td> 
-			            <td class="short">{{log.date}}</td>
-			            <td class="short">{{log.id_no}}</td>   
-			            <td class="long">{{log.name}}</td> 
-			            <td class="short">{{log.group}}</td>
-			            <td class="short">{{log.time_in}}</td>
-			            <td class="short">{{log.time_out}}</td>                
+			            <td class="short">{{item.date}}</td>
+			            <td class="short">{{item.time}}</td>   
+			            <td class="short">{{item.id_no}}</td>
+			            <td class="long">{{item.student_name}}</td> 
+			            <td class="short">{{item.time_in}}</td>               
 			        </tr>
 			        {% endfor %}
 					{% else %}

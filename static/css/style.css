@@ -1464,6 +1464,46 @@ a, a:hover, a:active, a:focus{
 	padding: 0 30px 0 30px;
 	display: -webkit-flex;
 	display: flex;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: left;
+}
+
+.page-upper-left{
+	width: 50%;
+	float: left;
+}
+
+.page-upper-left > div{
+	width: 100%;
+}
+
+.page-upper-right{
+	width: 50%;
+	float: left;
+}
+
+.wallet-data-container{
+	padding: 0 40px 0 40px;
+	background-color: #215078;
+	float: right;
+	height: 80px;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: left;
+}
+
+.wallet-data{
+	float: left;
+	height: 100%;
+	display: -webkit-flex;
+	display: flex;
 	-webkit-flex-direction: column;
 	flex-direction: column;
 	-webkit-align-items: center;
@@ -1471,9 +1511,56 @@ a, a:hover, a:active, a:focus{
 	-webkit-justify-content: center;
 }
 
-.page-upper > div{
-	width: 100%;
-	text-align: left;
+.wallet-options-container{
+	float: left;
+	height: 100%;
+	margin-left: 40px;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: row;
+	flex-direction: row;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-justify-content: center;
+}
+
+.wallet-options{
+	border: 2px solid #FFFFFF !important;
+	background-color: transparent;
+	color: #FFFFFF;
+	font-weight: bold;
+}
+
+.wallet-options:hover{
+	background-color: #FFFFFF;
+	color: #215078 !important;
+}
+
+.wallet-options:active{
+	outline: none !important;
+}
+
+.wallet-options:focus{
+	outline: none !important;
+	color: #fff;
+}
+
+#topUpBtn{
+	margin-right: 15px;
+}
+
+.wallet-data > span{
+	color: #FFFFFF;
+}
+
+.available-credits-label{
+	font-size: 12px;
+	text-transform: uppercase;
+}
+
+.available-credits{
+	font-weight: bold;
+	font-size: 24px;
 }
 
 .crumb{
@@ -1498,7 +1585,6 @@ a, a:hover, a:active, a:focus{
 	align-items: center;
 	-webkit-justify-content: left;
 	cursor: pointer;
-	float: left;
 }
 
 .back-btn > span{
@@ -1778,6 +1864,23 @@ table.table thead tr th, table.table tfoot tr th {
 	    margin-left: auto;
 	    margin-right: auto;
 	    margin-top: 0 !important;
+}
+
+.topup-modal-dialog{
+	width: 500px;
+}
+
+.topup-wallet-form{
+	padding: 20px 0 20px 0;
+}
+
+.topup-instruction{
+	float: left;
+	text-align: center;
+	width: 100%;
+	font-size: 16px;
+	margin-bottom: 10px;
+	font-weight: bold;
 }
 
 .calendar-schedule-modal-dialog{
