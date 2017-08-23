@@ -1,0 +1,213 @@
+<div class="page-upper">
+	<div class="page-upper-left">
+		<div>
+			<div class="crumb">
+				<span class="location-label root" onclick="show_home()">Dashboard</span>
+				<span class="separator">/</span>
+				<span class="location-label">Students</span>
+			</div>
+		</div>
+		<div>
+			<div class="back-btn">
+				<div onclick="show_home()">
+					<i class="material-icons">&#xE5C4;</i>
+					<span>Back</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="page-upper-right"></div>
+</div>
+<div id="table-container">
+	<div id="tabs">
+	    <ul class="nav main-nav-tabs nav-tabs">
+	        <li class="active">
+	            <a href="#k12Tab" class="tab-item" data-toggle="tab" onclick="change_tab('k12')">K-12</a>
+	        </li>
+	        <li>
+	            <a href="#collegeTab" class="tab-item" data-toggle="tab" onclick="change_tab('college')">COLLEGE</a>
+	        </li>
+	        <div class="button-container">
+	            <button class="btn add-user-btn" id="add-student-btn" data-toggle="modal" data-target="#add-student-modal"><i class="material-icons md-30">add</i></button>
+	            <button class="btn add-user-btn" id="add-college-btn" data-toggle="modal" data-target="#add-college-modal"><i class="material-icons md-30">add</i></button>
+	            <div class="btn-group">
+	            <button id="search-btn" onclick="toggle_search()" class="buttons btn"><span class="glyphicon glyphicon-search"></span></button>
+	            <button id="refresh-btn" class="buttons btn" onclick="back_home()"><span class="glyphicon glyphicon-repeat"></span></button>
+	            </div>
+	        </div>          
+	    </ul>
+	</div>
+	<div class="tab-content">
+		<div class="tab-pane active" id="k12Tab">
+			<table class="table">
+				<thead>	
+					<tr>
+						<th class="xs">#</th>
+						<th class="short" id="id_no">ID Number</th>
+						<th class="short" id="last_name">Last Name</th>
+						<th class="short" id="first_name">First Name</th>
+						<th class="short" id="middle_name">Middle Name</th>
+						<th class="short" id="level">Grade/Level</th>
+						<th class="short" id="section">Section</th>	
+					</tr>
+					<tr id="k12-search-panel" class="search-panel">
+						<td class="xs"></td>
+						<td class="short"><input id="attendance_search_id_no" type="text" class="form-control search-text search-students"></td>
+						<td class="short"><input id="attendance_search_last_name" type="text" class="form-control search-text search-students"></td>
+						<td class="short"><input id="attendance_search_first_name" type="text" class="form-control search-text search-students"></td>
+						<td class="short"><input id="attendance_search_middle_name" type="text" class="form-control search-text search-students"></td>
+						<td class="short">
+							<select class="form-control search-option search-students-options" id="attendance_search_level">
+							        <option value="">All</option>
+							        <option value="Junior Kinder">Junior Kinder</option>
+							        <option value="Senior Kinder">Senior Kinder</option>
+							        <option value="1st Grade">1st Grade</option>
+							        <option value="2nd Grade">2nd Grade</option>
+							        <option value="3rd Grade">3rd Grade</option>
+							        <option value="4th Grade">4th Grade</option>
+							        <option value="5th Grade">5th Grade</option>
+							        <option value="6th Grade">6th Grade</option>
+							        <option value="7th Grade">7th Grade</option>
+							        <option value="8th Grade">8th Grade</option>
+							        <option value="9th Grade">9th Grade</option>
+							        <option value="10th Grade">10th Grade</option>
+							        <option value="11th Grade">11th Grade</option>
+							        <option value="12th Grade">12th Grade</option>
+							</select>
+						</td>
+						<td class="short">
+							<select class="form-control search-option search-students-options" id="attendance_search_section">
+							        <option value="">All</option>
+							        {% for section in sections %}
+							        <option>{{section.name}}</option>
+							        {% endfor %}
+							</select><br />
+						</td>
+					</tr>
+				</thead>
+				<tbody id="k12" class="maximized">
+					{% if k12[0] %}
+					{% for student in k12 %}
+			        <tr id="{{student.id}}" class="rows" data-toggle="modal" data-target="#edit-user-modal" onclick="supply_data(this.id)">
+			            <td class="xs">{{loop.index}}</td> 
+			            <td class="short">{{student.id_no}}</td>
+			            <td class="short">{{student.last_name}}</td>   
+			            <td class="short">{{student.first_name}}</td> 
+			            <td class="short">{{student.middle_name}}</td>
+			            <td class="short">{{student.level}}</td>
+			            <td class="short">{{student.section}}</td>                
+			        </tr>
+			        {% endfor %}
+					{% else %}
+					<tr>
+					<td class="no-records">NO RECORDS</td>	
+					</tr>
+					{% endif %}
+				</tbody>
+			</table>
+		</div>
+
+		<div class="tab-pane" id="collegeTab">
+			<table class="table">
+				<thead>	
+					<tr>
+						<th class="xs">#</th>
+						<th class="short" id="id_no">ID Number</th>
+						<th class="short" id="last_name">Last Name</th>
+						<th class="short" id="first_name">First Name</th>
+						<th class="short" id="middle_name">Middle Name</th>
+						<th class="short" id="level">Year</th>
+						<th class="short" id="section">College/Department</th>	
+					</tr>
+					<tr id="college-search-panel" class="search-panel">
+						<td class="xs"></td>
+						<td class="short"><input id="college_search_id_no" type="text" class="form-control search-text search-college"></td>
+						<td class="short"><input id="college_search_last_name" type="text" class="form-control search-text search-college"></td>
+						<td class="short"><input id="college_search_first_name" type="text" class="form-control search-text search-college"></td>
+						<td class="short"><input id="college_search_middle_name" type="text" class="form-control search-text search-college"></td>
+						<td class="short">
+							<select class="form-control search-option search-college-options" id="college_search_level">
+							        <option value="">All</option>
+							        <option value="1st Year">1st Year</option>
+							        <option value="2nd Year">2nd Year</option>
+							        <option value="3rd Year">3rd Year</option>
+							        <option value="4th Year">4th Year</option>
+							        <option value="5th year">5th year</option>
+							</select>
+						</td>
+						<td class="short">
+							<select class="form-control search-option search-college-options" id="college_search_department">
+							        <option value="">All</option>
+							        {% for department in college_departments %}
+							        <option>{{department.name}}</option>
+							        {% endfor %}
+							</select><br />
+						</td>
+					</tr>
+				</thead>
+				<tbody id="college" class="maximized">
+					{% if college[0] %}
+					{% for col_student in college %}
+			        <tr id="{{col_student.id}}" class="rows" data-toggle="modal" data-target="#edit-user-modal" onclick="supply_college_data(this.id)">
+			            <td class="xs">{{loop.index}}</td> 
+			            <td class="short">{{col_student.id_no}}</td>
+			            <td class="short">{{col_student.last_name}}</td>   
+			            <td class="short">{{col_student.first_name}}</td> 
+			            <td class="short">{{col_student.middle_name}}</td>
+			            <td class="short">{{col_student.level}}</td>
+			            <td class="short">{{col_student.department}}</td>                
+			        </tr>
+			        {% endfor %}
+					{% else %}
+					<tr>
+					<td class="no-records">NO RECORDS</td>	
+					</tr>
+					{% endif %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$('.search-students').keypress(function(e){
+	    if (e.which == 13) {
+	        search_k12();
+	    }
+	});
+
+	$('.search-students-options').on('change', function(){
+	    search_k12();
+	});
+
+	$('.search-college').keypress(function(e){
+	    if (e.which == 13) {
+	        search_college();
+	    }
+	});
+
+	$('.search-college-options').on('change', function(){
+	    search_college();
+	});
+
+	var isPreviousEventComplete = true;
+
+	$('tbody').scroll(function () {
+	    var $this = jQuery(this);
+	    if ($this.data('activated')) return false;  // Pending, return
+
+	    if($(this).scrollTop() + $(this).height() > (this.scrollHeight * .95)) {
+	        if(isPreviousEventComplete){
+	            if(searchStatus == 'off'){
+	                load_next(String(this.getAttribute('id')));
+	                console.log('loading next');
+	                $this.data('activated', true);
+	            }
+	            else{
+	                eval(String(this.getAttribute('id'))+'_next_search()');
+	                $this.data('activated', true);
+	            }
+	        }
+	    }
+	});
+</script>

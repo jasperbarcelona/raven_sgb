@@ -1,0 +1,100 @@
+<div class="page-upper">
+	<div class="page-upper-left">
+		<div>
+			<div class="crumb">
+				<span class="location-label root" onclick="show_home()">Dashboard</span>
+				<span class="separator">/</span>
+				<span class="location-label">Logs</span>
+			</div>
+		</div>
+		<div>
+			<div class="back-btn">
+				<div onclick="show_home()">
+					<i class="material-icons">&#xE5C4;</i>
+					<span>Back</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="page-upper-right"></div>
+</div>
+<div id="table-container">
+	<div id="tabs">
+	    <ul class="nav main-nav-tabs nav-tabs">
+	        <div class="button-container">
+	            <div class="btn-group">
+		            <button id="search-btn" onclick="toggle_search()" class="buttons btn"><span class="glyphicon glyphicon-search"></span></button>
+		            <button id="refresh-btn" class="buttons btn" onclick="back_home()"><span class="glyphicon glyphicon-repeat"></span></button>
+	            </div>
+	        </div>          
+	    </ul>
+	</div>
+	<div class="tab-content">
+		<div class="tab-pane active" id="logsTab">
+			<table class="table">
+				<thead>	
+					<tr>
+						<th class="xs">#</th>
+						<th class="short">DATE</th>
+						<th class="short">ID NUMBER</th>	
+						<th class="long">NAME</th>
+						<th class="short">Department</th>
+						<th class="short">IN</th>
+						<th class="short">OUT</th>
+					</tr>
+					<tr id="logs-search-panel" class="search-panel">
+						<td class="xs"></td>	
+						<td class="short"><input type="text" id="log_search_date" class="form-control search-text search-logs datepicker"></td>	
+						<td class="short"><input type="text" id="log_search_id_no" class="form-control search-text search-logs"></td>
+						<td class="long"><input type="text" id="log_search_name" class="form-control search-text search-logs"></td>
+						<td class="short">
+							<select id="log_search_department" class="form-control search-option search-logs-options">
+							        <option value="">All</option>
+							        <option>K12</option>
+							        <option>College</option>
+							        <option>Staff</option>
+							</select>
+						</td>
+						<td class="short"></td>
+						<td class="short"></td>
+					</tr>
+				</thead>
+				<tbody id="logs" class="maximized">
+					{% if logs[0] %}
+					{% for log in logs %}
+			        <tr id="{{log.id}}" class="rows">
+			            <td class="xs">{{loop.index}}</td> 
+			            <td class="short">{{log.date}}</td>
+			            <td class="short">{{log.id_no}}</td>   
+			            <td class="long">{{log.name}}</td> 
+			            <td class="short">{{log.group}}</td>
+			            <td class="short">{{log.time_in}}</td>
+			            <td class="short">{{log.time_out}}</td>                
+			        </tr>
+			        {% endfor %}
+					{% else %}
+					<tr>
+					<td class="no-records">NO RECORDS</td>	
+					</tr>
+					{% endif %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$('.search-logs').keypress(function(e){
+	    if (e.which == 13) {
+	        search_logs();
+	    }
+	});
+
+	$('.search-logs-options').on('change', function(){
+	    search_logs();
+	});
+
+	$(".datepicker").datepicker({
+	    dateFormat: "MM dd, yy"
+	});
+</script>

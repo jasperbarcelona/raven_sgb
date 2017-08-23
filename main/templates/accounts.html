@@ -1,0 +1,86 @@
+<div class="page-upper">
+	<div class="page-upper-left">
+		<div>
+			<div class="crumb">
+				<span class="location-label root" onclick="show_home()">Dashboard</span>
+				<span class="separator">/</span>
+				<span class="location-label">Accounts</span>
+			</div>
+		</div>
+		<div>
+			<div class="back-btn">
+				<div onclick="show_home()">
+					<i class="material-icons">&#xE5C4;</i>
+					<span>Back</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="page-upper-right"></div>
+</div>
+<div id="table-container">
+	<div id="tabs">
+	    <ul class="nav main-nav-tabs nav-tabs">
+	        <div class="button-container">
+            	<button class="btn add-user-btn" id="add-student-btn" data-toggle="modal" data-target="#add-account-modal"><i class="material-icons md-30">add</i></button>
+	            <div class="btn-group">
+		            <button id="search-btn" onclick="toggle_search()" class="buttons btn"><span class="glyphicon glyphicon-search"></span></button>
+		            <button id="refresh-btn" class="buttons btn" onclick="back_home()"><span class="glyphicon glyphicon-repeat"></span></button>
+	            </div>
+	        </div>          
+	    </ul>
+	</div>
+	<div class="tab-content">
+		<div class="tab-pane active" id="messagesTab">
+			<table class="table">
+				<thead>	
+					<tr>
+						<th class="xs">#</th>
+						<th class="short">Name</th>
+						<th class="long">Email</th>
+						<th class="short">Status</th>
+						<th class="short">Join Date</th>
+					</tr>
+					<tr id="messages-search-panel" class="search-panel">
+						<td class="xs"></td>	
+						<td class="short"><input type="text" id="message_search_date" class="form-control search-text search-messages datepicker"></td>	
+						<td class="short"><input type="text" id="message_search_time" class="form-control search-text search-messages"></td>
+					</tr>
+				</thead>
+				<tbody id="accounts" class="maximized">
+					{% if accounts[0] %}
+					{% for account in accounts %}
+			        <tr id="{{account.id}}" class="rows">
+			            <td class="xs">{{loop.index}}</td>
+			            <td class="short">{{account.name}}</td>
+			            <td class="long email-td">{{account.email}}</td>
+			            <td class="short">{{account.status}}</td>                                             
+			            <td class="short">{{account.join_date}}</td>                                             
+			        </tr>
+			        {% endfor %}
+					{% else %}
+					<tr>
+					<td class="no-records">NO RECORDS</td>	
+					</tr>
+					{% endif %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$('.search-messages').keypress(function(e){
+	    if (e.which == 13) {
+	        search_messages();
+	    }
+	});
+
+	$('.search-messages-options').on('change', function(){
+	    search_messages();
+	});
+
+	$(".datepicker").datepicker({
+	    dateFormat: "MM dd, yy"
+	});
+</script>

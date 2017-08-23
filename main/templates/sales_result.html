@@ -1,0 +1,14 @@
+{% for record in data %}
+{% if record.date == date %}
+<tr id="{{record.id}}" class="rows today">
+{% else %}
+<tr id="{{record.id}}" class="rows">
+{% endif %}
+    <td class="xs">{{loop.index}}</td> 
+    <td class="short">{{record.date}}</td>
+    <td class="short">{{record.vendor}}</td>
+    <td class="short">&#8369; {{record.cash_total}}</td>   
+    <td class="short">&#8369; {{record.wallet_total}}</td> 
+    <td class="short">&#8369; {{record.grand_total}}</td>            
+</tr>
+{% endfor %}

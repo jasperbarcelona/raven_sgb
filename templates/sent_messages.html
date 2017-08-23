@@ -1,7 +1,0 @@
-{% for message in messages %}
-<div class="message-row" id="{{message.id}}" onclick="view_message(this.id)">
-        <span class="message-date">{{message.date}}</span><span class="message-time">{{message.time}}</span><br />
-        <p class="message-sender">sent by <span class="colored-font">{{message.sender_name}}</span> to {{message.recipient}}</p>
-        <p class="message-content-preview">{{message.content}}</p>
-</div>
-{% endfor %}

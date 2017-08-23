@@ -1,0 +1,10 @@
+{% for message in data %}
+<tr id="{{message.id}}" class="rows">
+    <td class="xs">{{loop.index}}</td> 
+    <td class="short">{{message.date}}</td>
+    <td class="short">{{message.time}}</td>   
+    <td class="short">{{message.sender_name}}</td>   
+    <td class="short">{{message.recipient}}</td>             
+    <td class="long padded-right message-content-td">{{message.content}}</td>                                  
+</tr>
+{% endfor %}

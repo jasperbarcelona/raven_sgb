@@ -1,0 +1,10 @@
+{% for item in data %}
+<tr id="{{item.id}}" class="rows">
+    <td class="xs">{{loop.index+limit}}</td> 
+    <td class="short">{{item.date}}</td>
+    <td class="short">{{item.time}}</td>   
+    <td class="short">{{item.id_no}}</td>
+    <td class="long">{{item.student_name}}</td> 
+    <td class="short">PHP {{item.amount}}</td>               
+</tr>
+{% endfor %}

@@ -1,0 +1,8 @@
+{% for fee in data %}
+<tr id="{{fee.id}}" class="rows">
+    <td class="xs">{{loop.index+limit}}</td> 
+    <td class="short">{{fee.name}}</td>
+    <td class="short">{{fee.category}}</td>             
+    <td class="short fee-price">Php {{fee.price}}</td>              
+</tr>
+{% endfor %}

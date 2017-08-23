@@ -1,0 +1,177 @@
+<div class="page-upper">
+	<div class="page-upper-left">
+		<div>
+			<div class="crumb">
+				<span class="location-label root" onclick="show_home()">Dashboard</span>
+				<span class="separator">/</span>
+				<span class="location-label">Transactions</span>
+			</div>
+		</div>
+		<div>
+			<div class="back-btn">
+				<div onclick="show_home()">
+					<i class="material-icons">&#xE5C4;</i>
+					<span>Back</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="page-upper-right"></div>
+</div>
+<div id="table-container">
+	<div id="tabs">
+	    <ul class="nav main-nav-tabs nav-tabs">
+	        <li class="active">
+	            <a href="#transactionsTab" class="tab-item" data-toggle="tab" onclick="change_tab('transactions')">Transactions</a>
+	        </li>
+	        <li>
+	            <a href="#salesTab" class="tab-item" data-toggle="tab" onclick="change_tab('sales')">Sales History</a>
+	        </li>
+	        <div class="button-container">
+	            <div class="btn-group">
+	            <button id="search-btn" onclick="toggle_search()" class="buttons btn"><span class="glyphicon glyphicon-search"></span></button>
+	            <button id="refresh-btn" class="buttons btn" onclick="back_home()"><span class="glyphicon glyphicon-repeat"></span></button>
+	            </div>
+	        </div>          
+	    </ul>
+	</div>
+	<div class="tab-content">
+		<div class="tab-pane active" id="transactionsTab">
+			<table class="table">
+				<thead>	
+					<tr>
+						<th class="xs">#</th>
+						<th class="short">DATE</th>
+						<th class="short">Time</th>
+						<th class="short">Vendor</th>
+						<th class="short">Type</th>
+						<th class="short">ID Number</th>	
+						<th class="long">Name</th>
+						<th class="short">Amount</th>
+					</tr>
+					<tr id="transactions-search-panel" class="search-panel">
+						<td class="xs"></td>
+						<td class="short"><input id="transactions_search_date" type="text" class="form-control search-text search-transactions datepicker"></td>
+						<td class="short"><input id="transactions_search_time" type="text" class="form-control search-text search-transactions"></td>
+						<td class="short">
+							<select class="form-control search-option search-transactions-options" id="transactions_search_vendor">
+							        <option value="">All</option>
+							        {% for pos in devices %}
+							        <option value="{{pos.vendor}}">{{pos.vendor}}</option>
+							        {% endfor %}
+							</select>
+						</td>
+						<td class="short">
+							<select class="form-control search-option search-transactions-options" id="transactions_search_transaction_type">
+							        <option value="">All</option>
+							        <option value="Cash">Cash</option>
+							        <option value="E-Wallet">E-Wallet</option>
+							</select><br />
+						</td>
+						<td class="short"><input id="transactions_search_id_no" type="text" class="form-control search-text search-transactions"></td>
+						<td class="long"><input id="transactions_search_customer_name" type="text" class="form-control search-text search-transactions"></td>
+						<td class="short"></td>
+					</tr>
+				</thead>
+				<tbody id="transactions" class="maximized">
+					{% if transactions[0] %}
+					{% for transaction in transactions %}
+			        <tr id="{{transaction.id}}" class="rows">
+			            <td class="xs">{{loop.index}}</td> 
+			            <td class="short">{{transaction.date}}</td>
+			            <td class="short">{{transaction.time}}</td>
+			            <td class="short">{{transaction.vendor_name}}</td>   
+			            <td class="short">{{transaction.transaction_type}}</td> 
+			            <td class="short">{{transaction.customer_id_no}}</td>
+			            <td class="long">{{transaction.customer_name}}</td>
+			            <td class="short">&#8369; {{transaction.total}}</td>                
+			        </tr>
+			        {% endfor %}
+					{% else %}
+					<tr>
+					<td class="no-records">NO RECORDS</td>	
+					</tr>
+					{% endif %}
+				</tbody>
+			</table>
+		</div>
+
+		<div class="tab-pane" id="salesTab">
+			<table class="table">
+				<thead>	
+					<tr>
+						<th class="xs">#</th>
+						<th class="short">DATE</th>
+						<th class="short">Vendor</th>
+						<th class="short">Total Cash</th>
+						<th class="short">Total E-Wallet</th>	
+						<th class="short">Grand Total</th>
+					</tr>
+					<tr id="sales-search-panel" class="search-panel">
+						<td class="xs"></td>
+						<td class="short"><input id="sales_search_date" type="text" class="form-control search-text search-sales datepicker"></td>
+						<td class="short">
+							<select class="form-control search-option search-sales-options" id="sales_search_vendor_name">
+							        <option value="">All</option>
+							        {% for pos in devices %}
+							        <option value="{{pos.vendor}}">{{pos.vendor}}</option>
+							        {% endfor %}
+							</select>
+						</td>
+						<td class="short"></td>
+						<td class="short"></td>
+						<td class="short"></td>
+					</tr>
+				</thead>
+				<tbody id="sales" class="maximized">
+					{% if sales[0] %}
+					{% for record in sales %}
+					{% if record.date == date %}
+			        <tr id="{{record.id}}" class="rows today">
+			        {% else %}
+			        <tr id="{{record.id}}" class="rows">
+			        {% endif %}
+			            <td class="xs">{{loop.index}}</td> 
+			            <td class="short">{{record.date}}</td>
+			            <td class="short">{{record.vendor}}</td>
+			            <td class="short">&#8369; {{record.cash_total}}</td>   
+			            <td class="short">&#8369; {{record.wallet_total}}</td> 
+			            <td class="short">&#8369; {{record.grand_total}}</td>            
+			        </tr>
+			        {% endfor %}
+					{% else %}
+					<tr>
+					<td class="no-records">NO RECORDS</td>	
+					</tr>
+					{% endif %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(".datepicker").datepicker({
+	    dateFormat: "MM dd, yy"
+	});
+
+	$('.search-transactions').keypress(function(e){
+	    if (e.which == 13) {
+	        search_transactions();
+	    }
+	});
+
+	$('.search-transactions-options').on('change', function(){
+	    search_transactions();
+	});
+
+	$('.search-sales').keypress(function(e){
+	    if (e.which == 13) {
+	        search_sales();
+	    }
+	});
+
+	$('.search-sales-options').on('change', function(){
+	    search_sales();
+	});
+</script>

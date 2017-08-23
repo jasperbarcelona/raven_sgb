@@ -1,0 +1,9 @@
+{% for account in accounts %}
+<tr id="{{account.id}}" class="rows">
+    <td class="xs">{{loop.index}}</td>
+    <td class="short">{{account.name}}</td>
+    <td class="long email-td">{{account.email}}</td>
+    <td class="short">{{account.status}}</td>                                             
+    <td class="short">{{account.join_date}}</td>                                             
+</tr>
+{% endfor %}

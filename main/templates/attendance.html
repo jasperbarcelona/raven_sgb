@@ -1,0 +1,201 @@
+<div class="page-upper">
+	<div class="page-upper-left">
+		<div>
+			<div class="crumb">
+				<span class="location-label root" onclick="show_home()">Dashboard</span>
+				<span class="separator">/</span>
+				<span class="location-label">Attendance</span>
+			</div>
+		</div>
+		<div>
+			<div class="back-btn">
+				<div onclick="show_home()">
+					<i class="material-icons">&#xE5C4;</i>
+					<span>Back</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="page-upper-right"></div>
+</div>
+<div id="table-container">
+	<div id="tabs">
+	    <ul class="nav main-nav-tabs nav-tabs">
+	        <li class="active">
+	            <a href="#absentTab" class="tab-item" data-toggle="tab" onclick="change_tab('absent')">ABSENT</a>
+	        </li>
+	        <li>
+	            <a href="#lateTab" class="tab-item" data-toggle="tab" onclick="change_tab('late')">LATE</a>
+	        </li>
+	        <div class="button-container">
+	        	<div class="btn-group">
+	            <button id="search-btn" onclick="toggle_search()" class="buttons btn"><span class="glyphicon glyphicon-search"></span></button>
+	            <button id="refresh-btn" class="buttons btn" onclick="back_home()"><span class="glyphicon glyphicon-repeat"></span></button>
+	            </div>
+            </div>       
+	    </ul>
+	</div>
+	<div class="tab-content">
+		<div class="tab-pane active" id="absentTab">
+			<table class="table">
+				<thead>	
+					<tr>
+						<th class="xs">#</th>
+						<th class="short" id="date">Date</th>
+						<th class="short" id="id_no">ID Number</th>
+						<th class="long" id="name">Name</th>
+						<th class="short" id="level">Grade/Level</th>
+						<th class="short" id="section">Section</th>	
+					</tr>
+					<tr id="absent-search-panel" class="search-panel">
+						<td class="xs"></td>	
+						<td class="short"><input type="text" id="absent_search_date" class="form-control search-text search-absent datepicker"></td>	
+						<td class="short"><input type="text" id="absent_search_id_no" class="form-control search-text search-absent"></td>	
+						<td class="long"><input type="text" id="absent_search_name" class="form-control search-text search-absent"></td>
+						<td class="short">
+							<select class="form-control search-option search-absent-options" id="absent_search_level">
+							        <option value="">All</option>
+							        <option value="Junior Kinder">Junior Kinder</option>
+							        <option value="Senior Kinder">Senior Kinder</option>
+							        <option value="1st Grade">1st Grade</option>
+							        <option value="2nd Grade">2nd Grade</option>
+							        <option value="3rd Grade">3rd Grade</option>
+							        <option value="4th Grade">4th Grade</option>
+							        <option value="5th Grade">5th Grade</option>
+							        <option value="6th Grade">6th Grade</option>
+							        <option value="7th Grade">7th Grade</option>
+							        <option value="8th Grade">8th Grade</option>
+							        <option value="9th Grade">9th Grade</option>
+							        <option value="10th Grade">10th Grade</option>
+							        <option value="11th Grade">11th Grade</option>
+							        <option value="12th Grade">12th Grade</option>
+						</td>
+						<td class="short">
+							<select class="form-control search-option search-absent-options" id="absent_search_section">
+							        <option value="">All</option>
+							        {% for section in sections %}
+							        <option  value="{{section.name}}">{{section.name}}</option>
+							        {% endfor %}
+							</select><br />
+						</td>
+					</tr>
+				</thead>
+				<tbody id="absent" class="maximized">
+					{% if absent[0] %}
+					{% for index in absent %}
+					<tr class="rows">
+						<td class="xs">{{loop.index}}</td>	
+						<td class="short">{{index.date}}</td>
+						<td class="short">{{index.id_no}}</td>	
+						<td class="long">{{index.name}}</td>	
+						<td class="short">{{index.level}}</td>
+						<td class="short">{{index.section}}</td>				
+					</tr>
+					{% endfor %}
+
+					{% else %}
+					<tr>
+					<td class="no-records">NO RECORDS</td>	
+					</tr>
+					{% endif %}
+				</tbody>
+			</table>
+		</div>
+
+		<div class="tab-pane" id="lateTab">
+			<table class="table">
+				<thead>
+					<tr>
+						<th class="xs">#</th>
+						<th class="short" id="date">Date</th>	
+						<th class="short" id="id_no">ID Number</th>
+						<th class="long" id="name">Name</th>
+						<th class="short" id="level">Grade/Level</th>
+						<th class="short" id="section">Section</th>			
+						<th class="short" id="time_in">In</th>
+					</tr>
+					<tr id="late-search-panel" class="search-panel">
+						<td class="xs"></td>	
+						<td class="short"><input type="text" id="late_search_date" class="form-control search-text search-late datepicker"></td>	
+						<td class="short"><input type="text" id="late_search_id_no" class="form-control search-text search-late"></td>	
+						<td class="long"><input type="text" id="late_search_name" class="form-control search-text search-late"></td>
+						<td class="short">
+							<select class="form-control search-option search-late-options" id="late_search_level">
+							        <option value="">All</option>
+							        <option value="Junior Kinder">Junior Kinder</option>
+							        <option value="Senior Kinder">Senior Kinder</option>
+							        <option value="1st Grade">1st Grade</option>
+							        <option value="2nd Grade">2nd Grade</option>
+							        <option value="3rd Grade">3rd Grade</option>
+							        <option value="4th Grade">4th Grade</option>
+							        <option value="5th Grade">5th Grade</option>
+							        <option value="6th Grade">6th Grade</option>
+							        <option value="7th Grade">7th Grade</option>
+							        <option value="8th Grade">8th Grade</option>
+							        <option value="9th Grade">9th Grade</option>
+							        <option value="10th Grade">10th Grade</option>
+							        <option value="11th Grade">11th Grade</option>
+							        <option value="12th Grade">12th Grade</option>
+							</select>
+						</td>
+						<td class="short">
+							<select class="form-control search-option search-late-options" id="late_search_section">
+							        <option value="">All</option>
+							        {% for section in sections %}
+							        <option  value="{{section.name}}">{{section.name}}</option>
+							        {% endfor %}
+							</select><br />
+						</td>
+						<td class="short"></td>
+					</tr>
+				</thead>
+				<tbody id="late" class="maximized">
+					{% if late[0] %}
+					{% for a in late %}
+					<tr class="rows">
+						<td class="xs">{{loop.index}}</td>
+						<td class="short">{{a.date}}</td>	
+						<td class="short">{{a.id_no}}</td>	
+						<td class="long">{{a.name}}</td>					
+						<td class="short">{{a.level}}</td>
+						<td class="short">{{a.section}}</td>				
+						<td class="short">{{a.time_in}}</td>	
+					</tr>
+					{% endfor %}
+
+					{% else %}
+					<tr>
+					<td class="no-records">NO RECORDS</td>	
+					</tr>
+					{% endif %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$('.search-late').keypress(function(e){
+	    if (e.which == 13) {
+	        search_late();
+	    }
+	});
+
+	$('.search-late-options').on('change', function(){
+	    search_late();
+	});
+
+	$('.search-absent').keypress(function(e){
+	    if (e.which == 13) {
+	        search_absent();
+	    }
+	});
+
+	$('.search-absent-options').on('change', function(){
+	    search_absent();
+	});
+
+	$(".datepicker").datepicker({
+	    dateFormat: "MM dd, yy"
+	});
+</script>
