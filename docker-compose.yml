@@ -18,8 +18,8 @@ services:
       POSTGRES_PASSWORD: sgbsaints
       POSTGRES_DB: sgb
     volumes:
-      - /var/lib/postgresql/data
-      # - ./main/data:/var/lib/postgresql/data
+      # - /var/lib/postgresql/data
+      - ./main/data:/var/lib/postgresql/data
 
   main:
     restart: always
