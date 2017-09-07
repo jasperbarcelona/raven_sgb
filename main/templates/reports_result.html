@@ -1,0 +1,17 @@
+{% if data[0] %}
+{% for report in data %}
+<tr id="{{report.id}}" class="rows">
+    <td class="xs">{{loop.index}}</td> 
+    <td class="short">{{report.date}}</td>
+    <td class="short">{{report.time}}</td>
+    <td class="short">{{report.name}}</td>
+    <td class="short">{{report.report_type}}</td>
+    <td class="short">{{report.staff_name}}</td>
+    {% if report.status == 'pending' %}
+    <td class="short padded-right">Preparing..</td>
+    {% else %}
+    <td class="short padded-right"><a href="../static/reports/{{report.name}}.pdf" class="download-report-btn" download>Download</a></td>
+    {% endif %}
+</tr>
+{% endfor %}
+{% endif %}

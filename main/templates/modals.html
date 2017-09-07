@@ -89,6 +89,36 @@
     </div><!-- /.modal-dialog -->
 </div>
 
+<div class="modal fade" id="printModal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header generic-background">
+                <h4 class="modal-title message-modal-title" id="gridSystemModalLabel">Generate Report</h4>
+            </div>
+            <div class="modal-body">
+                <select id="reportType" class="form-control select" required>
+                    <option value="" disabled selected>Report Type</option>
+                    <option value="Absent">Absent Records</option>
+                    <option value="Late">Late Records</option>
+                    <option value="Log">Log Records</option>
+                </select>
+                <input type="text" id="reportName" class="form-control" placeholder="Report Name" data-class="input-label">
+                <div id="report-from-date-container" class="report-date-container">
+                    <input type="text" id="reportFromDate" class="form-control datepicker" data-class="input-label" placeholder="From Date">
+                </div>
+                <div class="report-date-container">
+                    <input type="text" id="reportToDate" class="form-control datepicker" data-class="input-label" placeholder="To Date">
+                </div>
+                <div id="printError" class="center error"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger cancel-btn" data-dismiss="modal">Close</button>
+                <button id="generateReportBtn" type="button" class="btn btn-primary" onclick="generate_report()" data-loading-text="Generating" data-complete-text="Generate" disabled>Generate</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
 <div class="modal fade" id="confirm-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog confirm-modal-dialog">
                 <div class="modal-content">
@@ -269,13 +299,7 @@
                                                 </div>
                                         </div>
                                         <div class="left col-sm-6 col-xs-12">
-                                                <input type="text" class="form-control" id="add_guardian_last_name" placeholder="Last Name" data-class="input-label" />
-                                        </div>
-                                        <div class="right col-sm-6 col-xs-12">
-                                                <input type="text" class="form-control" id="add_guardian_first_name" placeholder="First Name" data-class="input-label" />
-                                        </div>
-                                        <div class="left col-sm-6 col-xs-12">
-                                                <input type="text" class="form-control" id="add_guardian_middle_name" placeholder="Middle Name" data-class="input-label" />
+                                                <input type="text" class="form-control" id="add_guardian_name" placeholder="Full Name" data-class="input-label" />
                                         </div>
                                         <div class="right col-sm-6 col-xs-12">
                                                 <input type="text" class="form-control" id="add_guardian_email" placeholder="Email" data-class="input-label" />

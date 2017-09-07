@@ -66,13 +66,7 @@
                     </div>
             </div>
             <div class="left col-sm-6 col-xs-12">
-                    <input type="text" value="{{guardian.last_name}}" class="form-control" id="edit_guardian_last_name" placeholder="Last Name" data-class="input-label" />
-            </div>
-            <div class="right col-sm-6 col-xs-12">
-                    <input type="text" value="{{guardian.first_name}}" class="form-control" id="edit_guardian_first_name" placeholder="First Name" data-class="input-label" />
-            </div>
-            <div class="left col-sm-6 col-xs-12">
-                    <input type="text" value="{{guardian.middle_name}}" class="form-control" id="edit_guardian_middle_name" placeholder="Middle Name" data-class="input-label" />
+                    <input type="text" value="{{guardian.name}}" class="form-control" id="edit_guardian_name" placeholder="Full Name" data-class="input-label" />
             </div>
             <div class="right col-sm-6 col-xs-12">
                     <input type="text" value="{{guardian.email}}" class="form-control" id="edit_guardian_email" placeholder="Email" data-class="input-label" />
@@ -235,13 +229,11 @@ $('.edit-user-modal-footer .edit-done-btn').on('click', function(){
     var id_no = $('#edit_id_no').val();
     var user_id = $(this).attr('id')
 
-    var guardian_first_name = $('#edit_guardian_first_name').val();
-    var guardian_last_name = $('#edit_guardian_last_name').val();
-    var guardian_middle_name = $('#edit_guardian_middle_name').val();
+    var guardian_name = $('#edit_guardian_name').val();
     var guardian_address = $('#edit_guardian_address').val();
     var guardian_mobile = $('#edit_guardian_mobile').val();
     var guardian_email = $('#edit_guardian_email').val();
     var guardian_relation = $('#edit_guardian_relation').val();
-    edit_student(last_name, first_name, middle_name, level, section, id_no, user_id, guardian_first_name , guardian_last_name, guardian_middle_name, guardian_address, guardian_mobile, guardian_email, guardian_relation);
+    edit_student(last_name, first_name, middle_name, level, section, id_no, user_id, guardian_name, guardian_address, guardian_mobile, guardian_email, guardian_relation);
 });
 </script>

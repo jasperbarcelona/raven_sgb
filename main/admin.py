@@ -32,14 +32,14 @@ import smtplib
 from email.mime.text import MIMEText as text
 import os
 import schedule
-from tasks import send_message
+from tasks import send_message, create_pdf, check_if_late, blast_sms, morning_absent, afternoon_absent
 import db_conn
 from db_conn import db, app
 from models import *
+import xlrd
 
 API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
 SCHOOL_NO = 'sgb-lc2017'
-CONNECT_TIMEOUT = 5.0
 CALENDAR_URL = 'http://ravenclock:5000%s'
 
 now = datetime.datetime.now()
@@ -85,6 +85,8 @@ admin.add_view(IngAdmin(Sale, db.session))
 admin.add_view(IngAdmin(Device, db.session))
 admin.add_view(IngAdmin(Permission, db.session))
 admin.add_view(IngAdmin(Topup, db.session))
+admin.add_view(IngAdmin(Report, db.session))
+admin.add_view(IngAdmin(MessageStatus, db.session))
 
 
 def crossdomain(origin=None, methods=None, headers=None,
@@ -131,16 +133,6 @@ def crossdomain(origin=None, methods=None, headers=None,
     return decorator
 
 
-def get_hour(time):
-    if time[6:8] == 'PM' and time[:2] != '12':
-        hour = int(time[:2]) + 12
-        return hour
-    elif time[6:8] == 'AM' and time[:2] == '12':
-        hour = 00
-        return hour
-    hour = int(time[:2])
-    return hour
-
 def get_student_data(id_no):
     return K12.query.filter_by(id_no=id_no).first()
 
@@ -163,162 +155,12 @@ def authenticate_user(email, password):
 
 
 def mark_morning_absent(school_no,api_key,level):
-    students = K12.query.filter_by(school_no=school_no,level=level).all()
+    morning_absent.delay(school_no,api_key,level)
+    return
 
-    for student in students:
-        logged = Log.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no).order_by(Log.timestamp.desc()).first()
-        print 'xxxxxxxxxxxxxxxxxxxxx'
-        print student.id_no
-        if not logged or logged == None or logged.time_out != None:
-            student_name = student.last_name+', '+student.first_name
-            if student.middle_name:
-                student_name += ' '+student.middle_name[:1]+'.'
-            absent = Absent(
-            school_no=school_no,
-            date=time.strftime("%B %d, %Y"),
-            id_no=student.id_no,
-            name=student_name,
-            level=student.level,
-            section=student.section,
-            department=student.department,
-            time_of_day='morning',
-            timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
-            )
-
-            db.session.add(absent)
-            student.absences=Absent.query.filter_by(id_no=student.id_no, school_no=school_no).count()
-            db.session.commit()
-            absent_count = Absent.query.filter_by(school_no=school_no,date=time.strftime("%B %d, %Y"),time_of_day='morning').count()
-    return schedule.CancelJob
-
-
-def mark_afternoon_absent(school_no,api_key):
-    all_students = K12.query.filter_by(school_no=school_no).all()
-
-    for student in all_students:
-        print 'xxxxxxxxxxxxxxxxxxxxx'
-        print student.id_no
-        logged = Log.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no).order_by(Log.timestamp.desc()).first()
-        if not logged or logged == None or logged.time_out != None:
-            student_name = student.last_name+', '+student.first_name
-            if student.middle_name:
-                student_name += ' '+student.middle_name[:1]+'.'
-            absent = Absent(
-            school_no=school_no,
-            date=time.strftime("%B %d, %Y"),
-            id_no=student.id_no,
-            name=student_name,
-            level=student.level,
-            section=student.section,
-            department=student.department,
-            time_of_day='afternoon',
-            timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
-            )
-
-            db.session.add(absent)
-            student.absences=Absent.query.filter_by(id_no=student.id_no, school_no=school_no).count()
-            db.session.commit()
-            absent_count = Absent.query.filter_by(school_no=school_no,date=time.strftime("%B %d, %Y"),time_of_day='afternoon').count()
-    return jsonify(status='Success', absent_count=absent_count),201
-
-def mark_specific_absent(school_no,id_no,time_of_day):
-    student = K12.query.filter_by(school_no=school_no,id_no=id_no).first()
-    student_name = student.last_name+', '+student.first_name
-    if student.middle_name:
-        student_name += ' '+student.middle_name[:1]+'.'
-    absent = Absent(
-            school_no=school_no,
-            date=time.strftime("%B %d, %Y"),
-            id_no=id_no,
-            name=student_name,
-            level=student.level,
-            section=student.section,
-            time_of_day=time_of_day,
-            timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
-            )
-    db.session.add(absent)
-    db.session.commit()
-
-    student.absences=Absent.query.filter_by(id_no=id_no, school_no=school_no).count()
-    db.session.commit()
-
-
-def check_if_late(school_no,api_key,id_no,name,level,section,date,group,time,timestamp):
-
-    time_now = str(now.replace(hour=get_hour(time), minute=int(time[3:5])))[11:16]
-    schedule = Schedule.query.filter_by(school_no=school_no).first()
-    if level == 'Junior Kinder':
-        educ = 'junior_kinder'
-    elif level == 'Senior Kinder':
-        educ = 'senior_kinder'
-    elif level == '1st Grade':
-        educ = 'first_grade'
-    elif level == '2nd Grade':
-        educ = 'second_grade'
-    elif level == '3rd Grade':
-        educ = 'third_grade'
-    elif level == '4th Grade':
-        educ = 'fourth_grade'
-    elif level == '5th Grade':
-        educ = 'fifth_grade'
-    elif level == '6th Grade':
-        educ = 'sixth_grade'
-    elif level == '7th Grade':
-        educ = 'seventh_grade'
-    elif level == '8th Grade':
-        educ = 'eight_grade'
-    elif level == '9th Grade':
-        educ = 'ninth_grade'
-    elif level == '10th Grade':
-        educ = 'tenth_grade'
-    elif level == '11th Grade':
-        educ = 'eleventh_grade'
-    elif level == '12th Grade':
-        educ = 'twelfth_grade'
-
-
-    query = 'schedule.%s' %educ
-
-    morning_class = eval(query+'_morning_class')
-    afternoon_class = eval(query+'_afternoon_class')
-
-    morning_start = eval(query+'_morning_start')
-    morning_end = eval(query+'_morning_end')
-    afternoon_start = eval(query+'_afternoon_start')
-    afternoon_end = eval(query+'_afternoon_end')
-
-    print 'time now: %s' % parse_date(time_now)
-    print 'afternoon start: %s' % parse_date(afternoon_start)
-    print 'afternoon end: %s' % parse_date(afternoon_end)
-    print 'afternoon class: %s' % str(afternoon_class)
-
-    # if ((parse_date(time_now) >= parse_date(morning_start) and parse_date(time_now) < parse_date(morning_end)) or \
-    #     (parse_date(time_now) >= parse_date(afternoon_start) and parse_date(time_now) < parse_date(afternoon_end))) and\
-    #     Absent.query.filter_by(school_id=school_id,id_no=id_no,date=date).first() == None:
-
-    #     record_as_late(school_id, id_no, name, level, section, 
-    #                    date, department, time)
-
-    if parse_date(time_now) >= parse_date(morning_start) and\
-        parse_date(time_now) < parse_date(morning_end) and\
-        Absent.query.filter_by(school_no=school_no,id_no=id_no,date=date,time_of_day='morning').first() == None:
-        if morning_class:
-            if str(parse_date(time_now) - parse_date(morning_start)) > '1:00:00':
-                mark_specific_absent(school_no,id_no,'morning')
-            else:
-                record_as_late(school_no, id_no, name, level, section, 
-                            date, group, time, timestamp)
-
-    elif (parse_date(time_now) >= parse_date(afternoon_start) and\
-        parse_date(time_now) < parse_date(afternoon_end)) and\
-        Absent.query.filter_by(school_no=school_no,id_no=id_no,date=date,time_of_day='afternoon').first() == None:
-        if afternoon_class:
-            if str(parse_date(time_now) - parse_date(afternoon_start)) > '1:00:00':
-                mark_specific_absent(school_no,id_no,'afternoon')
-            else:
-                record_as_late(school_no, id_no, name, level, section, 
-                            date, group, time, timestamp)
-
+def mark_afternoon_absent(school_no,api_key,level):
+    afternoon_absent.delay(school_no,api_key,level)
+    return
 
 def record_as_late(school_no, id_no, name, level, section, 
                     date, department, time, timestamp):
@@ -335,7 +177,6 @@ def record_as_late(school_no, id_no, name, level, section,
     student=K12.query.filter_by(id_no=id_no, school_no=school_no).one()
     student.lates=Late.query.filter_by(id_no=id_no, school_no=school_no).count()
     db.session.commit()
-
 
 def time_in(school_no,api_key,log_id,id_no,name,date,group,time,timestamp,level,section,logged):
 
@@ -354,11 +195,15 @@ def time_in(school_no,api_key,log_id,id_no,name,date,group,time,timestamp,level,
     db.session.add(add_this)
     db.session.commit()
     if group == 'k12':
-        if not logged:
-            print 'sending message now'
+        if logged == None:
             compose_message(add_this.id,id_no,time,'entered')
-        check_if_late(school_no,api_key,id_no,name,level,section,date,group,time,timestamp)
-
+        else:
+            add_this.time_in_notification_status = 'Exempted'
+            db.session.commit()
+        check_if_late.delay(school_no,api_key,id_no,name,level,section,date,group,time,timestamp)
+        return jsonify(status='Success',type='entry',action='entered'), 201
+    add_this.time_in_notification_status = 'Exempted'
+    db.session.commit()
     return jsonify(status='Success',type='entry',action='entered'), 201
 
 
@@ -370,10 +215,71 @@ def time_out(log_id, id_no, time, school_no, group):
     db.session.commit()
 
     if group == 'k12':
-        compose_message(log.id,id_no,time,'left')
+
+        schedule = Schedule.query.filter_by(school_no=school_no).first()
+        student = K12.query.filter_by(id_no=id_no).first()
+        level = student.level
+        if level == 'Junior Kinder':
+            educ = 'junior_kinder'
+        elif level == 'Senior Kinder':
+            educ = 'senior_kinder'
+        elif level == '1st Grade':
+            educ = 'first_grade'
+        elif level == '2nd Grade':
+            educ = 'second_grade'
+        elif level == '3rd Grade':
+            educ = 'third_grade'
+        elif level == '4th Grade':
+            educ = 'fourth_grade'
+        elif level == '5th Grade':
+            educ = 'fifth_grade'
+        elif level == '6th Grade':
+            educ = 'sixth_grade'
+        elif level == '7th Grade':
+            educ = 'seventh_grade'
+        elif level == '8th Grade':
+            educ = 'eight_grade'
+        elif level == '9th Grade':
+            educ = 'ninth_grade'
+        elif level == '10th Grade':
+            educ = 'tenth_grade'
+        elif level == '11th Grade':
+            educ = 'eleventh_grade'
+        elif level == '12th Grade':
+            educ = 'twelfth_grade'
+
+        query = 'schedule.%s' %educ
+
+        morning_class = eval(query+'_morning_class')
+        afternoon_class = eval(query+'_afternoon_class')
+
+        morning_start = eval(query+'_morning_start')
+        morning_end = eval(query+'_morning_end')
+        afternoon_start = eval(query+'_afternoon_start')
+        afternoon_end = eval(query+'_afternoon_end')
+
+        time_now = str(now.replace(hour=get_hour(time), minute=int(time[3:5])))[11:16]
+
+        if afternoon_class:
+            if parse_date(time_now) > parse_date(afternoon_start):
+                if parse_date(log.time_in) < parse_date(afternoon_end):
+                    compose_message(log.id,id_no,time,'left')
+                    return jsonify(status='Success',type='exit',action='left'), 201
+
+    log.time_out_notification_status = 'Exempted'
+    db.session.commit()
 
     return jsonify(status='Success',type='exit',action='left'), 201
 
+def get_hour(time):
+    if time[6:8] == 'PM' and time[:2] != '12':
+        hour = int(time[:2]) + 12
+        return hour
+    elif time[6:8] == 'AM' and time[:2] == '12':
+        hour = 00
+        return hour
+    hour = int(time[:2])
+    return hour
 
 def compose_message(log_id,id_no,log_time,action):
     student = get_student_data(id_no)
@@ -382,7 +288,8 @@ def compose_message(log_id,id_no,log_time,action):
               time.strftime("%B %d, %Y") +' at exactly '+\
               log_time+'.'
 
-    send_message(log_id,'log',message,student.parent_contact,action)
+    send_message.delay(log_id,'log',message,student.parent_contact,action)
+    return
             
 def prepare():
     global variable
@@ -554,6 +461,14 @@ def search_k12(*args, **kwargs):
     session['k12_search_limit']+=100
     return eval(query)
 
+def search_k12_edit(*args, **kwargs):
+    query = 'K12.query.filter(K12.school_no.ilike("'+session['school_no']+'"),'
+    for arg_name in kwargs:
+        if kwargs[arg_name]:
+            query += 'K12.' + arg_name + '.ilike("%'+kwargs[arg_name]+'%"),'
+    query += ').order_by(K12.last_name).slice(0,'+str(args[0])+')'
+    return eval(query)
+
 def search_college(*args, **kwargs):
     query = 'College.query.filter(College.school_no.ilike("'+session['school_no']+'"),'
     for arg_name in kwargs:
@@ -635,41 +550,26 @@ def str2bool(v):
 def test_job(word):
     print word
 
-def initialize_absent(school_no,api_key):
+def initialize_morning_absent(school_no,api_key):
     school = School.query.filter_by(school_no=school_no,api_key=api_key).first()
     class_schedule = Schedule.query.filter_by(school_no=school.school_no).first()
 
     time_format = '{:%H:%M}'
 
-    junior_kinder_morning_start = time_format.format(parse_date(class_schedule.junior_kinder_morning_start) + timedelta(hours=1))
-    senior_kinder_morning_start = time_format.format(parse_date(class_schedule.senior_kinder_morning_start) + timedelta(hours=1))
-    first_grade_morning_start = time_format.format(parse_date(class_schedule.first_grade_morning_start) + timedelta(hours=1))
-    second_grade_morning_start = time_format.format(parse_date(class_schedule.second_grade_morning_start) + timedelta(hours=1))
-    third_grade_morning_start = time_format.format(parse_date(class_schedule.third_grade_morning_start) + timedelta(hours=1))
-    fourth_grade_morning_start = time_format.format(parse_date(class_schedule.fourth_grade_morning_start) + timedelta(hours=1))
-    fifth_grade_morning_start = time_format.format(parse_date(class_schedule.fifth_grade_morning_start) + timedelta(hours=1))
-    sixth_grade_morning_start = time_format.format(parse_date(class_schedule.sixth_grade_morning_start) + timedelta(hours=1))
-    seventh_grade_morning_start = time_format.format(parse_date(class_schedule.seventh_grade_morning_start) + timedelta(hours=1))
-    eight_grade_morning_start = time_format.format(parse_date(class_schedule.eight_grade_morning_start) + timedelta(hours=1))
-    ninth_grade_morning_start = time_format.format(parse_date(class_schedule.ninth_grade_morning_start) + timedelta(hours=1))
-    tenth_grade_morning_start = time_format.format(parse_date(class_schedule.tenth_grade_morning_start) + timedelta(hours=1))
-    eleventh_grade_morning_start = time_format.format(parse_date(class_schedule.eleventh_grade_morning_start) + timedelta(hours=1))
-    twelfth_grade_morning_start = time_format.format(parse_date(class_schedule.twelfth_grade_morning_start) + timedelta(hours=1))
-
-    print 'Junior Kinder: %s' % junior_kinder_morning_start
-    print 'Junior Kinder: %s' % senior_kinder_morning_start
-    print 'Junior Kinder: %s' % first_grade_morning_start
-    print 'Junior Kinder: %s' % second_grade_morning_start
-    print 'Junior Kinder: %s' % third_grade_morning_start
-    print 'Junior Kinder: %s' % fourth_grade_morning_start
-    print 'Junior Kinder: %s' % fifth_grade_morning_start
-    print 'Junior Kinder: %s' % sixth_grade_morning_start
-    print 'Junior Kinder: %s' % seventh_grade_morning_start
-    print 'Junior Kinder: %s' % eight_grade_morning_start
-    print 'Junior Kinder: %s' % ninth_grade_morning_start
-    print 'Junior Kinder: %s' % tenth_grade_morning_start
-    print 'Junior Kinder: %s' % eleventh_grade_morning_start
-    print 'Junior Kinder: %s' % twelfth_grade_morning_start
+    junior_kinder_morning_start = time_format.format(parse_date(class_schedule.junior_kinder_morning_start) + timedelta(minutes=15))
+    senior_kinder_morning_start = time_format.format(parse_date(class_schedule.senior_kinder_morning_start) + timedelta(minutes=15))
+    first_grade_morning_start = time_format.format(parse_date(class_schedule.first_grade_morning_start) + timedelta(minutes=15))
+    second_grade_morning_start = time_format.format(parse_date(class_schedule.second_grade_morning_start) + timedelta(minutes=15))
+    third_grade_morning_start = time_format.format(parse_date(class_schedule.third_grade_morning_start) + timedelta(minutes=15))
+    fourth_grade_morning_start = time_format.format(parse_date(class_schedule.fourth_grade_morning_start) + timedelta(minutes=15))
+    fifth_grade_morning_start = time_format.format(parse_date(class_schedule.fifth_grade_morning_start) + timedelta(minutes=15))
+    sixth_grade_morning_start = time_format.format(parse_date(class_schedule.sixth_grade_morning_start) + timedelta(minutes=15))
+    seventh_grade_morning_start = time_format.format(parse_date(class_schedule.seventh_grade_morning_start) + timedelta(minutes=15))
+    eight_grade_morning_start = time_format.format(parse_date(class_schedule.eight_grade_morning_start) + timedelta(minutes=15))
+    ninth_grade_morning_start = time_format.format(parse_date(class_schedule.ninth_grade_morning_start) + timedelta(minutes=15))
+    tenth_grade_morning_start = time_format.format(parse_date(class_schedule.tenth_grade_morning_start) + timedelta(minutes=15))
+    eleventh_grade_morning_start = time_format.format(parse_date(class_schedule.eleventh_grade_morning_start) + timedelta(minutes=15))
+    twelfth_grade_morning_start = time_format.format(parse_date(class_schedule.twelfth_grade_morning_start) + timedelta(minutes=15))
 
     schedule.every().day.at(junior_kinder_morning_start).do(mark_morning_absent,school_no,api_key,'Junior Kinder')
     schedule.every().day.at(senior_kinder_morning_start).do(mark_morning_absent,school_no,api_key,'Senior Kinder')
@@ -691,6 +591,47 @@ def initialize_absent(school_no,api_key):
         time.sleep(1)
     return
 
+def initialize_afternoon_absent(school_no,api_key):
+    school = School.query.filter_by(school_no=school_no,api_key=api_key).first()
+    class_schedule = Schedule.query.filter_by(school_no=school.school_no).first()
+
+    time_format = '{:%H:%M}'
+
+    junior_kinder_afternoon_start = time_format.format(parse_date(class_schedule.junior_kinder_afternoon_start) + timedelta(minutes=15))
+    senior_kinder_afternoon_start = time_format.format(parse_date(class_schedule.senior_kinder_afternoon_start) + timedelta(minutes=15))
+    first_grade_afternoon_start = time_format.format(parse_date(class_schedule.first_grade_afternoon_start) + timedelta(minutes=15))
+    second_grade_afternoon_start = time_format.format(parse_date(class_schedule.second_grade_afternoon_start) + timedelta(minutes=15))
+    third_grade_afternoon_start = time_format.format(parse_date(class_schedule.third_grade_afternoon_start) + timedelta(minutes=15))
+    fourth_grade_afternoon_start = time_format.format(parse_date(class_schedule.fourth_grade_afternoon_start) + timedelta(minutes=15))
+    fifth_grade_afternoon_start = time_format.format(parse_date(class_schedule.fifth_grade_afternoon_start) + timedelta(minutes=15))
+    sixth_grade_afternoon_start = time_format.format(parse_date(class_schedule.sixth_grade_afternoon_start) + timedelta(minutes=15))
+    seventh_grade_afternoon_start = time_format.format(parse_date(class_schedule.seventh_grade_afternoon_start) + timedelta(minutes=15))
+    eight_grade_afternoon_start = time_format.format(parse_date(class_schedule.eight_grade_afternoon_start) + timedelta(minutes=15))
+    ninth_grade_afternoon_start = time_format.format(parse_date(class_schedule.ninth_grade_afternoon_start) + timedelta(minutes=15))
+    tenth_grade_afternoon_start = time_format.format(parse_date(class_schedule.tenth_grade_afternoon_start) + timedelta(minutes=15))
+    eleventh_grade_afternoon_start = time_format.format(parse_date(class_schedule.eleventh_grade_afternoon_start) + timedelta(minutes=15))
+    twelfth_grade_afternoon_start = time_format.format(parse_date(class_schedule.twelfth_grade_afternoon_start) + timedelta(minutes=15))
+
+    schedule.every().day.at(junior_kinder_afternoon_start).do(mark_afternoon_absent,school_no,api_key,'Junior Kinder')
+    schedule.every().day.at(senior_kinder_afternoon_start).do(mark_afternoon_absent,school_no,api_key,'Senior Kinder')
+    schedule.every().day.at(first_grade_afternoon_start).do(mark_afternoon_absent,school_no,api_key,'1st Grade')
+    schedule.every().day.at(second_grade_afternoon_start).do(mark_afternoon_absent,school_no,api_key,'2nd Grade')
+    schedule.every().day.at(third_grade_afternoon_start).do(mark_afternoon_absent,school_no,api_key,'3rd Grade')
+    schedule.every().day.at(fourth_grade_afternoon_start).do(mark_afternoon_absent,school_no,api_key,'4th Grade')
+    schedule.every().day.at(fifth_grade_afternoon_start).do(mark_afternoon_absent,school_no,api_key,'5th Grade')
+    schedule.every().day.at(sixth_grade_afternoon_start).do(mark_afternoon_absent,school_no,api_key,'6th Grade')
+    schedule.every().day.at(seventh_grade_afternoon_start).do(mark_afternoon_absent,school_no,api_key,'7th Grade')
+    schedule.every().day.at(eight_grade_afternoon_start).do(mark_afternoon_absent,school_no,api_key,'8th Grade')
+    schedule.every().day.at(ninth_grade_afternoon_start).do(mark_afternoon_absent,school_no,api_key,'9th Grade')
+    schedule.every().day.at(tenth_grade_afternoon_start).do(mark_afternoon_absent,school_no,api_key,'10th Grade')
+    schedule.every().day.at(eleventh_grade_afternoon_start).do(mark_afternoon_absent,school_no,api_key,'11th Grade')
+    schedule.every().day.at(twelfth_grade_afternoon_start).do(mark_afternoon_absent,school_no,api_key,'12th Grade')
+
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+    return
+
 def nocache(view):
     @wraps(view)
     def no_cache(*args, **kwargs):
@@ -704,31 +645,147 @@ def nocache(view):
     return update_wrapper(no_cache, view)
 
 def send_email(new_user,email_address,user_name,school_name,password):
-    # try:
-    s = smtplib.SMTP('smtp.gmail.com', 587)
-    myGmail = 'barcelona.jasperoliver@gmail.com'
-    myGMPasswd = 'royalpsalms11'
-    message = text(('Hi, %s!\r\n \r\nWelcome to Pisara! %s has added you as administrator for %s. '
-               'Please go to your school\'s Pisara Dashboard URL and login with your email.\r\n \r\n'
-               'Your temporary password is: %s\r\n \r\nWe strongly recommend that you change it '
-               'immediately.\r\n \r\nRegards,\r\nPisara Team')%(str(new_user),str(user_name), str(school_name), str(password)))
-    message['Subject'] = 'Welcome to Pisara'
-    message['From'] = 'Pisara'
-    message['To'] = email_address
+    try:
+        s = smtplib.SMTP('smtp.gmail.com', 587)
+        myGmail = 'barcelona.jasperoliver@gmail.com'
+        myGMPasswd = 'royalpsalms11'
+        message = text(('Hi, %s!\r\n \r\nWelcome to Pisara! %s has added you as administrator for %s. '
+                   'Please go to your school\'s Pisara Dashboard URL and login with your email.\r\n \r\n'
+                   'Your temporary password is: %s\r\n \r\nWe strongly recommend that you change it '
+                   'immediately.\r\n \r\nRegards,\r\nPisara Team')%(str(new_user),str(user_name), str(school_name), str(password)))
+        message['Subject'] = 'Welcome to Pisara'
+        message['From'] = 'Pisara'
+        message['To'] = email_address
 
-    s.starttls()
-    s.login(myGmail, myGMPasswd)
-    s.sendmail(myGmail,email_address,message.as_string())
-    s.quit()
-    return True
-    # except:
-    #     return False
+        s.starttls()
+        s.login(myGmail, myGMPasswd)
+        s.sendmail(myGmail,email_address,message.as_string())
+        s.quit()
+        return True
+    except requests.exceptions.ConnectionError as e:
+        return False
 
+
+@app.route('/test', methods=['GET', 'POST'])
+def test():
+    result = db.session.query(Log).filter(Log.timestamp >= '2017-09-03').filter(Log.timestamp <= '2017-09-03 23:59:59:999999')
+    return flask.render_template('test.html',result=result)
 
 @app.route('/sched/get', methods=['GET', 'POST'])
 def get_schedule():
     api_key = flask.request.args.get('api_key')
     return get_latest_schedule(api_key)
+
+
+@app.route('/records/fetch', methods=['GET', 'POST'])
+def fetch_records():
+    path = 'static/records/GRADE7_RECORDS.xlsx'
+    rows = 167
+    cols = 8
+
+    book = xlrd.open_workbook(path)
+ 
+    # get the first worksheet
+    sheet = book.sheet_by_index(0)
+
+    school = School.query.filter_by(school_no=session['school_no']).first()
+
+    total_students = 0
+ 
+    for row in range(rows-1):
+        vals = []
+        for col in range(cols):
+            cell = sheet.cell(row+1,col)
+            if cell.value == '':
+                vals.append(None)
+            else:
+                vals.append(cell.value)
+
+        guardian = Parent.query.filter_by(mobile_number=vals[6].strip()).first()
+        if guardian != None and guardian.mobile_number != school.contact:
+            parent_id = guardian.id
+        else:
+            guardian = Parent(
+                school_no = session['school_no'],
+                mobile_number = vals[6].strip(),
+                name = vals[5].strip().title(),
+                email = 'n/a',
+                address = vals[4].strip().title()
+                )
+            db.session.add(guardian)
+            db.session.commit()
+            parent_id = guardian.id
+
+        if vals[3] != None:
+            if vals[0]:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    id_no=str(int(vals[0])).strip().replace('.','').replace(',',''),
+                    first_name=vals[2].strip().title().replace('.','').replace(',',''),
+                    last_name=vals[1].strip().title().replace('.','').replace(',',''),
+                    middle_name=vals[3].strip().title().replace('.','').replace(',',''),
+                    level='7th Grade',
+                    group='k12',
+                    section=vals[7].strip().title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=vals[6].strip(),
+                    added_by=vals[5].strip().title().replace('.','').replace(',',''),
+                    )
+            else:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    first_name=vals[2].strip().title().replace('.','').replace(',',''),
+                    last_name=vals[1].strip().title().replace('.','').replace(',',''),
+                    middle_name=vals[3].strip().title().replace('.','').replace(',',''),
+                    level='7th Grade',
+                    group='k12',
+                    section=vals[7].strip().title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=vals[6].strip(),
+                    added_by=vals[5].strip().title().replace('.','').replace(',',''),
+                    )
+        else:
+            if vals[0]:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    id_no=str(int(vals[0])).replace('.','').replace(',',''),
+                    first_name=vals[2].title().replace('.','').replace(',',''),
+                    last_name=vals[1].title().replace('.','').replace(',',''),
+                    level='7th Grade',
+                    group='k12',
+                    section=vals[7].title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=vals[6].replace('.','').replace(',',''),
+                    added_by=vals[5].title().replace('.','').replace(',',''),
+                    )
+            else:
+                new_record = K12(
+                school_no=session['school_no'],
+                first_name=vals[2].title().replace('.','').replace(',',''),
+                last_name=vals[1].title().replace('.','').replace(',',''),
+                level='7th Grade',
+                group='k12',
+                section=vals[7].title().replace('.','').replace(',',''),
+                absences=0,
+                lates=0,
+                parent_id=parent_id,
+                parent_relation='Unknown',
+                parent_contact=vals[6].replace('.','').replace(',',''),
+                added_by=vals[5].title().replace('.','').replace(',',''),
+                )
+        db.session.add(new_record)
+        db.session.commit()
+        total_students += 1
+    return jsonify(status='success',total_students=total_students),201
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -748,6 +805,7 @@ def dashboard():
     session['topup_limit'] = 0
     session['messages_limit'] = 0
     session['accounts_limit'] = 0
+    session['reports_limit'] = 0
 
     session['logs_search_limit'] = 0
     session['fees_search_limit'] = 0
@@ -760,6 +818,7 @@ def dashboard():
     session['topup_search_limit'] = 0
     session['messages_search_limit'] = 0
     session['accounts_search_limit'] = 0
+    session['reports_search_limit'] = 0
 
     session['k12_search_status'] = False
     session['college_search_status'] = False
@@ -773,6 +832,7 @@ def dashboard():
     session['topup_search_status'] = False
     session['messages_search_status'] = False
     session['accounts_search_status'] = False
+    session['reports_search_status'] = False
 
     school = School.query.filter_by(api_key=session['api_key']).first()
     sections = Section.query.filter_by(school_no=school.school_no).order_by(Section.name).all()
@@ -908,6 +968,19 @@ def messages():
         'messages.html',
         messages=messages,
         messages_limit=session['messages_limit']
+        )
+
+
+@app.route('/reports',methods=['GET','POST'])
+@nocache
+def reports():
+    session['reports_limit']=0
+    session['reports_limit']+=100
+    reports = Report.query.order_by(Report.timestamp.desc()).slice((session['reports_limit']-100),session['reports_limit'])
+    return flask.render_template(
+        'reports.html',
+        reports=reports,
+        reports_limit=session['reports_limit']
         )
 
     
@@ -1436,6 +1509,13 @@ def change_tab():
 def add_log():
     data = flask.request.form.to_dict()
 
+    if Log.query.filter_by(date=data['date']).first() == None:
+        morning_absent_thread = threading.Thread(target=initialize_morning_absent,args=[data['school_no'],data['api_key']])
+        morning_absent_thread.start()
+
+        afternoon_absent_thread = threading.Thread(target=initialize_afternoon_absent,args=[data['school_no'],data['api_key']])
+        afternoon_absent_thread.start()
+
     if not data['api_key'] or not School.query.filter_by(school_no=data['school_no'],api_key=data['api_key']):
         return jsonify(status='500',message='Unauthorized'), 500
 
@@ -1455,21 +1535,19 @@ def blast_message():
     recipients = flask.request.form.getlist('recipients[]')
     message = flask.request.form.get('message')
 
-    msisdn = []
+    contacts = []
 
     if 'Parents' in recipients:
-        for user in db.session.query(K12.parent_contact).distinct():
-            msisdn.append(user)
+        for msisdn in db.session.query(K12.parent_contact).distinct():
+            contacts.append(msisdn)
 
     if 'College' in recipients:
-        for user in db.session.query(College.mobile).distinct():
-            msisdn.append(user)
+        for msisdn in db.session.query(College.mobile).distinct():
+            contacts.append(msisdn)
 
     if 'Staff' in recipients:
-        for user in db.session.query(Staff.mobile).distinct():
-            msisdn.append(user)
-
-    # ADD SMS CODE HERE
+        for msisdn in db.session.query(Staff.mobile).distinct():
+            contacts.append(msisdn)
 
     new_message = Message(
         school_no = session['school_no'],
@@ -1479,15 +1557,18 @@ def blast_message():
         date = datetime.datetime.now().strftime('%B %d, %Y'),
         time = time.strftime("%I:%M %p"),
         content = message,
+        batch_size = len(contacts),
         timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
         )
 
     db.session.add(new_message)
     db.session.commit()
 
+    blast_sms.delay(new_message.id,contacts,new_message.date,new_message.time,message)
+
     session['messages_limit'] = 0
     session['messages_search_limit'] = 0
-
+    contacts = []
     return fetch_next('messages')
 
 
@@ -1542,13 +1623,12 @@ def receive_records():
 @app.route('/guardians/info',methods=['GET','POST'])
 def get_guardian_info():
     mobile_number = flask.request.form.get('mobile_number')
+    school = School.query.filter_by(school_no=session['school_no']).first()
     guardian = Parent.query.filter_by(mobile_number=mobile_number).first()
-    if guardian or guardian != None:
+    if guardian != None and guardian.mobile_number != school.contact:
         return jsonify(
             status='success',
-            last_name=guardian.last_name,
-            first_name=guardian.first_name,
-            middle_name=guardian.middle_name,
+            name=guardian.name,
             email=guardian.email,
             address=guardian.address,
             ),200
@@ -1561,32 +1641,29 @@ def get_guardian_info():
 @app.route('/user/new',methods=['GET','POST'])
 def add_user():
     student_data = flask.request.form.to_dict()
+    school = School.query.filter_by(school_no=session['school_no']).first()
     if student_data['department'] == 'k12':
         guardian = Parent.query.filter_by(mobile_number=student_data['guardian_mobile']).first()
-        if guardian or guardian != None:
+        if guardian != None and guardian.mobile_number != school.contact:
             parent_id = guardian.id
         else:
-            new_guardian = Parent(
+            guardian = Parent(
                 school_no = session['school_no'],
                 mobile_number = student_data['guardian_mobile'],
-                last_name = student_data['guardian_last_name'].title(),
-                first_name = student_data['guardian_first_name'].title(),
-                middle_name = student_data['guardian_middle_name'].title(),
+                name = student_data['guardian_name'].title(),
                 email = student_data['guardian_email'],
                 address = student_data['guardian_address'].title()
                 )
-            db.session.add(new_guardian)
+            db.session.add(guardian)
             db.session.commit()
-
-        guardian = Parent.query.filter_by(mobile_number=student_data['guardian_mobile']).first()
-        parent_id = guardian.id
+            parent_id = guardian.id
 
         user = K12(
             school_no = session['school_no'],
             id_no = student_data['id_no'],
             first_name = student_data['first_name'].title(),
-            last_name = student_data['last_name'].title(),
             middle_name = student_data['middle_name'].title(),
+            last_name = student_data['last_name'].title(),
             level = student_data['level'],
             section = student_data['section'].title(),
             group = 'k12',
@@ -1688,24 +1765,22 @@ def edit_user():
     user.level = data['level']
     user.section = data['section']
     user.id_no = data['id_no']
+    user.parent_contact = data['guardian_mobile']
 
     db.session.commit()
 
     parent = Parent.query.filter_by(mobile_number=data['guardian_mobile']).first()
     if parent or parent != None:
-        parent.first_name = data['guardian_first_name']
-        parent.last_name = data['guardian_last_name']
-        parent.middle_name = data['guardian_middle_name']
+        parent.name = data['guardian_name']
         parent.email = data['guardian_email']
         parent.address = data['guardian_address']
         user.parent_id = parent.id
 
     else:
         new_parent = Parent(
+            school_no = session['school_no'],
             mobile_number = data['guardian_mobile'],
-            first_name = data['guardian_first_name'],
-            last_name = data['guardian_first_name'],
-            middle_name = data['guardian_first_name'],
+            name = data['guardian_name'],
             email = data['guardian_email'],
             address = data['guardian_address']
             )
@@ -1719,17 +1794,15 @@ def edit_user():
     db.session.commit()
 
     session['k12_limit'] = 0
-    
-    session['k12_search_limit'] = 0
 
     if session['k12_search_status']:
-        result = search_k12(session['k12_search_limit'],last_name=session['attendance_data']['last_name'], first_name=session['attendance_data']['first_name'],
+        result = search_k12_edit(session['k12_search_limit'],last_name=session['attendance_data']['last_name'], first_name=session['attendance_data']['first_name'],
                 middle_name=session['attendance_data']['middle_name'], id_no=session['attendance_data']['id_no'], level=session['attendance_data']['level'], section=session['attendance_data']['section'])
         return flask.render_template(
         session['attendance_data']['needed']+'.html',
         data=result,
         view=session['department'],
-        limit=session['k12_search_limit']-100
+        limit=session['k12_search_limit'] - (session['k12_search_limit'])
         )
 
     return fetch_next('k12')
@@ -1810,7 +1883,7 @@ def search_student_logs():
     if session['logs_data']['reset'] == 'yes':
         session['logs_search_limit']=0
     
-    limit = session['logs_search_limit']
+    limit = session['logs_search_limit']+100
 
     result = search_logs(session['logs_search_limit'],date=session['logs_data']['date'], id_no=session['logs_data']['id_no'],
                        name=session['logs_data']['name'], group=session['logs_data']['department'])
@@ -1828,7 +1901,7 @@ def search_school_transactions():
     session['transactions_search_status'] = True
 
     if session['transactions_data']['reset'] == 'yes':
-        session['transactions_search_limit']=0
+        session['transactions_search_limit']=100
     
     limit = session['transactions_search_limit']
 
@@ -1848,7 +1921,7 @@ def search_school_sales():
     session['sales_search_status'] = True
 
     if session['sales_data']['reset'] == 'yes':
-        session['sales_search_limit']=0
+        session['sales_search_limit']=100
     
     limit = session['sales_search_limit']
 
@@ -1867,7 +1940,7 @@ def search_student_fees():
     session['fees_search_status'] = True
 
     if session['fees_data']['reset'] == 'yes':
-        session['fees_search_limit'] = 0
+        session['fees_search_limit'] = 100
     
     limit = session['fees_search_limit']
 
@@ -1887,7 +1960,7 @@ def search_students_k12():
     session['k12_search_status'] = True
 
     if session['attendance_data']['reset'] == 'yes':
-        session['k12_search_limit'] = 0
+        session['k12_search_limit'] = 100
     
     limit = session['k12_search_limit']
 
@@ -1898,7 +1971,7 @@ def search_students_k12():
     return flask.render_template(
         session['attendance_data']['needed']+'.html',
         data=result,
-        limit=limit
+        limit=limit-100
         )
 
 
@@ -1908,7 +1981,7 @@ def search_students_college():
     session['college_search_status'] = True
 
     if session['college_data']['reset'] == 'yes':
-        session['college_search_limit'] = 0
+        session['college_search_limit'] = 100
     
     limit = session['college_search_limit']
 
@@ -1929,7 +2002,7 @@ def search_user_staff():
     session['staff_search_status'] = True
 
     if session['staff_data']['reset'] == 'yes':
-        session['staff_search_limit'] = 0
+        session['staff_search_limit'] = 100
     
     limit = session['staff_search_limit']
 
@@ -1944,7 +2017,6 @@ def search_user_staff():
         )
 
 
-
 @app.route('/search/absent',methods=['GET','POST'])
 def search_student_absent():
     data = flask.request.form.to_dict()
@@ -1952,7 +2024,7 @@ def search_student_absent():
     if data['reset'] == 'yes':
         session['absent_search_limit']=100
     
-    limit = session['absent_search_limit']-100
+    limit = session['absent_search_limit']
     
     result = search_absent(session['absent_search_limit'], date=data['date'], id_no=data['id_no'],
                        name=data['name'], level=data['level'],
@@ -1973,7 +2045,7 @@ def search_student_late():
     if data['reset'] == 'yes':
         session['late_search_limit']=100
     
-    limit = session['late_search_limit']-100
+    limit = session['late_search_limit']
     
     result = search_late(session['late_search_limit'], date=data['date'], id_no=data['id_no'],
                        name=data['name'], level=data['level'],
@@ -2084,6 +2156,54 @@ def populate_calendar():
 
     except requests.exceptions.ConnectionError as e:
         return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], month_name=calendar.month_name[session['month']], today=day) #return diff template??
+
+
+@app.route('/report/generate',methods=['GET','POST'])
+def test_print():
+    data = flask.request.form.to_dict()
+
+    if Report.query.filter_by(name=data['name'],status='pending').first() != None or \
+       Report.query.filter_by(name=data['name'],status='success').first() != None:
+        return jsonify(status='failed',message='Report name already exists.')
+
+    if data['report_type'] == 'Absent' or data['report_type'] == 'Log':
+        report = Report(
+        school_no = session['school_no'],
+        name = data['name'],
+        report_type = data['report_type'],
+        from_date = data['from_date'],
+        to_date = data['to_date'],
+        staff_name = session['user_name'],
+        staff_id = session['user_id'],
+        date = datetime.datetime.now().strftime('%B %d, %Y'),
+        time = time.strftime("%I:%M %p"),
+        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+        )
+
+        result = eval('db.session.query(%s).filter(%s.timestamp >= "%s")\
+            .filter(%s.timestamp <= "%s 23:59:59:999999")'\
+            % (data['report_type'], data['report_type'], datetime.datetime\
+            .strptime(data['from_date'], '%B %d, %Y').strftime('%Y-%m-%d'),\
+            data['report_type'], datetime.datetime.strptime(data['to_date'],\
+            '%B %d, %Y').strftime('%Y-%m-%d')))
+
+
+    db.session.add(report)
+    db.session.commit()
+
+    try:
+        create_pdf.delay(flask.render_template('print_attendance.html',\
+            result=result,report_type=data['report_type'],from_date=data['from_date'],to_date=data['to_date'],staff_name=session['user_name'],date=report.date,time=report.time),data['name'],report.id)
+        reports = Report.query.order_by(Report.timestamp.desc()).slice((session['reports_limit']-100),session['reports_limit'])
+        return jsonify(
+            status='success',
+            template=flask.render_template('reports_result.html',data=reports)
+            ),201
+
+    except requests.exceptions.ConnectionError as e:
+        report.status = 'failed'
+        db.session.commit()
+        return jsonify(status='failed',message='Could not generate report. Please Contact support.'),201
 
 
 @app.route('/calendar/date/go',methods=['GET','POST'])
@@ -2246,11 +2366,11 @@ def sync_schedule():
     schedule.twelfth_grade_afternoon_start = data['twelfth_grade_afternoon_start']
     schedule.twelfth_grade_afternoon_end = data['twelfth_grade_afternoon_end']
 
+
     db.session.commit()
 
     # INITIALIZE PYSCHEDULER HERE
-    absent_thread = threading.Thread(target=initialize_absent,args=[data['school_no'],data['api_key']])
-    absent_thread.start()
+    initialize_absent(data['school_no'],data['api_key'])
     return '',201
 
 
@@ -2440,16 +2560,14 @@ def rebuild_database():
         section = 'St. Jerome',
         parent_id = 1,
         parent_relation = 'mother',
-        parent_contact = '09183339068',
+        parent_contact = '09159484200',
         added_by = 'Jasper Barcelona'
         )
 
     parent = Parent(
         school_no = 'sgb-lc2017',
-        mobile_number = '09183339068',
-        first_name = 'Flora',
-        last_name = 'Barcelona',
-        middle_name = 'Estrada',
+        mobile_number = '09159484200',
+        name = 'Flora Estrada Barcelona',
         email = 'barcelona.jasperoliver@gmail.com',
         address = 'Lucena City'
         )
@@ -2489,39 +2607,39 @@ def rebuild_database():
         address="Barcelona Compound, Brgy Isabang",
         city="Lucena",
         email="sgb@gmail.com",
-        contact="555-4079"
+        contact="(042) 316-5471"
         )
 
     schedule = Schedule(
         school_no='sgb-lc2017',
-        junior_kinder_morning_class=False,
-        junior_kinder_afternoon_class=False,
-        senior_kinder_morning_class=False,
-        senior_kinder_afternoon_class=False,
-        first_grade_morning_class=False,
-        first_grade_afternoon_class=False,
-        second_grade_morning_class=False,
-        second_grade_afternoon_class=False,
-        third_grade_morning_class=False,
-        third_grade_afternoon_class=False,
-        fourth_grade_morning_class=False,
-        fourth_grade_afternoon_class=False,
-        fifth_grade_morning_class=False,
-        fifth_grade_afternoon_class=False,
-        sixth_grade_morning_class=False,
-        sixth_grade_afternoon_class=False,
-        seventh_grade_morning_class=False,
-        seventh_grade_afternoon_class=False,
-        eight_grade_morning_class=False,
-        eight_grade_afternoon_class=False,
-        ninth_grade_morning_class=False,
-        ninth_grade_afternoon_class=False,
-        tenth_grade_morning_class=False,
-        tenth_grade_afternoon_class=False,
-        eleventh_grade_morning_class=False,
-        eleventh_grade_afternoon_class=False,
-        twelfth_grade_morning_class=False,
-        twelfth_grade_afternoon_class=False,
+        junior_kinder_morning_class=True,
+        junior_kinder_afternoon_class=True,
+        senior_kinder_morning_class=True,
+        senior_kinder_afternoon_class=True,
+        first_grade_morning_class=True,
+        first_grade_afternoon_class=True,
+        second_grade_morning_class=True,
+        second_grade_afternoon_class=True,
+        third_grade_morning_class=True,
+        third_grade_afternoon_class=True,
+        fourth_grade_morning_class=True,
+        fourth_grade_afternoon_class=True,
+        fifth_grade_morning_class=True,
+        fifth_grade_afternoon_class=True,
+        sixth_grade_morning_class=True,
+        sixth_grade_afternoon_class=True,
+        seventh_grade_morning_class=True,
+        seventh_grade_afternoon_class=True,
+        eight_grade_morning_class=True,
+        eight_grade_afternoon_class=True,
+        ninth_grade_morning_class=True,
+        ninth_grade_afternoon_class=True,
+        tenth_grade_morning_class=True,
+        tenth_grade_afternoon_class=True,
+        eleventh_grade_morning_class=True,
+        eleventh_grade_afternoon_class=True,
+        twelfth_grade_morning_class=True,
+        twelfth_grade_afternoon_class=True,
 
         junior_kinder_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
         junior_kinder_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
@@ -2531,9 +2649,9 @@ def rebuild_database():
         senior_kinder_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
         senior_kinder_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
         senior_kinder_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        first_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        first_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        first_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
+        first_grade_morning_start=str(now.replace(hour=5, minute=55, second=0))[11:16],
+        first_grade_morning_end=str(now.replace(hour=6, minute=12, second=0))[11:16],
+        first_grade_afternoon_start=str(now.replace(hour=6, minute=28, second=0))[11:16],
         first_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
         second_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
         second_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],

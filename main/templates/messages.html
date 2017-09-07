@@ -40,7 +40,8 @@
 						<th class="short">Time</th>
 						<th class="short">Sender</th>
 						<th class="short">Recipient</th>
-						<th class="long">Message</th>	
+						<th class="long">Message</th>
+						<th class="short">Sent</th>
 					</tr>
 					<tr id="messages-search-panel" class="search-panel">
 						<td class="xs"></td>	
@@ -66,7 +67,8 @@
 			            <td class="short">{{message.time}}</td>   
 			            <td class="short">{{message.sender_name}}</td>  
 			            <td class="short">{{message.recipient}}</td>             
-			            <td class="long padded-right message-content-td">{{message.content}}</td>                                  
+			            <td class="long message-content-td">{{message.content}}</td>                                  
+			            <td class="short padded-right message-content-td">{{message.done}} / {{message.batch_size}}</td>                                  
 			        </tr>
 			        {% endfor %}
 					{% else %}

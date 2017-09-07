@@ -144,22 +144,22 @@ def sync_schedule():
     for school in schools:
         irregular_class = Irregular.query.filter_by(school_no=school.school_no,date=time.strftime("%B %d, %Y")).first()
 
-        try:
-            if irregular_class:
-                r = requests.post(
-                    SYNC_URL,
-                    get_schedule('irregular',school.school_no)           
-                )
-                print 'synced irregular'
-            else:
-                r = requests.post(
-                    SYNC_URL,
-                    get_schedule('regular',school.school_no)           
-                )
-                print 'synced regular'
+        # try:
+        if irregular_class:
+            r = requests.post(
+                SYNC_URL,
+                get_schedule('irregular',school.school_no)           
+            )
+            print 'synced irregular'
+        else:
+            r = requests.post(
+                SYNC_URL,
+                get_schedule('regular',school.school_no)           
+            )
+            print 'synced regular'
 
-        except requests.exceptions.ConnectionError as e:
-            print 'Failed'
+        # except requests.exceptions.ConnectionError as e:
+        #     print 'Failed'
     return
 
 def save_irregular_schedule(api_key,month,day,year,schedule):
@@ -692,7 +692,7 @@ def rebuild_database():
     db.create_all()
 
     irreg2 = Irregular(
-        school_no='123456789',
+        school_no='sgb-lc2017',
         date=time.strftime("%B %d, %Y"),
         day=5,
         month=1,
@@ -786,7 +786,7 @@ def rebuild_database():
         )
 
     sched2 = Regular(
-        school_no='123456789',
+        school_no='sgb-lc2017',
         day='Monday',
         junior_kinder_morning_class=True,
         junior_kinder_afternoon_class=True,
@@ -877,7 +877,7 @@ def rebuild_database():
         )
 
     sched3 = Regular(
-        school_no='123456789',
+        school_no='sgb-lc2017',
         day='Tuesday',
         junior_kinder_morning_class=True,
         junior_kinder_afternoon_class=True,
@@ -968,7 +968,7 @@ def rebuild_database():
         )
 
     sched4 = Regular(
-        school_no='123456789',
+        school_no='sgb-lc2017',
         day='Wednesday',
         junior_kinder_morning_class=True,
         junior_kinder_afternoon_class=True,
@@ -1059,7 +1059,7 @@ def rebuild_database():
         )
 
     sched5 = Regular(
-        school_no='123456789',
+        school_no='sgb-lc2017',
         day='Thursday',
         junior_kinder_morning_class=True,
         junior_kinder_afternoon_class=True,
@@ -1150,7 +1150,7 @@ def rebuild_database():
         )
 
     sched6 = Regular(
-        school_no='123456789',
+        school_no='sgb-lc2017',
         day='Friday',
         junior_kinder_morning_class=True,
         junior_kinder_afternoon_class=True,
@@ -1241,7 +1241,7 @@ def rebuild_database():
         )
 
     school2 = School(
-        school_no='123456789',
+        school_no='sgb-lc2017',
         api_key='ecc67d28db284a2fb351d58fe18965f9',
         name='Sacred Heart College'
         )

@@ -18,7 +18,8 @@ services:
       POSTGRES_PASSWORD: sgbsaints
       POSTGRES_DB: sgb
     volumes:
-      - ./main/data:/var/lib/postgresql/data
+      - /var/lib/postgresql/data
+      # - ./main/data:/var/lib/postgresql/data
 
   main:
     restart: always
@@ -42,8 +43,6 @@ services:
     ports:
       - "5000:5000"
     command: /usr/local/bin/gunicorn -w 2 -b :5000 clock:app
-    links:
-      - main
     depends_on:
       - main
 

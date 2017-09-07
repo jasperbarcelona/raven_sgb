@@ -1,0 +1,88 @@
+<html>
+	<head>
+		<style type="text/css">
+			html, body {
+			    width: 210mm;
+			    height: 297mm;
+			    text-align: center;
+			    padding: 0;
+			    margin: 0;
+			    font-family: Helvetica;
+		 	}
+
+		 	.table {
+		 		width: 100%;
+		 		border: 1px solid #ddd;
+		 	}
+
+		 	th {
+		 		font-size: 20px;
+		 	}
+
+		 	.head-row {
+		 		padding-top: 5px;
+		 		padding-bottom: 3px;
+		 	}
+
+		 	.bottom-row {
+		 		padding-top: 5px;
+		 		padding-bottom: 3px;
+		 	}
+		</style>
+	</head>
+	<body>
+		<h1>Leon Guinto Memorial College</h1>
+		<span><strong>{{report_type}} Records</strong> for <strong>{{from_date}} to {{to_date}}</strong></span><br /><br />
+		<span>Prepared by <strong>{{staff_name}}</strong></span><br />
+		<span>on {{date}} at {{time}}</span><br /><br /><br />
+		<table class="table">
+			{% if report_type == 'Absent' %}
+			<thead>
+				<tr class="head-row">
+					<td width="100px"><strong>No.</strong></td>
+					<td><strong>Name</strong></td>
+					<td><strong>Grade/Level</strong></td>
+					<td><strong>Section</strong></td>
+					<td><strong>ID Number</strong></td>
+				</tr>
+			</thead>
+			<tbody>
+				{% for item in result %}
+				<tr class="bottom-row">
+					<td width="100px">{{ loop.index }}</td>
+					<td>{{ item.name }}</td>
+					<td>{{ item.level }}</td>
+					<td>{{ item.section }}</td>
+					<td>{{ item.id_no }}</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+			{% elif report_type == 'Log' %}
+			<thead>
+				<tr class="head-row">
+					<td width="100px"><strong>No.</strong></td>
+					<td><strong>Name</strong></td>
+					<td><strong>Department</strong></td>
+					<td><strong>ID Number</strong></td>
+					<td><strong>Time In</strong></td>
+					<td><strong>Time Out</strong></td>
+				</tr>
+			</thead>
+			<tbody>
+				{% for item in result %}
+				<tr class="bottom-row">
+					<td width="100px">{{ loop.index }}</td>
+					<td>{{ item.name }}</td>
+					<td>{{ item.group }}</td>
+					<td>{{ item.id_no }}</td>
+					<td>{{ item.time_in }}</td>
+					<td>{{ item.time_out }}</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+			{% endif %}
+		</table>
+		<br /><br /><br />
+		<span>-- END OF REPORT --</span>
+	</body>
+</html>

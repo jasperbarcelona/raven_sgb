@@ -41,6 +41,20 @@ class School(db.Model, Serializer):
     email = db.Column(db.String(60))
     contact = db.Column(db.String(15))
 
+class Report(db.Model, Serializer):
+    id = db.Column(db.Integer,primary_key=True)
+    school_no = db.Column(db.String(32))
+    name = db.Column(db.String(60))
+    report_type = db.Column(db.String(60))
+    from_date = db.Column(db.String(30))
+    to_date = db.Column(db.String(30))
+    staff_name = db.Column(db.String(60))
+    staff_id = db.Column(db.Integer())
+    date = db.Column(db.String(50))
+    time = db.Column(db.String(30))
+    status = db.Column(db.String(30),default='pending')
+    timestamp = db.Column(db.String(50))
+
 class AdminUser(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     school_no = db.Column(db.String(32))
@@ -214,11 +228,25 @@ class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     school_no = db.Column(db.String(32))
     sender_id = db.Column(db.Integer())
+    batch_size = db.Column(db.Integer())
+    done = db.Column(db.Integer(),default=0)
+    pending = db.Column(db.Integer(),default=0)
+    failed = db.Column(db.Integer(),default=0)
     sender_name = db.Column(db.String(60))
-    recipient = db.Column(db.Text)
+    recipient = db.Column(db.Text())
     date = db.Column(db.String(20))
     time = db.Column(db.String(10))
     content = db.Column(db.Text)
+    timestamp = db.Column(db.String(50))
+
+class MessageStatus(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    message_id = db.Column(db.Integer())
+    date = db.Column(db.String(20))
+    time = db.Column(db.String(10))
+    recipient_name = db.Column(db.String(100))
+    msisdn = db.Column(db.String(30))
+    status = db.Column(db.String(30),default='pending')
     timestamp = db.Column(db.String(50))
 
 class Topup(db.Model):
@@ -243,10 +271,10 @@ class Log(db.Model, Serializer):
     group = db.Column(db.String(30))
     time_in = db.Column(db.String(10))
     time_in_id = db.Column(db.Integer)
-    time_in_notification_status = db.Column(db.String(10), unique=False)
+    time_in_notification_status = db.Column(db.String(60), unique=False)
     time_out = db.Column(db.String(10),default=None)
     time_out_id = db.Column(db.Integer)
-    time_out_notification_status = db.Column(db.String(10), unique=False)
+    time_out_notification_status = db.Column(db.String(60), unique=False)
     timestamp = db.Column(db.String(50))
 
 class K12(db.Model, Serializer):
@@ -266,7 +294,8 @@ class K12(db.Model, Serializer):
     lates = db.Column(db.String(3))
     parent_id = db.Column(db.Integer)
     parent_relation = db.Column(db.String(30))
-    parent_contact = db.Column(db.String(12))
+    parent_contact = db.Column(db.String(30))
+    image = db.Column(db.Text())
     added_by = db.Column(db.String(60))
 
 class College(db.Model, Serializer):
@@ -283,6 +312,7 @@ class College(db.Model, Serializer):
     group = db.Column(db.String(30))
     email = db.Column(db.String(30))
     mobile = db.Column(db.String(12))
+    image = db.Column(db.Text())
     added_by = db.Column(db.String(60))
 
 class Staff(db.Model, Serializer):
@@ -298,15 +328,14 @@ class Staff(db.Model, Serializer):
     group = db.Column(db.String(30))
     email = db.Column(db.String(30))
     mobile = db.Column(db.String(12))
+    image = db.Column(db.Text())
     added_by = db.Column(db.String(60))
 
 class Parent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     school_no = db.Column(db.String(32))
-    mobile_number = db.Column(db.String(12))
-    first_name = db.Column(db.String(30))
-    last_name = db.Column(db.String(30))
-    middle_name = db.Column(db.String(30))
+    mobile_number = db.Column(db.String(30))
+    name = db.Column(db.String(100))
     email = db.Column(db.String(60))
     address = db.Column(db.Text())
 
@@ -332,6 +361,7 @@ class Absent(db.Model):
     section = db.Column(db.String(30))
     department = db.Column(db.String(30))
     time_of_day = db.Column(db.String(20))
+    notification_status = db.Column(db.String(60), unique=False)
     timestamp = db.Column(db.String(50))
 
 class Fee(db.Model):

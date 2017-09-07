@@ -3,8 +3,9 @@
     <td class="xs">{{loop.index}}</td> 
     <td class="short">{{message.date}}</td>
     <td class="short">{{message.time}}</td>   
-    <td class="short">{{message.sender_name}}</td>   
+    <td class="short">{{message.sender_name}}</td>  
     <td class="short">{{message.recipient}}</td>             
-    <td class="long padded-right message-content-td">{{message.content}}</td>                                  
+    <td class="long message-content-td">{{message.content}}</td>                                  
+    <td class="short padded-right message-content-td">{{message.done}} / {{message.batch_size}}</td>                                     
 </tr>
 {% endfor %}

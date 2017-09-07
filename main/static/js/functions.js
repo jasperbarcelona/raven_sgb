@@ -69,6 +69,38 @@ function remove_fee(fee_id){
   }
 }
 
+function generate_report() {
+  $('#generateReportBtn').button('loading');
+  report_type = $('#reportType').val();
+  report_name = $('#reportName').val();
+  report_from = $('#reportFromDate').val();
+  report_to = $('#reportToDate').val();
+
+  $.post('/report/generate',{
+    report_type:report_type,
+    name:report_name,
+    from_date:report_from,
+    to_date:report_to
+  },
+  function(data){
+    if (data['status'] == 'success') {
+      $('#generateReportBtn').button('complete');
+      $('#reports').html(data['template']);
+      $('#printModal .form-control').val('');
+      $('#printError').hide();
+      setTimeout(function(){ 
+          $('#generateReportBtn').attr('disabled',true);
+      }, 0); 
+      $('#printModal').modal('hide');
+    }
+    else {
+      $('#generateReportBtn').button('complete');
+      $('#printError').html(data['message']);
+      $('#printError').show();
+    }
+  });
+}
+
 function show_students(){
   $('.menu-container').fadeOut();
   tab = 'k12';
@@ -102,6 +134,16 @@ function show_accounts(){
 function show_messages(){
   tab = 'messages';
   $.post('/messages',
+  function(data){
+    $('.content').html(data);
+    $('.menu-container').fadeOut();
+    $('.content').fadeIn();
+  });
+}
+
+function show_reports(){
+  tab = 'reports';
+  $.post('/reports',
   function(data){
     $('.content').html(data);
     $('.menu-container').fadeOut();
@@ -656,6 +698,36 @@ function search_k12(){
   });
 }
 
+function k12_next_search(){
+  var last_name = $('#attendance_search_last_name').val();
+  var first_name = $('#attendance_search_first_name').val();
+  var middle_name = $('#attendance_search_middle_name').val();
+  var id_no = $('#attendance_search_id_no').val();
+  var level = $('#attendance_search_level').val();
+  var section = $('#attendance_search_section').val();
+  var contact = $('#attendance_search_contact').val();
+  var absences = $('#attendance_search_absences').val();
+  var lates = $('#attendance_search_lates').val();
+  var reset = 'no';
+
+  $.post('/search/k12',{
+      needed:tab,
+      last_name:last_name,
+      first_name:first_name,
+      middle_name:middle_name,
+      id_no:id_no,
+      level:level,
+      section:section,
+      contact:contact,    
+      absences:absences,
+      lates:lates,
+      reset:reset
+  },
+  function(data){
+      $('#'+tab).append(data);
+  });
+}
+
 function search_college(){
   show_search_load();
   var last_name = $('#college_search_last_name').val();
@@ -765,9 +837,7 @@ function fill_guardian_data(mobile_number){
   },
   function(data){
     if (data['status'] == 'success'){
-      $('#add_guardian_last_name').val(data['last_name']);
-      $('#add_guardian_first_name').val(data['first_name']);
-      $('#add_guardian_middle_name').val(data['middle_name']);
+      $('#add_guardian_name').val(data['name']);
       $('#add_guardian_email').val(data['email']);
       $('#add_guardian_address').val(data['address']);
       $('#add_guardian_relation').val('');
@@ -785,9 +855,7 @@ function fill_guardian_data_edit(mobile_number){
   },
   function(data){
     if (data['status'] == 'success'){
-      $('#edit_guardian_last_name').val(data['last_name']);
-      $('#edit_guardian_first_name').val(data['first_name']);
-      $('#edit_guardian_middle_name').val(data['middle_name']);
+      $('#edit_guardian_name').val(data['name']);
       $('#edit_guardian_email').val(data['email']);
       $('#edit_guardian_address').val(data['address']);
       $('#edit_guardian_relation').val('');
@@ -1423,7 +1491,7 @@ function save_calendar_sched(){
     });
 }
 
-function save_k12(last_name, first_name, middle_name, level, section, id_no, guardian_mobile, guardian_last_name, guardian_first_name, guardian_middle_name, guardian_email, guardian_address, guardian_relation){
+function save_k12(last_name, first_name, middle_name, level, section, id_no, guardian_mobile, guardian_name, guardian_email, guardian_address, guardian_relation){
   department = 'k12';
   $.post('/user/new',{
       last_name:last_name,
@@ -1434,9 +1502,7 @@ function save_k12(last_name, first_name, middle_name, level, section, id_no, gua
       id_no:id_no,
       department:department,
       guardian_mobile:guardian_mobile,
-      guardian_last_name:guardian_last_name,
-      guardian_first_name:guardian_first_name,
-      guardian_middle_name:guardian_middle_name,
+      guardian_name:guardian_name,
       guardian_email:guardian_email,
       guardian_address:guardian_address,
       guardian_relation:guardian_relation
@@ -1595,10 +1661,12 @@ function back_home(){
     function(data){
     $('#'+tab).html(data);
     $('#table-loading').hide();
+    isPreviousEventComplete = true;
+    $('tbody').data('activated', false)
     });
 }
 
-function edit_student(last_name, first_name, middle_name, level, section, id_no, user_id, guardian_first_name , guardian_last_name, guardian_middle_name, guardian_address, guardian_mobile, guardian_email, guardian_relation){
+function edit_student(last_name, first_name, middle_name, level, section, id_no, user_id, guardian_name, guardian_address, guardian_mobile, guardian_email, guardian_relation){
     $.post('/student/edit',{
         last_name:last_name,
         first_name:first_name,
@@ -1607,9 +1675,7 @@ function edit_student(last_name, first_name, middle_name, level, section, id_no,
         section:section,
         id_no:id_no,
         user_id:user_id,
-        guardian_first_name:guardian_first_name,
-        guardian_last_name:guardian_last_name,
-        guardian_middle_name:guardian_middle_name,
+        guardian_name:guardian_name,
         guardian_address:guardian_address,
         guardian_mobile:guardian_mobile,
         guardian_email:guardian_email,

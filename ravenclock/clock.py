@@ -27,6 +27,7 @@ import uuid
 import os
 
 app = flask.Flask(__name__)
+app.config.from_pyfile('config.py')
 app.secret_key = '234234rfascasascqweqscasefsdvqwefe2323234dvsv'
 
 class IngAdmin(sqla.ModelView):
@@ -38,10 +39,10 @@ admin.add_view(IngAdmin(helper.Irregular, helper.db.session))
 admin.add_view(IngAdmin(helper.School, helper.db.session))
 
 
-# @app.route('/schedule/sync',methods=['GET','POST'])
-# def initialize_timer():
-#     helper.sync_schedule()
-#     return jsonify(status='success'),200
+@app.route('/schedule/sync',methods=['GET','POST'])
+def initialize_timer():
+    helper.sync_schedule()
+    return jsonify(status='success'),200
 
 
 @app.route('/schedule/regular/update',methods=['GET','POST'])

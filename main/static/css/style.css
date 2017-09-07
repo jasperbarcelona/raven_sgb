@@ -61,7 +61,7 @@ textarea{
 }
 
 select:required:invalid {
-  color: #999;
+  color: #999 !important;
 }
 option[value=""][disabled] {
   display: none;
@@ -317,7 +317,8 @@ a, a:hover, a:active, a:focus{
 }
 
 .add-user-modal-body .add-user-section div .form-control, .edit-user-modal-body .add-user-section div .form-control,
-.add-staff-modal-body .add-user-section div .form-control, .edit-staff-modal-body .add-user-section div .form-control{
+.add-staff-modal-body .add-user-section div .form-control, .edit-staff-modal-body .add-user-section div .form-control,
+#printModal .form-control {
 	outline: none !important;
 	height: 45px !important;
 	margin-bottom: 15px;
@@ -327,6 +328,11 @@ a, a:hover, a:active, a:focus{
 	border-bottom: 1px solid #999 !important;
 	box-shadow: none !important;
 	font-size: 15px;
+}
+
+.add-user-modal-body .add-user-section div .form-control, .edit-user-modal-body .add-user-section div .form-control,
+.add-staff-modal-body .add-user-section div .form-control, .edit-staff-modal-body .add-user-section div .form-control,
+#printModal .form-control:not(#reportName) {
 	text-transform: capitalize;
 }
 
@@ -465,6 +471,20 @@ a, a:hover, a:active, a:focus{
 #user-id-error,
 #staff-id-error{
 	color: red;
+}
+
+#printError {
+	width: 100%;
+	text-align: center;
+	display: none;
+}
+
+.download-report-btn,
+.download-report-btn:focus,
+.download-report-btn:active,
+.download-report-btn:hover {
+	text-decoration: underline !important;
+	color: blue !important;
 }
 
 .error {
@@ -992,7 +1012,7 @@ a, a:hover, a:active, a:focus{
 .sched-label{
 	font-weight: bold;
 	font-size: 16px;
-	color: #3B75D7;
+	color: #6C1C2D;
 }
 
 .schedule-text{
@@ -1184,8 +1204,16 @@ a, a:hover, a:active, a:focus{
 	outline: none;
 }
 
+#print-btn:focus{
+	outline: none;
+}
+
 #refresh-btn{
 	color: #6D6D6D;
+}
+
+#printModal .modal-footer {
+	background-color: #FFFFFF;
 }
 
 #refresh-btn:focus{
@@ -1502,6 +1530,15 @@ a, a:hover, a:active, a:focus{
 .search-panel td .form-control{
 	padding-left: 5px;
 	padding-right: 5px;
+}
+
+#report-from-date-container {
+	margin-right: 20px;
+}
+
+.report-date-container {
+	width: calc(50% - 10px) !important;
+	float: left;
 }
 
 .search-panel td .form-control:focus, .search-panel td .form-control:active{
