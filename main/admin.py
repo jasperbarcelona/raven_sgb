@@ -87,6 +87,8 @@ admin.add_view(IngAdmin(Permission, db.session))
 admin.add_view(IngAdmin(Topup, db.session))
 admin.add_view(IngAdmin(Report, db.session))
 admin.add_view(IngAdmin(MessageStatus, db.session))
+admin.add_view(IngAdmin(Regular, db.session))
+admin.add_view(IngAdmin(Irregular, db.session))
 
 
 def crossdomain(origin=None, methods=None, headers=None,
@@ -207,16 +209,20 @@ def time_in(school_no,api_key,log_id,id_no,name,date,group,time,timestamp,level,
     return jsonify(status='Success',type='entry',action='entered'), 201
 
 
-def time_out(log_id, id_no, time, school_no, group):
+def time_out(log_id, id_no, log_time, school_no, group):
     log = Log.query.filter_by(id_no=id_no,school_no=school_no).order_by(Log.timestamp.desc()).first()
-    log.time_out = time
+    log.time_out = log_time
     log.time_out_id = log_id
     log.time_out_notification_status = 'Pending'
     db.session.commit()
 
     if group == 'k12':
+        irregular_class = Irregular.query.filter_by(school_no=school_no,date=time.strftime("%B %d, %Y")).first()
+        if irregular_class:
+            schedule = irregular_class
+        else:
+            schedule = Regular.query.filter_by(school_no=school_no,day=time.strftime('%A')).first()
 
-        schedule = Schedule.query.filter_by(school_no=school_no).first()
         student = K12.query.filter_by(id_no=id_no).first()
         level = student.level
         if level == 'Junior Kinder':
@@ -258,12 +264,12 @@ def time_out(log_id, id_no, time, school_no, group):
         afternoon_start = eval(query+'_afternoon_start')
         afternoon_end = eval(query+'_afternoon_end')
 
-        time_now = str(now.replace(hour=get_hour(time), minute=int(time[3:5])))[11:16]
+        time_now = str(now.replace(hour=get_hour(log_time), minute=int(log_time[3:5])))[11:16]
 
         if afternoon_class:
             if parse_date(time_now) > parse_date(afternoon_start):
                 if parse_date(log.time_in) < parse_date(afternoon_end):
-                    compose_message(log.id,id_no,time,'left')
+                    compose_message(log.id,id_no,log_time,'left')
                     return jsonify(status='Success',type='exit',action='left'), 201
 
     log.time_out_notification_status = 'Exempted'
@@ -552,24 +558,28 @@ def test_job(word):
 
 def initialize_morning_absent(school_no,api_key):
     school = School.query.filter_by(school_no=school_no,api_key=api_key).first()
-    class_schedule = Schedule.query.filter_by(school_no=school.school_no).first()
+    irregular_class = Irregular.query.filter_by(school_no=school_no,date=time.strftime("%B %d, %Y")).first()
+    if irregular_class:
+        class_schedule = irregular_class
+    else:
+        class_schedule = Regular.query.filter_by(school_no=school_no,day=time.strftime('%A')).first()
 
     time_format = '{:%H:%M}'
 
-    junior_kinder_morning_start = time_format.format(parse_date(class_schedule.junior_kinder_morning_start) + timedelta(minutes=15))
-    senior_kinder_morning_start = time_format.format(parse_date(class_schedule.senior_kinder_morning_start) + timedelta(minutes=15))
-    first_grade_morning_start = time_format.format(parse_date(class_schedule.first_grade_morning_start) + timedelta(minutes=15))
-    second_grade_morning_start = time_format.format(parse_date(class_schedule.second_grade_morning_start) + timedelta(minutes=15))
-    third_grade_morning_start = time_format.format(parse_date(class_schedule.third_grade_morning_start) + timedelta(minutes=15))
-    fourth_grade_morning_start = time_format.format(parse_date(class_schedule.fourth_grade_morning_start) + timedelta(minutes=15))
-    fifth_grade_morning_start = time_format.format(parse_date(class_schedule.fifth_grade_morning_start) + timedelta(minutes=15))
-    sixth_grade_morning_start = time_format.format(parse_date(class_schedule.sixth_grade_morning_start) + timedelta(minutes=15))
-    seventh_grade_morning_start = time_format.format(parse_date(class_schedule.seventh_grade_morning_start) + timedelta(minutes=15))
-    eight_grade_morning_start = time_format.format(parse_date(class_schedule.eight_grade_morning_start) + timedelta(minutes=15))
-    ninth_grade_morning_start = time_format.format(parse_date(class_schedule.ninth_grade_morning_start) + timedelta(minutes=15))
-    tenth_grade_morning_start = time_format.format(parse_date(class_schedule.tenth_grade_morning_start) + timedelta(minutes=15))
-    eleventh_grade_morning_start = time_format.format(parse_date(class_schedule.eleventh_grade_morning_start) + timedelta(minutes=15))
-    twelfth_grade_morning_start = time_format.format(parse_date(class_schedule.twelfth_grade_morning_start) + timedelta(minutes=15))
+    junior_kinder_morning_start = time_format.format(parse_date(class_schedule.junior_kinder_morning_start) + timedelta(minutes=5))
+    senior_kinder_morning_start = time_format.format(parse_date(class_schedule.senior_kinder_morning_start) + timedelta(minutes=5))
+    first_grade_morning_start = time_format.format(parse_date(class_schedule.first_grade_morning_start) + timedelta(minutes=5))
+    second_grade_morning_start = time_format.format(parse_date(class_schedule.second_grade_morning_start) + timedelta(minutes=5))
+    third_grade_morning_start = time_format.format(parse_date(class_schedule.third_grade_morning_start) + timedelta(minutes=5))
+    fourth_grade_morning_start = time_format.format(parse_date(class_schedule.fourth_grade_morning_start) + timedelta(minutes=5))
+    fifth_grade_morning_start = time_format.format(parse_date(class_schedule.fifth_grade_morning_start) + timedelta(minutes=5))
+    sixth_grade_morning_start = time_format.format(parse_date(class_schedule.sixth_grade_morning_start) + timedelta(minutes=5))
+    seventh_grade_morning_start = time_format.format(parse_date(class_schedule.seventh_grade_morning_start) + timedelta(minutes=5))
+    eight_grade_morning_start = time_format.format(parse_date(class_schedule.eight_grade_morning_start) + timedelta(minutes=5))
+    ninth_grade_morning_start = time_format.format(parse_date(class_schedule.ninth_grade_morning_start) + timedelta(minutes=5))
+    tenth_grade_morning_start = time_format.format(parse_date(class_schedule.tenth_grade_morning_start) + timedelta(minutes=5))
+    eleventh_grade_morning_start = time_format.format(parse_date(class_schedule.eleventh_grade_morning_start) + timedelta(minutes=5))
+    twelfth_grade_morning_start = time_format.format(parse_date(class_schedule.twelfth_grade_morning_start) + timedelta(minutes=5))
 
     schedule.every().day.at(junior_kinder_morning_start).do(mark_morning_absent,school_no,api_key,'Junior Kinder')
     schedule.every().day.at(senior_kinder_morning_start).do(mark_morning_absent,school_no,api_key,'Senior Kinder')
@@ -593,24 +603,29 @@ def initialize_morning_absent(school_no,api_key):
 
 def initialize_afternoon_absent(school_no,api_key):
     school = School.query.filter_by(school_no=school_no,api_key=api_key).first()
-    class_schedule = Schedule.query.filter_by(school_no=school.school_no).first()
+
+    irregular_class = Irregular.query.filter_by(school_no=school_no,date=time.strftime("%B %d, %Y")).first()
+    if irregular_class:
+        class_schedule = irregular_class
+    else:
+        class_schedule = Regular.query.filter_by(school_no=school_no,day=time.strftime('%A')).first()
 
     time_format = '{:%H:%M}'
 
-    junior_kinder_afternoon_start = time_format.format(parse_date(class_schedule.junior_kinder_afternoon_start) + timedelta(minutes=15))
-    senior_kinder_afternoon_start = time_format.format(parse_date(class_schedule.senior_kinder_afternoon_start) + timedelta(minutes=15))
-    first_grade_afternoon_start = time_format.format(parse_date(class_schedule.first_grade_afternoon_start) + timedelta(minutes=15))
-    second_grade_afternoon_start = time_format.format(parse_date(class_schedule.second_grade_afternoon_start) + timedelta(minutes=15))
-    third_grade_afternoon_start = time_format.format(parse_date(class_schedule.third_grade_afternoon_start) + timedelta(minutes=15))
-    fourth_grade_afternoon_start = time_format.format(parse_date(class_schedule.fourth_grade_afternoon_start) + timedelta(minutes=15))
-    fifth_grade_afternoon_start = time_format.format(parse_date(class_schedule.fifth_grade_afternoon_start) + timedelta(minutes=15))
-    sixth_grade_afternoon_start = time_format.format(parse_date(class_schedule.sixth_grade_afternoon_start) + timedelta(minutes=15))
-    seventh_grade_afternoon_start = time_format.format(parse_date(class_schedule.seventh_grade_afternoon_start) + timedelta(minutes=15))
-    eight_grade_afternoon_start = time_format.format(parse_date(class_schedule.eight_grade_afternoon_start) + timedelta(minutes=15))
-    ninth_grade_afternoon_start = time_format.format(parse_date(class_schedule.ninth_grade_afternoon_start) + timedelta(minutes=15))
-    tenth_grade_afternoon_start = time_format.format(parse_date(class_schedule.tenth_grade_afternoon_start) + timedelta(minutes=15))
-    eleventh_grade_afternoon_start = time_format.format(parse_date(class_schedule.eleventh_grade_afternoon_start) + timedelta(minutes=15))
-    twelfth_grade_afternoon_start = time_format.format(parse_date(class_schedule.twelfth_grade_afternoon_start) + timedelta(minutes=15))
+    junior_kinder_afternoon_start = time_format.format(parse_date(class_schedule.junior_kinder_afternoon_start) + timedelta(minutes=5))
+    senior_kinder_afternoon_start = time_format.format(parse_date(class_schedule.senior_kinder_afternoon_start) + timedelta(minutes=5))
+    first_grade_afternoon_start = time_format.format(parse_date(class_schedule.first_grade_afternoon_start) + timedelta(minutes=5))
+    second_grade_afternoon_start = time_format.format(parse_date(class_schedule.second_grade_afternoon_start) + timedelta(minutes=5))
+    third_grade_afternoon_start = time_format.format(parse_date(class_schedule.third_grade_afternoon_start) + timedelta(minutes=5))
+    fourth_grade_afternoon_start = time_format.format(parse_date(class_schedule.fourth_grade_afternoon_start) + timedelta(minutes=5))
+    fifth_grade_afternoon_start = time_format.format(parse_date(class_schedule.fifth_grade_afternoon_start) + timedelta(minutes=5))
+    sixth_grade_afternoon_start = time_format.format(parse_date(class_schedule.sixth_grade_afternoon_start) + timedelta(minutes=5))
+    seventh_grade_afternoon_start = time_format.format(parse_date(class_schedule.seventh_grade_afternoon_start) + timedelta(minutes=5))
+    eight_grade_afternoon_start = time_format.format(parse_date(class_schedule.eight_grade_afternoon_start) + timedelta(minutes=5))
+    ninth_grade_afternoon_start = time_format.format(parse_date(class_schedule.ninth_grade_afternoon_start) + timedelta(minutes=5))
+    tenth_grade_afternoon_start = time_format.format(parse_date(class_schedule.tenth_grade_afternoon_start) + timedelta(minutes=5))
+    eleventh_grade_afternoon_start = time_format.format(parse_date(class_schedule.eleventh_grade_afternoon_start) + timedelta(minutes=5))
+    twelfth_grade_afternoon_start = time_format.format(parse_date(class_schedule.twelfth_grade_afternoon_start) + timedelta(minutes=5))
 
     schedule.every().day.at(junior_kinder_afternoon_start).do(mark_afternoon_absent,school_no,api_key,'Junior Kinder')
     schedule.every().day.at(senior_kinder_afternoon_start).do(mark_afternoon_absent,school_no,api_key,'Senior Kinder')
@@ -701,13 +716,13 @@ def fetch_records():
             else:
                 vals.append(cell.value)
 
-        guardian = Parent.query.filter_by(mobile_number=vals[6].strip()).first()
+        guardian = Parent.query.filter_by(mobile_number=str(vals[6]).strip()).first()
         if guardian != None and guardian.mobile_number != school.contact:
             parent_id = guardian.id
         else:
             guardian = Parent(
                 school_no = session['school_no'],
-                mobile_number = vals[6].strip(),
+                mobile_number = str(vals[6]).strip(),
                 name = vals[5].strip().title(),
                 email = 'n/a',
                 address = vals[4].strip().title()
@@ -720,7 +735,7 @@ def fetch_records():
             if vals[0]:
                 new_record = K12(
                     school_no=session['school_no'],
-                    id_no=str(int(vals[0])).strip().replace('.','').replace(',',''),
+                    id_no='000%s' % str(int(vals[0])).strip().replace('.','').replace(',',''),
                     first_name=vals[2].strip().title().replace('.','').replace(',',''),
                     last_name=vals[1].strip().title().replace('.','').replace(',',''),
                     middle_name=vals[3].strip().title().replace('.','').replace(',',''),
@@ -731,7 +746,7 @@ def fetch_records():
                     lates=0,
                     parent_id=parent_id,
                     parent_relation='Unknown',
-                    parent_contact=vals[6].strip(),
+                    parent_contact=str(vals[6]).strip(),
                     added_by=vals[5].strip().title().replace('.','').replace(',',''),
                     )
             else:
@@ -747,14 +762,14 @@ def fetch_records():
                     lates=0,
                     parent_id=parent_id,
                     parent_relation='Unknown',
-                    parent_contact=vals[6].strip(),
+                    parent_contact=str(vals[6]).strip(),
                     added_by=vals[5].strip().title().replace('.','').replace(',',''),
                     )
         else:
             if vals[0]:
                 new_record = K12(
                     school_no=session['school_no'],
-                    id_no=str(int(vals[0])).replace('.','').replace(',',''),
+                    id_no='000%s' % str(int(vals[0])).replace('.','').replace(',',''),
                     first_name=vals[2].title().replace('.','').replace(',',''),
                     last_name=vals[1].title().replace('.','').replace(',',''),
                     level='7th Grade',
@@ -764,7 +779,7 @@ def fetch_records():
                     lates=0,
                     parent_id=parent_id,
                     parent_relation='Unknown',
-                    parent_contact=vals[6].replace('.','').replace(',',''),
+                    parent_contact=str(vals[6]).replace('.','').replace(',',''),
                     added_by=vals[5].title().replace('.','').replace(',',''),
                     )
             else:
@@ -779,7 +794,532 @@ def fetch_records():
                 lates=0,
                 parent_id=parent_id,
                 parent_relation='Unknown',
-                parent_contact=vals[6].replace('.','').replace(',',''),
+                parent_contact=str(vals[6]).replace('.','').replace(',',''),
+                added_by=vals[5].title().replace('.','').replace(',',''),
+                )
+        db.session.add(new_record)
+        db.session.commit()
+        total_students += 1
+
+    path = 'static/records/GRADE8_RECORDS.xlsx'
+    rows = 154
+    cols = 8
+
+    book = xlrd.open_workbook(path)
+ 
+    # get the first worksheet
+    sheet = book.sheet_by_index(0)
+
+    school = School.query.filter_by(school_no=session['school_no']).first()
+ 
+    for row in range(rows-1):
+        vals = []
+        for col in range(cols):
+            cell = sheet.cell(row+1,col)
+            if cell.value == '':
+                vals.append(None)
+            else:
+                vals.append(cell.value)
+
+        guardian = Parent.query.filter_by(mobile_number=str(vals[6]).strip()).first()
+        if guardian != None and guardian.mobile_number != school.contact:
+            parent_id = guardian.id
+        else:
+            guardian = Parent(
+                school_no = session['school_no'],
+                mobile_number = str(vals[6]).strip(),
+                name = vals[5].strip().title(),
+                email = 'n/a',
+                address = vals[4].strip().title()
+                )
+            db.session.add(guardian)
+            db.session.commit()
+            parent_id = guardian.id
+
+        if vals[3] != None:
+            if vals[0]:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    id_no='000%s' % str(int(vals[0])).strip().replace('.','').replace(',',''),
+                    first_name=vals[2].strip().title().replace('.','').replace(',',''),
+                    last_name=vals[1].strip().title().replace('.','').replace(',',''),
+                    middle_name=vals[3].strip().title().replace('.','').replace(',',''),
+                    level='8th Grade',
+                    group='k12',
+                    section=vals[7].strip().title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=str(vals[6]).strip(),
+                    added_by=vals[5].strip().title().replace('.','').replace(',',''),
+                    )
+            else:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    first_name=vals[2].strip().title().replace('.','').replace(',',''),
+                    last_name=vals[1].strip().title().replace('.','').replace(',',''),
+                    middle_name=vals[3].strip().title().replace('.','').replace(',',''),
+                    level='8th Grade',
+                    group='k12',
+                    section=vals[7].strip().title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=str(vals[6]).strip(),
+                    added_by=vals[5].strip().title().replace('.','').replace(',',''),
+                    )
+        else:
+            if vals[0]:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    id_no='000%s' % str(int(vals[0])).replace('.','').replace(',',''),
+                    first_name=vals[2].title().replace('.','').replace(',',''),
+                    last_name=vals[1].title().replace('.','').replace(',',''),
+                    level='8th Grade',
+                    group='k12',
+                    section=vals[7].title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=str(vals[6]).replace('.','').replace(',',''),
+                    added_by=vals[5].title().replace('.','').replace(',',''),
+                    )
+            else:
+                new_record = K12(
+                school_no=session['school_no'],
+                first_name=vals[2].title().replace('.','').replace(',',''),
+                last_name=vals[1].title().replace('.','').replace(',',''),
+                level='8th Grade',
+                group='k12',
+                section=vals[7].title().replace('.','').replace(',',''),
+                absences=0,
+                lates=0,
+                parent_id=parent_id,
+                parent_relation='Unknown',
+                parent_contact=str(vals[6]).replace('.','').replace(',',''),
+                added_by=vals[5].title().replace('.','').replace(',',''),
+                )
+        db.session.add(new_record)
+        db.session.commit()
+        total_students += 1
+
+    path = 'static/records/GRADE9_RECORDS.xlsx'
+    rows = 143
+    cols = 8
+
+    book = xlrd.open_workbook(path)
+ 
+    # get the first worksheet
+    sheet = book.sheet_by_index(0)
+
+    school = School.query.filter_by(school_no=session['school_no']).first()
+ 
+    for row in range(rows-1):
+        vals = []
+        for col in range(cols):
+            cell = sheet.cell(row+1,col)
+            if cell.value == '':
+                vals.append(None)
+            else:
+                vals.append(cell.value)
+
+        guardian = Parent.query.filter_by(mobile_number=str(str(vals[6])).strip()).first()
+        if guardian != None and guardian.mobile_number != school.contact:
+            parent_id = guardian.id
+        else:
+            guardian = Parent(
+                school_no = session['school_no'],
+                mobile_number = str(str(vals[6])).strip(),
+                name = vals[5].strip().title(),
+                email = 'n/a',
+                address = vals[4].strip().title()
+                )
+            db.session.add(guardian)
+            db.session.commit()
+            parent_id = guardian.id
+
+        if vals[3] != None:
+            if vals[0]:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    id_no='000%s' % str(int(vals[0])).strip().replace('.','').replace(',',''),
+                    first_name=vals[2].strip().title().replace('.','').replace(',',''),
+                    last_name=vals[1].strip().title().replace('.','').replace(',',''),
+                    middle_name=vals[3].strip().title().replace('.','').replace(',',''),
+                    level='9th Grade',
+                    group='k12',
+                    section=vals[7].strip().title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=str(vals[6]).strip(),
+                    added_by=vals[5].strip().title().replace('.','').replace(',',''),
+                    )
+            else:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    first_name=vals[2].strip().title().replace('.','').replace(',',''),
+                    last_name=vals[1].strip().title().replace('.','').replace(',',''),
+                    middle_name=vals[3].strip().title().replace('.','').replace(',',''),
+                    level='9th Grade',
+                    group='k12',
+                    section=vals[7].strip().title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=str(vals[6]).strip(),
+                    added_by=vals[5].strip().title().replace('.','').replace(',',''),
+                    )
+        else:
+            if vals[0]:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    id_no='000%s' % str(int(vals[0])).replace('.','').replace(',',''),
+                    first_name=vals[2].title().replace('.','').replace(',',''),
+                    last_name=vals[1].title().replace('.','').replace(',',''),
+                    level='9th Grade',
+                    group='k12',
+                    section=vals[7].title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=str(vals[6]).replace('.','').replace(',',''),
+                    added_by=vals[5].title().replace('.','').replace(',',''),
+                    )
+            else:
+                new_record = K12(
+                school_no=session['school_no'],
+                first_name=vals[2].title().replace('.','').replace(',',''),
+                last_name=vals[1].title().replace('.','').replace(',',''),
+                level='9th Grade',
+                group='k12',
+                section=vals[7].title().replace('.','').replace(',',''),
+                absences=0,
+                lates=0,
+                parent_id=parent_id,
+                parent_relation='Unknown',
+                parent_contact=str(vals[6]).replace('.','').replace(',',''),
+                added_by=vals[5].title().replace('.','').replace(',',''),
+                )
+        db.session.add(new_record)
+        db.session.commit()
+        total_students += 1
+
+    path = 'static/records/GRADE10_RECORDS.xlsx'
+    rows = 106
+    cols = 8
+
+    book = xlrd.open_workbook(path)
+ 
+    # get the first worksheet
+    sheet = book.sheet_by_index(0)
+
+    school = School.query.filter_by(school_no=session['school_no']).first()
+ 
+    for row in range(rows-1):
+        vals = []
+        for col in range(cols):
+            cell = sheet.cell(row+1,col)
+            if cell.value == '':
+                vals.append(None)
+            else:
+                vals.append(cell.value)
+
+        guardian = Parent.query.filter_by(mobile_number=str(vals[6]).strip()).first()
+        if guardian != None and guardian.mobile_number != school.contact:
+            parent_id = guardian.id
+        else:
+            guardian = Parent(
+                school_no = session['school_no'],
+                mobile_number = str(vals[6]).strip(),
+                name = vals[5].strip().title(),
+                email = 'n/a',
+                address = vals[4].strip().title()
+                )
+            db.session.add(guardian)
+            db.session.commit()
+            parent_id = guardian.id
+
+        if vals[3] != None:
+            if vals[0]:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    id_no='000%s' % str(int(vals[0])).strip().replace('.','').replace(',',''),
+                    first_name=vals[2].strip().title().replace('.','').replace(',',''),
+                    last_name=vals[1].strip().title().replace('.','').replace(',',''),
+                    middle_name=vals[3].strip().title().replace('.','').replace(',',''),
+                    level='10th Grade',
+                    group='k12',
+                    section=vals[7].strip().title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=str(vals[6]).strip(),
+                    added_by=vals[5].strip().title().replace('.','').replace(',',''),
+                    )
+            else:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    first_name=vals[2].strip().title().replace('.','').replace(',',''),
+                    last_name=vals[1].strip().title().replace('.','').replace(',',''),
+                    middle_name=vals[3].strip().title().replace('.','').replace(',',''),
+                    level='10th Grade',
+                    group='k12',
+                    section=vals[7].strip().title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=str(vals[6]).strip(),
+                    added_by=vals[5].strip().title().replace('.','').replace(',',''),
+                    )
+        else:
+            if vals[0]:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    id_no='000%s' % str(int(vals[0])).replace('.','').replace(',',''),
+                    first_name=vals[2].title().replace('.','').replace(',',''),
+                    last_name=vals[1].title().replace('.','').replace(',',''),
+                    level='10th Grade',
+                    group='k12',
+                    section=vals[7].title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=str(vals[6]).replace('.','').replace(',',''),
+                    added_by=vals[5].title().replace('.','').replace(',',''),
+                    )
+            else:
+                new_record = K12(
+                school_no=session['school_no'],
+                first_name=vals[2].title().replace('.','').replace(',',''),
+                last_name=vals[1].title().replace('.','').replace(',',''),
+                level='10th Grade',
+                group='k12',
+                section=vals[7].title().replace('.','').replace(',',''),
+                absences=0,
+                lates=0,
+                parent_id=parent_id,
+                parent_relation='Unknown',
+                parent_contact=str(vals[6]).replace('.','').replace(',',''),
+                added_by=vals[5].title().replace('.','').replace(',',''),
+                )
+        db.session.add(new_record)
+        db.session.commit()
+        total_students += 1
+
+    path = 'static/records/GRADE11_RECORDS.xlsx'
+    rows = 193
+    cols = 8
+
+    book = xlrd.open_workbook(path)
+ 
+    # get the first worksheet
+    sheet = book.sheet_by_index(0)
+
+    school = School.query.filter_by(school_no=session['school_no']).first()
+ 
+    for row in range(rows-1):
+        vals = []
+        for col in range(cols):
+            cell = sheet.cell(row+1,col)
+            if cell.value == '':
+                vals.append(None)
+            else:
+                vals.append(cell.value)
+
+        guardian = Parent.query.filter_by(mobile_number=str(vals[6]).strip()).first()
+        if guardian != None and guardian.mobile_number != school.contact:
+            parent_id = guardian.id
+        else:
+            guardian = Parent(
+                school_no = session['school_no'],
+                mobile_number = str(vals[6]).strip(),
+                name = vals[5].strip().title(),
+                email = 'n/a',
+                address = vals[4].strip().title()
+                )
+            db.session.add(guardian)
+            db.session.commit()
+            parent_id = guardian.id
+
+        if vals[3] != None:
+            if vals[0]:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    id_no='000%s' % str(int(vals[0])).strip().replace('.','').replace(',',''),
+                    first_name=vals[2].strip().title().replace('.','').replace(',',''),
+                    last_name=vals[1].strip().title().replace('.','').replace(',',''),
+                    middle_name=vals[3].strip().title().replace('.','').replace(',',''),
+                    level='11th Grade',
+                    group='k12',
+                    section=vals[7].strip().title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=str(vals[6]).strip(),
+                    added_by=vals[5].strip().title().replace('.','').replace(',',''),
+                    )
+            else:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    first_name=vals[2].strip().title().replace('.','').replace(',',''),
+                    last_name=vals[1].strip().title().replace('.','').replace(',',''),
+                    middle_name=vals[3].strip().title().replace('.','').replace(',',''),
+                    level='11th Grade',
+                    group='k12',
+                    section=vals[7].strip().title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=str(vals[6]).strip(),
+                    added_by=vals[5].strip().title().replace('.','').replace(',',''),
+                    )
+        else:
+            if vals[0]:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    id_no='000%s' % str(int(vals[0])).replace('.','').replace(',',''),
+                    first_name=vals[2].title().replace('.','').replace(',',''),
+                    last_name=vals[1].title().replace('.','').replace(',',''),
+                    level='11th Grade',
+                    group='k12',
+                    section=vals[7].title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=str(vals[6]).replace('.','').replace(',',''),
+                    added_by=vals[5].title().replace('.','').replace(',',''),
+                    )
+            else:
+                new_record = K12(
+                school_no=session['school_no'],
+                first_name=vals[2].title().replace('.','').replace(',',''),
+                last_name=vals[1].title().replace('.','').replace(',',''),
+                level='11th Grade',
+                group='k12',
+                section=vals[7].title().replace('.','').replace(',',''),
+                absences=0,
+                lates=0,
+                parent_id=parent_id,
+                parent_relation='Unknown',
+                parent_contact=str(vals[6]).replace('.','').replace(',',''),
+                added_by=vals[5].title().replace('.','').replace(',',''),
+                )
+        db.session.add(new_record)
+        db.session.commit()
+        total_students += 1
+
+    path = 'static/records/GRADE12_RECORDS.xlsx'
+    rows = 146
+    cols = 8
+
+    book = xlrd.open_workbook(path)
+ 
+    # get the first worksheet
+    sheet = book.sheet_by_index(0)
+
+    school = School.query.filter_by(school_no=session['school_no']).first()
+ 
+    for row in range(rows-1):
+        vals = []
+        for col in range(cols):
+            cell = sheet.cell(row+1,col)
+            if cell.value == '':
+                vals.append(None)
+            else:
+                vals.append(cell.value)
+
+        guardian = Parent.query.filter_by(mobile_number=str(vals[6]).strip()).first()
+        if guardian != None and guardian.mobile_number != school.contact:
+            parent_id = guardian.id
+        else:
+            guardian = Parent(
+                school_no = session['school_no'],
+                mobile_number = str(vals[6]).strip(),
+                name = vals[5].strip().title(),
+                email = 'n/a',
+                address = vals[4].strip().title()
+                )
+            db.session.add(guardian)
+            db.session.commit()
+            parent_id = guardian.id
+
+        if vals[3] != None:
+            if vals[0]:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    id_no='000%s' % str(int(vals[0])).strip().replace('.','').replace(',',''),
+                    first_name=vals[2].strip().title().replace('.','').replace(',',''),
+                    last_name=vals[1].strip().title().replace('.','').replace(',',''),
+                    middle_name=vals[3].strip().title().replace('.','').replace(',',''),
+                    level='12th Grade',
+                    group='k12',
+                    section=vals[7].strip().title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=str(vals[6]).strip(),
+                    added_by=vals[5].strip().title().replace('.','').replace(',',''),
+                    )
+            else:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    first_name=vals[2].strip().title().replace('.','').replace(',',''),
+                    last_name=vals[1].strip().title().replace('.','').replace(',',''),
+                    middle_name=vals[3].strip().title().replace('.','').replace(',',''),
+                    level='12th Grade',
+                    group='k12',
+                    section=vals[7].strip().title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=str(vals[6]).strip(),
+                    added_by=vals[5].strip().title().replace('.','').replace(',',''),
+                    )
+        else:
+            if vals[0]:
+                new_record = K12(
+                    school_no=session['school_no'],
+                    id_no='000%s' % str(int(vals[0])).replace('.','').replace(',',''),
+                    first_name=vals[2].title().replace('.','').replace(',',''),
+                    last_name=vals[1].title().replace('.','').replace(',',''),
+                    level='12th Grade',
+                    group='k12',
+                    section=vals[7].title().replace('.','').replace(',',''),
+                    absences=0,
+                    lates=0,
+                    parent_id=parent_id,
+                    parent_relation='Unknown',
+                    parent_contact=str(vals[6]).replace('.','').replace(',',''),
+                    added_by=vals[5].title().replace('.','').replace(',',''),
+                    )
+            else:
+                new_record = K12(
+                school_no=session['school_no'],
+                first_name=vals[2].title().replace('.','').replace(',',''),
+                last_name=vals[1].title().replace('.','').replace(',',''),
+                level='12th Grade',
+                group='k12',
+                section=vals[7].title().replace('.','').replace(',',''),
+                absences=0,
+                lates=0,
+                parent_id=parent_id,
+                parent_relation='Unknown',
+                parent_contact=str(vals[6]).replace('.','').replace(',',''),
                 added_by=vals[5].title().replace('.','').replace(',',''),
                 )
         db.session.add(new_record)
@@ -1240,102 +1780,96 @@ def new_account():
 @app.route('/schedule/irregular/get', methods=['GET', 'POST'])
 def get_irregular_schedule():
     data = flask.request.form.to_dict()
-    session['day'] = data['day']
-    calendar_params = {
-        'api_key':session['api_key'],
-        'month':data['month'],
-        'day':data['day'],
-        'year':data['year']
-    }
-    get_events = requests.get(CALENDAR_URL%'/schedule/irregular/get',params=calendar_params)
-    schedule = get_events.json()
+    session['specific_month'] = data['month']
+    session['specific_day'] = data['day']
+    session['specific_year'] = data['year']
+    schedule = Irregular.query.filter_by(school_no=session['school_no'],month=data['month'],day=data['day'],year=data['year']).first()
     return jsonify(
-        date=str(calendar.month_name[int(data['month'])]+' ' +data['day']+', '+data['year']),
-        junior_kinder_morning_class=schedule['junior_kinder_morning_class'],
-        junior_kinder_afternoon_class=schedule['junior_kinder_afternoon_class'],
-        senior_kinder_morning_class=schedule['senior_kinder_morning_class'],
-        senior_kinder_afternoon_class=schedule['senior_kinder_afternoon_class'],
-        first_grade_morning_class=schedule['first_grade_morning_class'],
-        first_grade_afternoon_class=schedule['first_grade_afternoon_class'],
-        second_grade_morning_class=schedule['second_grade_morning_class'],
-        second_grade_afternoon_class=schedule['second_grade_afternoon_class'],
-        third_grade_morning_class=schedule['third_grade_morning_class'],
-        third_grade_afternoon_class=schedule['third_grade_afternoon_class'],
-        fourth_grade_morning_class=schedule['fourth_grade_morning_class'],
-        fourth_grade_afternoon_class=schedule['fourth_grade_afternoon_class'],
-        fifth_grade_morning_class=schedule['fifth_grade_morning_class'],
-        fifth_grade_afternoon_class=schedule['fifth_grade_afternoon_class'],
-        sixth_grade_morning_class=schedule['sixth_grade_morning_class'],
-        sixth_grade_afternoon_class=schedule['sixth_grade_afternoon_class'],
-        seventh_grade_morning_class=schedule['seventh_grade_morning_class'],
-        seventh_grade_afternoon_class=schedule['seventh_grade_afternoon_class'],
-        eight_grade_morning_class=schedule['eight_grade_morning_class'],
-        eight_grade_afternoon_class=schedule['eight_grade_afternoon_class'],
-        ninth_grade_morning_class=schedule['ninth_grade_morning_class'],
-        ninth_grade_afternoon_class=schedule['ninth_grade_afternoon_class'],
-        tenth_grade_morning_class=schedule['tenth_grade_morning_class'],
-        tenth_grade_afternoon_class=schedule['tenth_grade_afternoon_class'],
-        eleventh_grade_morning_class=schedule['eleventh_grade_morning_class'],
-        eleventh_grade_afternoon_class=schedule['eleventh_grade_afternoon_class'],
-        twelfth_grade_morning_class=schedule['twelfth_grade_morning_class'],
-        twelfth_grade_afternoon_class=schedule['twelfth_grade_afternoon_class'],
-        junior_kinder_morning_start=schedule['junior_kinder_morning_start'],
-        junior_kinder_morning_end=schedule['junior_kinder_morning_end'],
-        junior_kinder_afternoon_start=schedule['junior_kinder_afternoon_start'],
-        junior_kinder_afternoon_end=schedule['junior_kinder_afternoon_end'],
-        senior_kinder_morning_start=schedule['senior_kinder_morning_start'],
-        senior_kinder_morning_end=schedule['senior_kinder_morning_end'],
-        senior_kinder_afternoon_start=schedule['senior_kinder_afternoon_start'],
-        senior_kinder_afternoon_end=schedule['senior_kinder_afternoon_end'],
-        first_grade_morning_start=schedule['first_grade_morning_start'],
-        first_grade_morning_end=schedule['first_grade_morning_end'],
-        first_grade_afternoon_start=schedule['first_grade_afternoon_start'],
-        first_grade_afternoon_end=schedule['first_grade_afternoon_end'],
-        second_grade_morning_start=schedule['second_grade_morning_start'],
-        second_grade_morning_end=schedule['second_grade_morning_end'],
-        second_grade_afternoon_start=schedule['second_grade_afternoon_start'],
-        second_grade_afternoon_end=schedule['second_grade_afternoon_end'],
-        third_grade_morning_start=schedule['third_grade_morning_start'],
-        third_grade_morning_end=schedule['third_grade_morning_end'],
-        third_grade_afternoon_start=schedule['third_grade_afternoon_start'],
-        third_grade_afternoon_end=schedule['third_grade_afternoon_end'],
-        fourth_grade_morning_start=schedule['fourth_grade_morning_start'],
-        fourth_grade_morning_end=schedule['fourth_grade_morning_end'],
-        fourth_grade_afternoon_start=schedule['fourth_grade_afternoon_start'],
-        fourth_grade_afternoon_end=schedule['fourth_grade_afternoon_end'],
-        fifth_grade_morning_start=schedule['fifth_grade_morning_start'],
-        fifth_grade_morning_end=schedule['fifth_grade_morning_end'],
-        fifth_grade_afternoon_start=schedule['fifth_grade_afternoon_start'],
-        fifth_grade_afternoon_end=schedule['fifth_grade_afternoon_end'],
-        sixth_grade_morning_start=schedule['sixth_grade_morning_start'],
-        sixth_grade_morning_end=schedule['sixth_grade_morning_end'],
-        sixth_grade_afternoon_start=schedule['sixth_grade_afternoon_start'],
-        sixth_grade_afternoon_end=schedule['sixth_grade_afternoon_end'],
-        seventh_grade_morning_start=schedule['seventh_grade_morning_start'],
-        seventh_grade_morning_end=schedule['seventh_grade_morning_end'],
-        seventh_grade_afternoon_start=schedule['seventh_grade_afternoon_start'],
-        seventh_grade_afternoon_end=schedule['seventh_grade_afternoon_end'],
-        eight_grade_morning_start=schedule['eight_grade_morning_start'],
-        eight_grade_morning_end=schedule['eight_grade_morning_end'],
-        eight_grade_afternoon_start=schedule['eight_grade_afternoon_start'],
-        eight_grade_afternoon_end=schedule['eight_grade_afternoon_end'],
-        ninth_grade_morning_start=schedule['ninth_grade_morning_start'],
-        ninth_grade_morning_end=schedule['ninth_grade_morning_end'],
-        ninth_grade_afternoon_start=schedule['ninth_grade_afternoon_start'],
-        ninth_grade_afternoon_end=schedule['ninth_grade_afternoon_end'],
-        tenth_grade_morning_start=schedule['tenth_grade_morning_start'],
-        tenth_grade_morning_end=schedule['tenth_grade_morning_end'],
-        tenth_grade_afternoon_start=schedule['tenth_grade_afternoon_start'],
-        tenth_grade_afternoon_end=schedule['tenth_grade_afternoon_end'],
-        eleventh_grade_morning_start=schedule['eleventh_grade_morning_start'],
-        eleventh_grade_morning_end=schedule['eleventh_grade_morning_end'],
-        eleventh_grade_afternoon_start=schedule['eleventh_grade_afternoon_start'],
-        eleventh_grade_afternoon_end=schedule['eleventh_grade_afternoon_end'],
-        twelfth_grade_morning_start=schedule['twelfth_grade_morning_start'],
-        twelfth_grade_morning_end=schedule['twelfth_grade_morning_end'],
-        twelfth_grade_afternoon_start=schedule['twelfth_grade_afternoon_start'],
-        twelfth_grade_afternoon_end=schedule['twelfth_grade_afternoon_end']
-        )
+        junior_kinder_morning_class=schedule.junior_kinder_morning_class,
+        junior_kinder_afternoon_class=schedule.junior_kinder_afternoon_class,
+        senior_kinder_morning_class=schedule.senior_kinder_morning_class,
+        senior_kinder_afternoon_class=schedule.senior_kinder_afternoon_class,
+        first_grade_morning_class=schedule.first_grade_morning_class,
+        first_grade_afternoon_class=schedule.first_grade_afternoon_class,
+        second_grade_morning_class=schedule.second_grade_morning_class,
+        second_grade_afternoon_class=schedule.second_grade_afternoon_class,
+        third_grade_morning_class=schedule.third_grade_morning_class,
+        third_grade_afternoon_class=schedule.third_grade_afternoon_class,
+        fourth_grade_morning_class=schedule.fourth_grade_morning_class,
+        fourth_grade_afternoon_class=schedule.fourth_grade_afternoon_class,
+        fifth_grade_morning_class=schedule.fifth_grade_morning_class,
+        fifth_grade_afternoon_class=schedule.fifth_grade_afternoon_class,
+        sixth_grade_morning_class=schedule.sixth_grade_morning_class,
+        sixth_grade_afternoon_class=schedule.sixth_grade_afternoon_class,
+        seventh_grade_morning_class=schedule.seventh_grade_morning_class,
+        seventh_grade_afternoon_class=schedule.seventh_grade_afternoon_class,
+        eight_grade_morning_class=schedule.eight_grade_morning_class,
+        eight_grade_afternoon_class=schedule.eight_grade_afternoon_class,
+        ninth_grade_morning_class=schedule.ninth_grade_morning_class,
+        ninth_grade_afternoon_class=schedule.ninth_grade_afternoon_class,
+        tenth_grade_morning_class=schedule.tenth_grade_morning_class,
+        tenth_grade_afternoon_class=schedule.tenth_grade_afternoon_class,
+        eleventh_grade_morning_class=schedule.eleventh_grade_morning_class,
+        eleventh_grade_afternoon_class=schedule.eleventh_grade_afternoon_class,
+        twelfth_grade_morning_class=schedule.twelfth_grade_morning_class,
+        twelfth_grade_afternoon_class=schedule.twelfth_grade_afternoon_class,
+        junior_kinder_morning_start=schedule.junior_kinder_morning_start,
+        junior_kinder_morning_end=schedule.junior_kinder_morning_end,
+        junior_kinder_afternoon_start=schedule.junior_kinder_afternoon_start,
+        junior_kinder_afternoon_end=schedule.junior_kinder_afternoon_end,
+        senior_kinder_morning_start=schedule.senior_kinder_morning_start,
+        senior_kinder_morning_end=schedule.senior_kinder_morning_end,
+        senior_kinder_afternoon_start=schedule.senior_kinder_afternoon_start,
+        senior_kinder_afternoon_end=schedule.senior_kinder_afternoon_end,
+        first_grade_morning_start=schedule.first_grade_morning_start,
+        first_grade_morning_end=schedule.first_grade_morning_end,
+        first_grade_afternoon_start=schedule.first_grade_afternoon_start,
+        first_grade_afternoon_end=schedule.first_grade_afternoon_end,
+        second_grade_morning_start=schedule.second_grade_morning_start,
+        second_grade_morning_end=schedule.second_grade_morning_end,
+        second_grade_afternoon_start=schedule.second_grade_afternoon_start,
+        second_grade_afternoon_end=schedule.second_grade_afternoon_end,
+        third_grade_morning_start=schedule.third_grade_morning_start,
+        third_grade_morning_end=schedule.third_grade_morning_end,
+        third_grade_afternoon_start=schedule.third_grade_afternoon_start,
+        third_grade_afternoon_end=schedule.third_grade_afternoon_end,
+        fourth_grade_morning_start=schedule.fourth_grade_morning_start,
+        fourth_grade_morning_end=schedule.fourth_grade_morning_end,
+        fourth_grade_afternoon_start=schedule.fourth_grade_afternoon_start,
+        fourth_grade_afternoon_end=schedule.fourth_grade_afternoon_end,
+        fifth_grade_morning_start=schedule.fifth_grade_morning_start,
+        fifth_grade_morning_end=schedule.fifth_grade_morning_end,
+        fifth_grade_afternoon_start=schedule.fifth_grade_afternoon_start,
+        fifth_grade_afternoon_end=schedule.fifth_grade_afternoon_end,
+        sixth_grade_morning_start=schedule.sixth_grade_morning_start,
+        sixth_grade_morning_end=schedule.sixth_grade_morning_end,
+        sixth_grade_afternoon_start=schedule.sixth_grade_afternoon_start,
+        sixth_grade_afternoon_end=schedule.sixth_grade_afternoon_end,
+        seventh_grade_morning_start=schedule.seventh_grade_morning_start,
+        seventh_grade_morning_end=schedule.seventh_grade_morning_end,
+        seventh_grade_afternoon_start=schedule.seventh_grade_afternoon_start,
+        seventh_grade_afternoon_end=schedule.seventh_grade_afternoon_end,
+        eight_grade_morning_start=schedule.eight_grade_morning_start,
+        eight_grade_morning_end=schedule.eight_grade_morning_end,
+        eight_grade_afternoon_start=schedule.eight_grade_afternoon_start,
+        eight_grade_afternoon_end=schedule.eight_grade_afternoon_end,
+        ninth_grade_morning_start=schedule.ninth_grade_morning_start,
+        ninth_grade_morning_end=schedule.ninth_grade_morning_end,
+        ninth_grade_afternoon_start=schedule.ninth_grade_afternoon_start,
+        ninth_grade_afternoon_end=schedule.ninth_grade_afternoon_end,
+        tenth_grade_morning_start=schedule.tenth_grade_morning_start,
+        tenth_grade_morning_end=schedule.tenth_grade_morning_end,
+        tenth_grade_afternoon_start=schedule.tenth_grade_afternoon_start,
+        tenth_grade_afternoon_end=schedule.tenth_grade_afternoon_end,
+        eleventh_grade_morning_start=schedule.eleventh_grade_morning_start,
+        eleventh_grade_morning_end=schedule.eleventh_grade_morning_end,
+        eleventh_grade_afternoon_start=schedule.eleventh_grade_afternoon_start,
+        eleventh_grade_afternoon_end=schedule.eleventh_grade_afternoon_end,
+        twelfth_grade_morning_start=schedule.twelfth_grade_morning_start,
+        twelfth_grade_morning_end=schedule.twelfth_grade_morning_end,
+        twelfth_grade_afternoon_start=schedule.twelfth_grade_afternoon_start,
+        twelfth_grade_afternoon_end=schedule.twelfth_grade_afternoon_end
+        ),201
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -1403,8 +1937,7 @@ def logout():
     session.clear()
     return redirect('/login')
 
-
-def retry_sms(unsent_sms):
+def retry_sms_in(unsent_sms):
     for sms in unsent_sms:
         if sms.time_out == '' or sms.time_out == None or sms.time_out == 'None':
             action = 'entered'
@@ -1412,20 +1945,38 @@ def retry_sms(unsent_sms):
         else:
             action = 'left'
             time = sms.time_out
-        print 'xxxxxxxxxxxxxxxxxxxxxxx'
-        print 'retrying' + str(sms.id_no)
+        compose_message(sms.id,sms.id_no,time,action)
+    return 'success',200
+
+def retry_sms_out(unsent_sms):
+    for sms in unsent_sms:
+        if sms.time_out == '' or sms.time_out == None or sms.time_out == 'None':
+            action = 'entered'
+            time = sms.time_in
+        else:
+            action = 'left'
+            time = sms.time_out
         compose_message(sms.id,sms.id_no,time,action)
     return 'success',200
 
 
 @app.route('/sms/retry', methods=['GET', 'POST'])
 def sms_retry():
-    unsent_sms = Log.query.filter_by(date=time.strftime("%B %d, %Y"),notification_status='Failed').all()
-    retry_sms_thread = threading.Thread(target=retry_sms,args=[unsent_sms])
-    retry_sms_thread.start()
+    unsent_sms_in = Log.query.filter_by(date=time.strftime("%B %d, %Y"),time_in_notification_status='Failed').all()
+    unsent_sms_out = Log.query.filter_by(date=time.strftime("%B %d, %Y"),time_out_notification_status='Failed').all()
+    unsent_sms_in_count = Log.query.filter_by(date=time.strftime("%B %d, %Y"),time_in_notification_status='Failed').count()
+    unsent_sms_out_count = Log.query.filter_by(date=time.strftime("%B %d, %Y"),time_out_notification_status='Failed').count()
+    retry_sms_in_thread = threading.Thread(target=retry_sms_in,args=[unsent_sms_in])
+    retry_sms_in_thread.start()
+    retry_sms_out_thread = threading.Thread(target=retry_sms_out,args=[unsent_sms_out])
+    retry_sms_out_thread.start()
+    report_body = {
+        'unsent_in': unsent_sms_in_count,
+        'unsent_out': unsent_sms_out_count
+    }
+    r = requests.post('http://ravenguard.herokuapp.com/report/unsent',report_body)
     return jsonify(status='success'),200
         
-
 
 @app.route('/student/info/get', methods=['GET', 'POST'])
 def get_student_info():
@@ -1505,6 +2056,17 @@ def change_tab():
     return '',200
 
 
+@app.route('/absent/initialize', methods=['POST'])
+def initialize_from_kiosk():
+    data = flask.request.form.to_dict()
+    morning_absent_thread = threading.Thread(target=initialize_morning_absent,args=[data['school_no'],data['api_key']])
+    morning_absent_thread.start()
+
+    afternoon_absent_thread = threading.Thread(target=initialize_afternoon_absent,args=[data['school_no'],data['api_key']])
+    afternoon_absent_thread.start()
+    return jsonify(status='success'),200
+
+
 @app.route('/addlog', methods=['POST'])
 def add_log():
     data = flask.request.form.to_dict()
@@ -1537,9 +2099,38 @@ def blast_message():
 
     contacts = []
 
+    new_message = Message(
+        school_no = session['school_no'],
+        sender_id = session['user_id'],
+        sender_name = session['user_name'],
+        recipient = ", ".join(recipients),
+        date = datetime.datetime.now().strftime('%B %d, %Y'),
+        time = time.strftime("%I:%M %p"),
+        content = message,
+        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+        )
+    db.session.add(new_message)
+    db.session.commit()
+
     if 'Parents' in recipients:
-        for msisdn in db.session.query(K12.parent_contact).distinct():
-            contacts.append(msisdn)
+        contacts = K12.query.all()
+        for contact in contacts:
+            in_list = MessageStatus.query.filter_by(message_id=new_message.id,msisdn=contact.parent_contact).first()
+            if not in_list or in_list == None:
+                student_name = contact.last_name+', '+contact.first_name
+                if contact.middle_name:
+                    student_name += ' '+contact.middle_name[:1]+'.'
+
+                new_message_status = MessageStatus(
+                    message_id = new_message.id,
+                    date = new_message.date,
+                    time = new_message.time,
+                    recipient_name = student_name,
+                    msisdn = contact.parent_contact
+                    )
+
+                db.session.add(new_message_status)
+                db.session.commit()
 
     if 'College' in recipients:
         for msisdn in db.session.query(College.mobile).distinct():
@@ -1549,27 +2140,17 @@ def blast_message():
         for msisdn in db.session.query(Staff.mobile).distinct():
             contacts.append(msisdn)
 
-    new_message = Message(
-        school_no = session['school_no'],
-        sender_id = session['user_id'],
-        sender_name = session['user_name'],
-        recipient = ", ".join(recipients),
-        date = datetime.datetime.now().strftime('%B %d, %Y'),
-        time = time.strftime("%I:%M %p"),
-        content = message,
-        batch_size = len(contacts),
-        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
-        )
-
-    db.session.add(new_message)
+    new_message.batch_size = MessageStatus.query.filter_by(message_id=new_message.id).count()
+    new_message.pending = MessageStatus.query.filter_by(message_id=new_message.id,status='pending').count()
     db.session.commit()
 
-    blast_sms.delay(new_message.id,contacts,new_message.date,new_message.time,message)
+    blast_sms.delay(new_message.id,new_message.date,new_message.time,message)
 
     session['messages_limit'] = 0
     session['messages_search_limit'] = 0
     contacts = []
     return fetch_next('messages')
+
 
 
 @app.route('/sync',methods=['GET','POST'])
@@ -2063,17 +2644,302 @@ def search_student_late():
 def change_sched():
     schedule = flask.request.form.getlist('schedule[]')
 
-    sched_data = {
-        'api_key': session['api_key'],
-        'schedule': schedule 
-    }
+    monday_sched = Regular.query.filter_by(school_no=session['school_no'],day='Monday').one()
+    tuesday_sched = Regular.query.filter_by(school_no=session['school_no'],day=u'Tuesday').one()
+    wednesday_sched = Regular.query.filter_by(school_no=session['school_no'],day='Wednesday').one()
+    thursday_sched = Regular.query.filter_by(school_no=session['school_no'],day='Thursday').one()
+    friday_sched = Regular.query.filter_by(school_no=session['school_no'],day='Friday').one()
 
-    try:
-        r = requests.post(CALENDAR_URL%'/schedule/regular/update',sched_data)
-        print r.status_code #update log database (put 'sent' to status)
+    monday_sched.junior_kinder_morning_start = schedule[0]
+    monday_sched.junior_kinder_morning_end = schedule[1]
+    monday_sched.junior_kinder_afternoon_start = schedule[2]
+    monday_sched.junior_kinder_afternoon_end = schedule[3]
+    monday_sched.senior_kinder_morning_start = schedule[4]
+    monday_sched.senior_kinder_morning_end = schedule[5]
+    monday_sched.senior_kinder_afternoon_start = schedule[6]
+    monday_sched.senior_kinder_afternoon_end = schedule[7]
+    monday_sched.first_grade_morning_start = schedule[8]
+    monday_sched.first_grade_morning_end = schedule[9]
+    monday_sched.first_grade_afternoon_start = schedule[10]
+    monday_sched.first_grade_afternoon_end = schedule[11]
+    monday_sched.second_grade_morning_start = schedule[12]
+    monday_sched.second_grade_morning_end = schedule[13]
+    monday_sched.second_grade_afternoon_start = schedule[14]
+    monday_sched.second_grade_afternoon_end = schedule[15]
+    monday_sched.third_grade_morning_start = schedule[16]
+    monday_sched.third_grade_morning_end = schedule[17]
+    monday_sched.third_grade_afternoon_start = schedule[18]
+    monday_sched.third_grade_afternoon_end = schedule[19]
+    monday_sched.fourth_grade_morning_start = schedule[20]
+    monday_sched.fourth_grade_morning_end = schedule[21]
+    monday_sched.fourth_grade_afternoon_start = schedule[22]
+    monday_sched.fourth_grade_afternoon_end = schedule[23]
+    monday_sched.fifth_grade_morning_start = schedule[24]
+    monday_sched.fifth_grade_morning_end = schedule[25]
+    monday_sched.fifth_grade_afternoon_start = schedule[26]
+    monday_sched.fifth_grade_afternoon_end = schedule[27]
+    monday_sched.sixth_grade_morning_start = schedule[28]
+    monday_sched.sixth_grade_morning_end = schedule[29]
+    monday_sched.sixth_grade_afternoon_start = schedule[30]
+    monday_sched.sixth_grade_afternoon_end = schedule[31]
+    monday_sched.seventh_grade_morning_start = schedule[32]
+    monday_sched.seventh_grade_morning_end = schedule[33]
+    monday_sched.seventh_grade_afternoon_start = schedule[34]
+    monday_sched.seventh_grade_afternoon_end = schedule[35]
+    monday_sched.eight_grade_morning_start = schedule[36]
+    monday_sched.eight_grade_morning_end = schedule[37]
+    monday_sched.eight_grade_afternoon_start = schedule[38]
+    monday_sched.eight_grade_afternoon_end = schedule[39]
+    monday_sched.ninth_grade_morning_start = schedule[40]
+    monday_sched.ninth_grade_morning_end = schedule[41]
+    monday_sched.ninth_grade_afternoon_start = schedule[42]
+    monday_sched.ninth_grade_afternoon_end = schedule[43]
+    monday_sched.tenth_grade_morning_start = schedule[44]
+    monday_sched.tenth_grade_morning_end = schedule[45]
+    monday_sched.tenth_grade_afternoon_start = schedule[46]
+    monday_sched.tenth_grade_afternoon_end = schedule[47]
+    monday_sched.eleventh_grade_morning_start = schedule[48]
+    monday_sched.eleventh_grade_morning_end = schedule[49]
+    monday_sched.eleventh_grade_afternoon_start = schedule[50]
+    monday_sched.eleventh_grade_afternoon_end = schedule[51]
+    monday_sched.twelfth_grade_morning_start = schedule[52]
+    monday_sched.twelfth_grade_morning_end = schedule[53]
+    monday_sched.twelfth_grade_afternoon_start = schedule[54]
+    monday_sched.twelfth_grade_afternoon_end = schedule[55]
 
-    except requests.exceptions.ConnectionError as e:
-        print "Disconnected!"
+
+    tuesday_sched.junior_kinder_morning_start = schedule[56]
+    tuesday_sched.junior_kinder_morning_end = schedule[57]
+    tuesday_sched.junior_kinder_afternoon_start = schedule[58]
+    tuesday_sched.junior_kinder_afternoon_end = schedule[59]
+    tuesday_sched.senior_kinder_morning_start = schedule[60]
+    tuesday_sched.senior_kinder_morning_end = schedule[61]
+    tuesday_sched.senior_kinder_afternoon_start = schedule[62]
+    tuesday_sched.senior_kinder_afternoon_end = schedule[63]
+    tuesday_sched.first_grade_morning_start = schedule[64]
+    tuesday_sched.first_grade_morning_end = schedule[65]
+    tuesday_sched.first_grade_afternoon_start = schedule[66]
+    tuesday_sched.first_grade_afternoon_end = schedule[67]
+    tuesday_sched.second_grade_morning_start = schedule[68]
+    tuesday_sched.second_grade_morning_end = schedule[69]
+    tuesday_sched.second_grade_afternoon_start = schedule[70]
+    tuesday_sched.second_grade_afternoon_end = schedule[71]
+    tuesday_sched.third_grade_morning_start = schedule[72]
+    tuesday_sched.third_grade_morning_end = schedule[73]
+    tuesday_sched.third_grade_afternoon_start = schedule[74]
+    tuesday_sched.third_grade_afternoon_end = schedule[75]
+    tuesday_sched.fourth_grade_morning_start = schedule[76]
+    tuesday_sched.fourth_grade_morning_end = schedule[77]
+    tuesday_sched.fourth_grade_afternoon_start = schedule[78]
+    tuesday_sched.fourth_grade_afternoon_end = schedule[79]
+    tuesday_sched.fifth_grade_morning_start = schedule[80]
+    tuesday_sched.fifth_grade_morning_end = schedule[81]
+    tuesday_sched.fifth_grade_afternoon_start = schedule[82]
+    tuesday_sched.fifth_grade_afternoon_end = schedule[83]
+    tuesday_sched.sixth_grade_morning_start = schedule[84]
+    tuesday_sched.sixth_grade_morning_end = schedule[85]
+    tuesday_sched.sixth_grade_afternoon_start = schedule[86]
+    tuesday_sched.sixth_grade_afternoon_end = schedule[87]
+    tuesday_sched.seventh_grade_morning_start = schedule[88]
+    tuesday_sched.seventh_grade_morning_end = schedule[89]
+    tuesday_sched.seventh_grade_afternoon_start = schedule[90]
+    tuesday_sched.seventh_grade_afternoon_end = schedule[91]
+    tuesday_sched.eight_grade_morning_start = schedule[92]
+    tuesday_sched.eight_grade_morning_end = schedule[93]
+    tuesday_sched.eight_grade_afternoon_start = schedule[94]
+    tuesday_sched.eight_grade_afternoon_end = schedule[95]
+    tuesday_sched.ninth_grade_morning_start = schedule[96]
+    tuesday_sched.ninth_grade_morning_end = schedule[97]
+    tuesday_sched.ninth_grade_afternoon_start = schedule[98]
+    tuesday_sched.ninth_grade_afternoon_end = schedule[99]
+    tuesday_sched.tenth_grade_morning_start = schedule[100]
+    tuesday_sched.tenth_grade_morning_end = schedule[101]
+    tuesday_sched.tenth_grade_afternoon_start = schedule[102]
+    tuesday_sched.tenth_grade_afternoon_end = schedule[103]
+    tuesday_sched.eleventh_grade_morning_start = schedule[104]
+    tuesday_sched.eleventh_grade_morning_end = schedule[105]
+    tuesday_sched.eleventh_grade_afternoon_start = schedule[106]
+    tuesday_sched.eleventh_grade_afternoon_end = schedule[107]
+    tuesday_sched.twelfth_grade_morning_start = schedule[108]
+    tuesday_sched.twelfth_grade_morning_end = schedule[109]
+    tuesday_sched.twelfth_grade_afternoon_start = schedule[110]
+    tuesday_sched.twelfth_grade_afternoon_end = schedule[111]
+
+
+    wednesday_sched.junior_kinder_morning_start = schedule[112]
+    wednesday_sched.junior_kinder_morning_end = schedule[113]
+    wednesday_sched.junior_kinder_afternoon_start = schedule[114]
+    wednesday_sched.junior_kinder_afternoon_end = schedule[115]
+    wednesday_sched.senior_kinder_morning_start = schedule[116]
+    wednesday_sched.senior_kinder_morning_end = schedule[117]
+    wednesday_sched.senior_kinder_afternoon_start = schedule[118]
+    wednesday_sched.senior_kinder_afternoon_end = schedule[119]
+    wednesday_sched.first_grade_morning_start = schedule[120]
+    wednesday_sched.first_grade_morning_end = schedule[121]
+    wednesday_sched.first_grade_afternoon_start = schedule[122]
+    wednesday_sched.first_grade_afternoon_end = schedule[123]
+    wednesday_sched.second_grade_morning_start = schedule[124]
+    wednesday_sched.second_grade_morning_end = schedule[125]
+    wednesday_sched.second_grade_afternoon_start = schedule[126]
+    wednesday_sched.second_grade_afternoon_end = schedule[127]
+    wednesday_sched.third_grade_morning_start = schedule[128]
+    wednesday_sched.third_grade_morning_end = schedule[129]
+    wednesday_sched.third_grade_afternoon_start = schedule[130]
+    wednesday_sched.third_grade_afternoon_end = schedule[131]
+    wednesday_sched.fourth_grade_morning_start = schedule[132]
+    wednesday_sched.fourth_grade_morning_end = schedule[133]
+    wednesday_sched.fourth_grade_afternoon_start = schedule[134]
+    wednesday_sched.fourth_grade_afternoon_end = schedule[135]
+    wednesday_sched.fifth_grade_morning_start = schedule[136]
+    wednesday_sched.fifth_grade_morning_end = schedule[137]
+    wednesday_sched.fifth_grade_afternoon_start = schedule[138]
+    wednesday_sched.fifth_grade_afternoon_end = schedule[139]
+    wednesday_sched.sixth_grade_morning_start = schedule[140]
+    wednesday_sched.sixth_grade_morning_end = schedule[141]
+    wednesday_sched.sixth_grade_afternoon_start = schedule[142]
+    wednesday_sched.sixth_grade_afternoon_end = schedule[143]
+    wednesday_sched.seventh_grade_morning_start = schedule[144]
+    wednesday_sched.seventh_grade_morning_end = schedule[145]
+    wednesday_sched.seventh_grade_afternoon_start = schedule[146]
+    wednesday_sched.seventh_grade_afternoon_end = schedule[147]
+    wednesday_sched.eight_grade_morning_start = schedule[148]
+    wednesday_sched.eight_grade_morning_end = schedule[149]
+    wednesday_sched.eight_grade_afternoon_start = schedule[150]
+    wednesday_sched.eight_grade_afternoon_end = schedule[151]
+    wednesday_sched.ninth_grade_morning_start = schedule[152]
+    wednesday_sched.ninth_grade_morning_end = schedule[153]
+    wednesday_sched.ninth_grade_afternoon_start = schedule[154]
+    wednesday_sched.ninth_grade_afternoon_end = schedule[155]
+    wednesday_sched.tenth_grade_morning_start = schedule[156]
+    wednesday_sched.tenth_grade_morning_end = schedule[157]
+    wednesday_sched.tenth_grade_afternoon_start = schedule[158]
+    wednesday_sched.tenth_grade_afternoon_end = schedule[159]
+    wednesday_sched.eleventh_grade_morning_start = schedule[160]
+    wednesday_sched.eleventh_grade_morning_end = schedule[161]
+    wednesday_sched.eleventh_grade_afternoon_start = schedule[162]
+    wednesday_sched.eleventh_grade_afternoon_end = schedule[163]
+    wednesday_sched.twelfth_grade_morning_start = schedule[164]
+    wednesday_sched.twelfth_grade_morning_end = schedule[165]
+    wednesday_sched.twelfth_grade_afternoon_start = schedule[166]
+    wednesday_sched.twelfth_grade_afternoon_end = schedule[167]
+
+
+    thursday_sched.junior_kinder_morning_start = schedule[168]
+    thursday_sched.junior_kinder_morning_end = schedule[169]
+    thursday_sched.junior_kinder_afternoon_start = schedule[170]
+    thursday_sched.junior_kinder_afternoon_end = schedule[171]
+    thursday_sched.senior_kinder_morning_start = schedule[172]
+    thursday_sched.senior_kinder_morning_end = schedule[173]
+    thursday_sched.senior_kinder_afternoon_start = schedule[174]
+    thursday_sched.senior_kinder_afternoon_end = schedule[175]
+    thursday_sched.first_grade_morning_start = schedule[176]
+    thursday_sched.first_grade_morning_end = schedule[177]
+    thursday_sched.first_grade_afternoon_start = schedule[178]
+    thursday_sched.first_grade_afternoon_end = schedule[179]
+    thursday_sched.second_grade_morning_start = schedule[180]
+    thursday_sched.second_grade_morning_end = schedule[181]
+    thursday_sched.second_grade_afternoon_start = schedule[182]
+    thursday_sched.second_grade_afternoon_end = schedule[183]
+    thursday_sched.third_grade_morning_start = schedule[184]
+    thursday_sched.third_grade_morning_end = schedule[185]
+    thursday_sched.third_grade_afternoon_start = schedule[186]
+    thursday_sched.third_grade_afternoon_end = schedule[187]
+    thursday_sched.fourth_grade_morning_start = schedule[188]
+    thursday_sched.fourth_grade_morning_end = schedule[189]
+    thursday_sched.fourth_grade_afternoon_start = schedule[190]
+    thursday_sched.fourth_grade_afternoon_end = schedule[191]
+    thursday_sched.fifth_grade_morning_start = schedule[192]
+    thursday_sched.fifth_grade_morning_end = schedule[193]
+    thursday_sched.fifth_grade_afternoon_start = schedule[194]
+    thursday_sched.fifth_grade_afternoon_end = schedule[195]
+    thursday_sched.sixth_grade_morning_start = schedule[196]
+    thursday_sched.sixth_grade_morning_end = schedule[197]
+    thursday_sched.sixth_grade_afternoon_start = schedule[198]
+    thursday_sched.sixth_grade_afternoon_end = schedule[199]
+    thursday_sched.seventh_grade_morning_start = schedule[200]
+    thursday_sched.seventh_grade_morning_end = schedule[201]
+    thursday_sched.seventh_grade_afternoon_start = schedule[202]
+    thursday_sched.seventh_grade_afternoon_end = schedule[203]
+    thursday_sched.eight_grade_morning_start = schedule[204]
+    thursday_sched.eight_grade_morning_end = schedule[205]
+    thursday_sched.eight_grade_afternoon_start = schedule[206]
+    thursday_sched.eight_grade_afternoon_end = schedule[207]
+    thursday_sched.ninth_grade_morning_start = schedule[208]
+    thursday_sched.ninth_grade_morning_end = schedule[209]
+    thursday_sched.ninth_grade_afternoon_start = schedule[210]
+    thursday_sched.ninth_grade_afternoon_end = schedule[211]
+    thursday_sched.tenth_grade_morning_start = schedule[212]
+    thursday_sched.tenth_grade_morning_end = schedule[213]
+    thursday_sched.tenth_grade_afternoon_start = schedule[214]
+    thursday_sched.tenth_grade_afternoon_end = schedule[215]
+    thursday_sched.eleventh_grade_morning_start = schedule[216]
+    thursday_sched.eleventh_grade_morning_end = schedule[217]
+    thursday_sched.eleventh_grade_afternoon_start = schedule[218]
+    thursday_sched.eleventh_grade_afternoon_end = schedule[219]
+    thursday_sched.twelfth_grade_morning_start = schedule[220]
+    thursday_sched.twelfth_grade_morning_end = schedule[221]
+    thursday_sched.twelfth_grade_afternoon_start = schedule[222]
+    thursday_sched.twelfth_grade_afternoon_end = schedule[223]
+
+
+    friday_sched.junior_kinder_morning_start = schedule[224]
+    friday_sched.junior_kinder_morning_end = schedule[225]
+    friday_sched.junior_kinder_afternoon_start = schedule[226]
+    friday_sched.junior_kinder_afternoon_end = schedule[227]
+    friday_sched.senior_kinder_morning_start = schedule[228]
+    friday_sched.senior_kinder_morning_end = schedule[229]
+    friday_sched.senior_kinder_afternoon_start = schedule[230]
+    friday_sched.senior_kinder_afternoon_end = schedule[231]
+    friday_sched.first_grade_morning_start = schedule[232]
+    friday_sched.first_grade_morning_end = schedule[233]
+    friday_sched.first_grade_afternoon_start = schedule[234]
+    friday_sched.first_grade_afternoon_end = schedule[235]
+    friday_sched.second_grade_morning_start = schedule[236]
+    friday_sched.second_grade_morning_end = schedule[237]
+    friday_sched.second_grade_afternoon_start = schedule[238]
+    friday_sched.second_grade_afternoon_end = schedule[239]
+    friday_sched.third_grade_morning_start = schedule[240]
+    friday_sched.third_grade_morning_end = schedule[241]
+    friday_sched.third_grade_afternoon_start = schedule[242]
+    friday_sched.third_grade_afternoon_end = schedule[243]
+    friday_sched.fourth_grade_morning_start = schedule[244]
+    friday_sched.fourth_grade_morning_end = schedule[245]
+    friday_sched.fourth_grade_afternoon_start = schedule[246]
+    friday_sched.fourth_grade_afternoon_end = schedule[247]
+    friday_sched.fifth_grade_morning_start = schedule[248]
+    friday_sched.fifth_grade_morning_end = schedule[249]
+    friday_sched.fifth_grade_afternoon_start = schedule[250]
+    friday_sched.fifth_grade_afternoon_end = schedule[251]
+    friday_sched.sixth_grade_morning_start = schedule[252]
+    friday_sched.sixth_grade_morning_end = schedule[253]
+    friday_sched.sixth_grade_afternoon_start = schedule[254]
+    friday_sched.sixth_grade_afternoon_end = schedule[255]
+    friday_sched.seventh_grade_morning_start = schedule[256]
+    friday_sched.seventh_grade_morning_end = schedule[257]
+    friday_sched.seventh_grade_afternoon_start = schedule[258]
+    friday_sched.seventh_grade_afternoon_end = schedule[259]
+    friday_sched.eight_grade_morning_start = schedule[260]
+    friday_sched.eight_grade_morning_end = schedule[261]
+    friday_sched.eight_grade_afternoon_start = schedule[262]
+    friday_sched.eight_grade_afternoon_end = schedule[263]
+    friday_sched.ninth_grade_morning_start = schedule[264]
+    friday_sched.ninth_grade_morning_end = schedule[265]
+    friday_sched.ninth_grade_afternoon_start = schedule[266]
+    friday_sched.ninth_grade_afternoon_end = schedule[267]
+    friday_sched.tenth_grade_morning_start = schedule[268]
+    friday_sched.tenth_grade_morning_end = schedule[269]
+    friday_sched.tenth_grade_afternoon_start = schedule[270]
+    friday_sched.tenth_grade_afternoon_end = schedule[271]
+    friday_sched.eleventh_grade_morning_start = schedule[272]
+    friday_sched.eleventh_grade_morning_end = schedule[273]
+    friday_sched.eleventh_grade_afternoon_start = schedule[274]
+    friday_sched.eleventh_grade_afternoon_end = schedule[275]
+    friday_sched.twelfth_grade_morning_start = schedule[276]
+    friday_sched.twelfth_grade_morning_end = schedule[277]
+    friday_sched.twelfth_grade_afternoon_start = schedule[278]
+    friday_sched.twelfth_grade_afternoon_end = schedule[279]
+
+    db.session.commit()
 
     return '',200
 
@@ -2081,22 +2947,116 @@ def change_sched():
 @app.route('/schedule/irregular/save',methods=['GET','POST'])
 def change_irregular_sched():
     schedule = flask.request.form.to_dict()
+    existing = Irregular.query.filter_by(school_no=session['school_no'],month=session['specific_month'],day=session['specific_day'],year=session['specific_year']).first()
+    if existing:
+        db.session.delete(existing)
+        db.session.commit()
 
-    request_param = {
-        'api_key':session['api_key'],
-        'month':session['month'],
-        'day':session['day'],
-        'year':session['year']
-    }
+    irregular_schedule = Irregular(
+        school_no=session['school_no'],
+        date=calendar.month_name[int(session['specific_month'])]+' '+str(session['specific_day'])+', '+str(session['specific_year']),
+        day=session['specific_day'],
+        month=session['specific_month'],
+        year=session['specific_year'],
+        junior_kinder_morning_class=True if schedule['save_junior_kinder_morning_class'] == 'true' else False,
+        junior_kinder_afternoon_class=True if schedule['save_junior_kinder_afternoon_class'] == 'true' else False,
+        senior_kinder_morning_class=True if schedule['save_senior_kinder_morning_class'] == 'true' else False,
+        senior_kinder_afternoon_class=True if schedule['save_senior_kinder_afternoon_class'] == 'true' else False,
+        first_grade_morning_class=True if schedule['save_first_grade_morning_class'] == 'true' else False,
+        first_grade_afternoon_class=True if schedule['save_first_grade_afternoon_class'] == 'true' else False,
+        second_grade_morning_class=True if schedule['save_second_grade_morning_class'] == 'true' else False,
+        second_grade_afternoon_class=True if schedule['save_second_grade_afternoon_class'] == 'true' else False,
+        third_grade_morning_class=True if schedule['save_third_grade_morning_class'] == 'true' else False,
+        third_grade_afternoon_class=True if schedule['save_third_grade_afternoon_class'] == 'true' else False,
+        fourth_grade_morning_class=True if schedule['save_fourth_grade_morning_class'] == 'true' else False,
+        fourth_grade_afternoon_class=True if schedule['save_fourth_grade_afternoon_class'] == 'true' else False,
+        fifth_grade_morning_class=True if schedule['save_fifth_grade_morning_class'] == 'true' else False,
+        fifth_grade_afternoon_class=True if schedule['save_fifth_grade_afternoon_class'] == 'true' else False,
+        sixth_grade_morning_class=True if schedule['save_sixth_grade_morning_class'] == 'true' else False,
+        sixth_grade_afternoon_class=True if schedule['save_sixth_grade_afternoon_class'] == 'true' else False,
+        seventh_grade_morning_class=True if schedule['save_seventh_grade_morning_class'] == 'true' else False,
+        seventh_grade_afternoon_class=True if schedule['save_seventh_grade_afternoon_class'] == 'true' else False,
+        eight_grade_morning_class=True if schedule['save_eight_grade_morning_class'] == 'true' else False,
+        eight_grade_afternoon_class=True if schedule['save_eight_grade_afternoon_class'] == 'true' else False,
+        ninth_grade_morning_class=True if schedule['save_ninth_grade_morning_class'] == 'true' else False,
+        ninth_grade_afternoon_class=True if schedule['save_ninth_grade_afternoon_class'] == 'true' else False,
+        tenth_grade_morning_class=True if schedule['save_tenth_grade_morning_class'] == 'true' else False,
+        tenth_grade_afternoon_class=True if schedule['save_tenth_grade_afternoon_class'] == 'true' else False,
+        eleventh_grade_morning_class=True if schedule['save_eleventh_grade_morning_class'] == 'true' else False,
+        eleventh_grade_afternoon_class=True if schedule['save_eleventh_grade_afternoon_class'] == 'true' else False,
+        twelfth_grade_morning_class=True if schedule['save_twelfth_grade_morning_class'] == 'true' else False,
+        twelfth_grade_afternoon_class=True if schedule['save_twelfth_grade_afternoon_class'] == 'true' else False,
 
-    try:
-        r = requests.post(CALENDAR_URL%'/schedule/irregular/new',schedule,params=request_param)
-        print r.status_code #update log database (put 'sent' to status)
+        junior_kinder_morning_start=schedule['save_junior_kinder_morning_start'],
+        junior_kinder_morning_end=schedule['save_junior_kinder_morning_end'],
+        junior_kinder_afternoon_start=schedule['save_junior_kinder_afternoon_start'],
+        junior_kinder_afternoon_end=schedule['save_junior_kinder_afternoon_end'],
+        senior_kinder_morning_start=schedule['save_senior_kinder_morning_start'],
+        senior_kinder_morning_end=schedule['save_senior_kinder_morning_end'],
+        senior_kinder_afternoon_start=schedule['save_senior_kinder_afternoon_start'],
+        senior_kinder_afternoon_end=schedule['save_senior_kinder_afternoon_end'],
+        first_grade_morning_start=schedule['save_first_grade_morning_start'],
+        first_grade_morning_end=schedule['save_first_grade_morning_end'],
+        first_grade_afternoon_start=schedule['save_first_grade_afternoon_start'],
+        first_grade_afternoon_end=schedule['save_first_grade_afternoon_end'],
+        second_grade_morning_start=schedule['save_second_grade_morning_start'],
+        second_grade_morning_end=schedule['save_second_grade_morning_end'],
+        second_grade_afternoon_start=schedule['save_second_grade_afternoon_start'],
+        second_grade_afternoon_end=schedule['save_second_grade_afternoon_end'],
+        third_grade_morning_start=schedule['save_third_grade_morning_start'],
+        third_grade_morning_end=schedule['save_third_grade_morning_end'],
+        third_grade_afternoon_start=schedule['save_third_grade_afternoon_start'],
+        third_grade_afternoon_end=schedule['save_third_grade_afternoon_end'],
+        fourth_grade_morning_start=schedule['save_fourth_grade_morning_start'],
+        fourth_grade_morning_end=schedule['save_fourth_grade_morning_end'],
+        fourth_grade_afternoon_start=schedule['save_fourth_grade_afternoon_start'],
+        fourth_grade_afternoon_end=schedule['save_fourth_grade_afternoon_end'],
+        fifth_grade_morning_start=schedule['save_fifth_grade_morning_start'],
+        fifth_grade_morning_end=schedule['save_fifth_grade_morning_end'],
+        fifth_grade_afternoon_start=schedule['save_fifth_grade_afternoon_start'],
+        fifth_grade_afternoon_end=schedule['save_fifth_grade_afternoon_end'],
+        sixth_grade_morning_start=schedule['save_sixth_grade_morning_start'],
+        sixth_grade_morning_end=schedule['save_sixth_grade_morning_end'],
+        sixth_grade_afternoon_start=schedule['save_sixth_grade_afternoon_start'],
+        sixth_grade_afternoon_end=schedule['save_sixth_grade_afternoon_end'],
+        seventh_grade_morning_start=schedule['save_seventh_grade_morning_start'],
+        seventh_grade_morning_end=schedule['save_seventh_grade_morning_end'],
+        seventh_grade_afternoon_start=schedule['save_seventh_grade_afternoon_start'],
+        seventh_grade_afternoon_end=schedule['save_seventh_grade_afternoon_end'],
+        eight_grade_morning_start=schedule['save_eight_grade_morning_start'],
+        eight_grade_morning_end=schedule['save_eight_grade_morning_end'],
+        eight_grade_afternoon_start=schedule['save_eight_grade_afternoon_start'],
+        eight_grade_afternoon_end=schedule['save_eight_grade_afternoon_end'],
+        ninth_grade_morning_start=schedule['save_ninth_grade_morning_start'],
+        ninth_grade_morning_end=schedule['save_ninth_grade_morning_end'],
+        ninth_grade_afternoon_start=schedule['save_ninth_grade_afternoon_start'],
+        ninth_grade_afternoon_end=schedule['save_ninth_grade_afternoon_end'],
+        tenth_grade_morning_start=schedule['save_tenth_grade_morning_start'],
+        tenth_grade_morning_end=schedule['save_tenth_grade_morning_end'],
+        tenth_grade_afternoon_start=schedule['save_tenth_grade_afternoon_start'],
+        tenth_grade_afternoon_end=schedule['save_tenth_grade_afternoon_end'],
+        eleventh_grade_morning_start=schedule['save_eleventh_grade_morning_start'],
+        eleventh_grade_morning_end=schedule['save_eleventh_grade_morning_end'],
+        eleventh_grade_afternoon_start=schedule['save_eleventh_grade_afternoon_start'],
+        eleventh_grade_afternoon_end=schedule['save_eleventh_grade_afternoon_end'],
+        twelfth_grade_morning_start=schedule['save_twelfth_grade_morning_start'],
+        twelfth_grade_morning_end=schedule['save_twelfth_grade_morning_end'],
+        twelfth_grade_afternoon_start=schedule['save_twelfth_grade_afternoon_start'],
+        twelfth_grade_afternoon_end=schedule['save_twelfth_grade_afternoon_end']
+        )
+    db.session.add(irregular_schedule)
+    db.session.commit()
 
-    except requests.exceptions.ConnectionError as e:
-        print "Disconnected!"
+    cal = Calendar(6)
+    dates = cal.monthdatescalendar(session['year'], session['month'])
 
-    return '',200
+    event_days=[]
+    events = Irregular.query.filter_by(school_no=session['school_no'],month=session['month'],year=session['year']).all()
+    
+    for event in events:
+        event_days.append(event.day)
+    
+    return flask.render_template('new_dates.html', dates=dates, year=session['year'], month=session['month'], events=event_days, month_name=calendar.month_name[session['month']]),201
 
 
 @app.route('/id/validate',methods=['GET','POST'])
@@ -2143,19 +3103,13 @@ def populate_calendar():
     day = date.today().day
     dates = cal.monthdatescalendar(session['year'], session['month'])
 
-    calendar_params = {
-        'api_key':session['api_key'],
-        'month':session['month'],
-        'year':session['year']
-    }
-
-    try:
-        get_events = requests.get(CALENDAR_URL%'/events/get',params=calendar_params)
-        events = get_events.json()['days']
-        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today=day, events=events, month_name=calendar.month_name[session['month']])
-
-    except requests.exceptions.ConnectionError as e:
-        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], month_name=calendar.month_name[session['month']], today=day) #return diff template??
+    event_days=[]
+    events = Irregular.query.filter_by(school_no=session['school_no'],month=session['month'],year=session['year']).all()
+    
+    for event in events:
+        event_days.append(event.day)
+    
+    return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today=day, events=event_days, month_name=calendar.month_name[session['month']])
 
 
 @app.route('/report/generate',methods=['GET','POST'])
@@ -2214,19 +3168,11 @@ def next_month():
     session['year'] = int(data['year'])
     dates = cal.monthdatescalendar(session['year'], session['month'])
 
-    calendar_params = {
-        'api_key':session['api_key'],
-        'month':session['month'],
-        'year':session['year']
-    }
-
-    try:
-        get_events = requests.get(CALENDAR_URL%'/events/get',params=calendar_params)
-        events = get_events.json()['days']
-        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today='', events=events, month_name=calendar.month_name[session['month']])
-
-    except requests.exceptions.ConnectionError as e:
-        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today='')
+    event_days=[]
+    events = Irregular.query.filter_by(school_no=session['school_no'],month=session['month'],year=session['year']).all()
+    for event in events:
+        event_days.append(event.day)
+    return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today='', events=event_days, month_name=calendar.month_name[session['month']])
 
 
 @app.route('/calendar/prev/get',methods=['GET','POST'])
@@ -2239,139 +3185,227 @@ def prev_month():
         session['month'] -= 1
     dates = cal.monthdatescalendar(session['year'], session['month'])
 
-    calendar_params = {
-        'api_key':session['api_key'],
-        'month':session['month'],
-        'year':session['year']
-    }
-
-    try:
-        get_events = requests.get(CALENDAR_URL%'/events/get',params=calendar_params)
-        events = get_events.json()['days']
-        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today='', events=events, month_name=calendar.month_name[session['month']])
-
-    except requests.exceptions.ConnectionError as e:
-        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today='')
+    event_days=[]
+    events = Irregular.query.filter_by(school_no=session['school_no'],month=session['month'],year=session['year']).all()
+    for event in events:
+        event_days.append(event.day)
+    return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], today='', events=event_days, month_name=calendar.month_name[session['month']])
 
 
 @app.route('/schedule/regular/get',methods=['GET','POST'])
 def populate_regular_schedule():
-    calendar_params = {
-        'api_key':session['api_key']
-    }
-
-    try:
-        get_sched = requests.get(CALENDAR_URL%'/schedule/regular/get',params=calendar_params)
-        return SWJsonify({
-        'monday': get_sched.json()['monday'],
-        'tuesday': get_sched.json()['tuesday'],
-        'wednesday': get_sched.json()['wednesday'],
-        'thursday': get_sched.json()['thursday'],
-        'friday': get_sched.json()['friday'],
+    monday_schedule = Regular.query.filter_by(school_no=session['school_no'],day='Monday').first()
+    tuesday_schedule = Regular.query.filter_by(school_no=session['school_no'],day='Tuesday').first()
+    wednesday_schedule = Regular.query.filter_by(school_no=session['school_no'],day='Wednesday').first()
+    thursday_schedule = Regular.query.filter_by(school_no=session['school_no'],day='Thursday').first()
+    friday_schedule = Regular.query.filter_by(school_no=session['school_no'],day='Friday').first()
+    saturday_schedule = Regular.query.filter_by(school_no=session['school_no'],day='Saturday').first()
+    return SWJsonify({
+        'monday': monday_schedule,
+        'tuesday': tuesday_schedule,
+        'wednesday': wednesday_schedule,
+        'thursday': thursday_schedule,
+        'friday': friday_schedule,
         }), 200
 
-    except requests.exceptions.ConnectionError as e:
-        return flask.render_template('dates.html', dates=dates, year=session['year'], month=session['month'], month_name=calendar.month_name[session['month']], today='')
 
-
-@app.route('/schedule/sync',methods=['GET','POST'])
-def sync_schedule():
+@app.route('/schedule/regular/get/specific',methods=['GET','POST'])
+def populate_specific_regular_schedule():
     data = flask.request.form.to_dict()
+    session['specific_month'] = data['month']
+    session['specific_day'] = data['day']
+    session['specific_year'] = data['year']
+    day = calendar.day_name[datetime.datetime(month=int(data['month']),day=int(data['day']),year=int(data['year'])).weekday()]
+    schedule = Regular.query.filter_by(school_no=session['school_no'],day=day).first()
+    return jsonify(
+        junior_kinder_morning_class=schedule.junior_kinder_morning_class,
+        junior_kinder_afternoon_class=schedule.junior_kinder_afternoon_class,
+        senior_kinder_morning_class=schedule.senior_kinder_morning_class,
+        senior_kinder_afternoon_class=schedule.senior_kinder_afternoon_class,
+        first_grade_morning_class=schedule.first_grade_morning_class,
+        first_grade_afternoon_class=schedule.first_grade_afternoon_class,
+        second_grade_morning_class=schedule.second_grade_morning_class,
+        second_grade_afternoon_class=schedule.second_grade_afternoon_class,
+        third_grade_morning_class=schedule.third_grade_morning_class,
+        third_grade_afternoon_class=schedule.third_grade_afternoon_class,
+        fourth_grade_morning_class=schedule.fourth_grade_morning_class,
+        fourth_grade_afternoon_class=schedule.fourth_grade_afternoon_class,
+        fifth_grade_morning_class=schedule.fifth_grade_morning_class,
+        fifth_grade_afternoon_class=schedule.fifth_grade_afternoon_class,
+        sixth_grade_morning_class=schedule.sixth_grade_morning_class,
+        sixth_grade_afternoon_class=schedule.sixth_grade_afternoon_class,
+        seventh_grade_morning_class=schedule.seventh_grade_morning_class,
+        seventh_grade_afternoon_class=schedule.seventh_grade_afternoon_class,
+        eight_grade_morning_class=schedule.eight_grade_morning_class,
+        eight_grade_afternoon_class=schedule.eight_grade_afternoon_class,
+        ninth_grade_morning_class=schedule.ninth_grade_morning_class,
+        ninth_grade_afternoon_class=schedule.ninth_grade_afternoon_class,
+        tenth_grade_morning_class=schedule.tenth_grade_morning_class,
+        tenth_grade_afternoon_class=schedule.tenth_grade_afternoon_class,
+        eleventh_grade_morning_class=schedule.eleventh_grade_morning_class,
+        eleventh_grade_afternoon_class=schedule.eleventh_grade_afternoon_class,
+        twelfth_grade_morning_class=schedule.twelfth_grade_morning_class,
+        twelfth_grade_afternoon_class=schedule.twelfth_grade_afternoon_class,
+        junior_kinder_morning_start=schedule.junior_kinder_morning_start,
+        junior_kinder_morning_end=schedule.junior_kinder_morning_end,
+        junior_kinder_afternoon_start=schedule.junior_kinder_afternoon_start,
+        junior_kinder_afternoon_end=schedule.junior_kinder_afternoon_end,
+        senior_kinder_morning_start=schedule.senior_kinder_morning_start,
+        senior_kinder_morning_end=schedule.senior_kinder_morning_end,
+        senior_kinder_afternoon_start=schedule.senior_kinder_afternoon_start,
+        senior_kinder_afternoon_end=schedule.senior_kinder_afternoon_end,
+        first_grade_morning_start=schedule.first_grade_morning_start,
+        first_grade_morning_end=schedule.first_grade_morning_end,
+        first_grade_afternoon_start=schedule.first_grade_afternoon_start,
+        first_grade_afternoon_end=schedule.first_grade_afternoon_end,
+        second_grade_morning_start=schedule.second_grade_morning_start,
+        second_grade_morning_end=schedule.second_grade_morning_end,
+        second_grade_afternoon_start=schedule.second_grade_afternoon_start,
+        second_grade_afternoon_end=schedule.second_grade_afternoon_end,
+        third_grade_morning_start=schedule.third_grade_morning_start,
+        third_grade_morning_end=schedule.third_grade_morning_end,
+        third_grade_afternoon_start=schedule.third_grade_afternoon_start,
+        third_grade_afternoon_end=schedule.third_grade_afternoon_end,
+        fourth_grade_morning_start=schedule.fourth_grade_morning_start,
+        fourth_grade_morning_end=schedule.fourth_grade_morning_end,
+        fourth_grade_afternoon_start=schedule.fourth_grade_afternoon_start,
+        fourth_grade_afternoon_end=schedule.fourth_grade_afternoon_end,
+        fifth_grade_morning_start=schedule.fifth_grade_morning_start,
+        fifth_grade_morning_end=schedule.fifth_grade_morning_end,
+        fifth_grade_afternoon_start=schedule.fifth_grade_afternoon_start,
+        fifth_grade_afternoon_end=schedule.fifth_grade_afternoon_end,
+        sixth_grade_morning_start=schedule.sixth_grade_morning_start,
+        sixth_grade_morning_end=schedule.sixth_grade_morning_end,
+        sixth_grade_afternoon_start=schedule.sixth_grade_afternoon_start,
+        sixth_grade_afternoon_end=schedule.sixth_grade_afternoon_end,
+        seventh_grade_morning_start=schedule.seventh_grade_morning_start,
+        seventh_grade_morning_end=schedule.seventh_grade_morning_end,
+        seventh_grade_afternoon_start=schedule.seventh_grade_afternoon_start,
+        seventh_grade_afternoon_end=schedule.seventh_grade_afternoon_end,
+        eight_grade_morning_start=schedule.eight_grade_morning_start,
+        eight_grade_morning_end=schedule.eight_grade_morning_end,
+        eight_grade_afternoon_start=schedule.eight_grade_afternoon_start,
+        eight_grade_afternoon_end=schedule.eight_grade_afternoon_end,
+        ninth_grade_morning_start=schedule.ninth_grade_morning_start,
+        ninth_grade_morning_end=schedule.ninth_grade_morning_end,
+        ninth_grade_afternoon_start=schedule.ninth_grade_afternoon_start,
+        ninth_grade_afternoon_end=schedule.ninth_grade_afternoon_end,
+        tenth_grade_morning_start=schedule.tenth_grade_morning_start,
+        tenth_grade_morning_end=schedule.tenth_grade_morning_end,
+        tenth_grade_afternoon_start=schedule.tenth_grade_afternoon_start,
+        tenth_grade_afternoon_end=schedule.tenth_grade_afternoon_end,
+        eleventh_grade_morning_start=schedule.eleventh_grade_morning_start,
+        eleventh_grade_morning_end=schedule.eleventh_grade_morning_end,
+        eleventh_grade_afternoon_start=schedule.eleventh_grade_afternoon_start,
+        eleventh_grade_afternoon_end=schedule.eleventh_grade_afternoon_end,
+        twelfth_grade_morning_start=schedule.twelfth_grade_morning_start,
+        twelfth_grade_morning_end=schedule.twelfth_grade_morning_end,
+        twelfth_grade_afternoon_start=schedule.twelfth_grade_afternoon_start,
+        twelfth_grade_afternoon_end=schedule.twelfth_grade_afternoon_end
+        ),201
 
-    schedule = Schedule.query.filter_by(school_no=data['school_no']).one()
 
-    schedule.junior_kinder_morning_class = str2bool(data['junior_kinder_morning_class'])
-    schedule.junior_kinder_afternoon_class = str2bool(data['junior_kinder_afternoon_class'])
-    schedule.senior_kinder_morning_class = str2bool(data['senior_kinder_morning_class'])
-    schedule.senior_kinder_afternoon_class = str2bool(data['senior_kinder_afternoon_class'])
-    schedule.first_grade_morning_class = str2bool(data['first_grade_morning_class'])
-    schedule.first_grade_afternoon_class = str2bool(data['first_grade_afternoon_class'])
-    schedule.second_grade_morning_class = str2bool(data['second_grade_morning_class'])
-    schedule.second_grade_afternoon_class = str2bool(data['second_grade_afternoon_class'])
-    schedule.third_grade_morning_class = str2bool(data['third_grade_morning_class'])
-    schedule.third_grade_afternoon_class = str2bool(data['third_grade_afternoon_class'])
-    schedule.fourth_grade_morning_class = str2bool(data['fourth_grade_morning_class'])
-    schedule.fourth_grade_afternoon_class = str2bool(data['fourth_grade_afternoon_class'])
-    schedule.fifth_grade_morning_class = str2bool(data['fifth_grade_morning_class'])
-    schedule.fifth_grade_afternoon_class = str2bool(data['fifth_grade_afternoon_class'])
-    schedule.sixth_grade_morning_class = str2bool(data['sixth_grade_morning_class'])
-    schedule.sixth_grade_afternoon_class = str2bool(data['sixth_grade_afternoon_class'])
-    schedule.seventh_grade_morning_class = str2bool(data['seventh_grade_morning_class'])
-    schedule.seventh_grade_afternoon_class = str2bool(data['seventh_grade_afternoon_class'])
-    schedule.eight_grade_morning_class = str2bool(data['eight_grade_morning_class'])
-    schedule.eight_grade_afternoon_class = str2bool(data['eight_grade_afternoon_class'])
-    schedule.ninth_grade_morning_class = str2bool(data['ninth_grade_morning_class'])
-    schedule.ninth_grade_afternoon_class = str2bool(data['ninth_grade_afternoon_class'])
-    schedule.tenth_grade_morning_class = str2bool(data['tenth_grade_morning_class'])
-    schedule.tenth_grade_afternoon_class = str2bool(data['tenth_grade_afternoon_class'])
-    schedule.eleventh_grade_morning_class = str2bool(data['eleventh_grade_morning_class'])
-    schedule.eleventh_grade_afternoon_class = str2bool(data['eleventh_grade_afternoon_class'])
-    schedule.twelfth_grade_morning_class = str2bool(data['twelfth_grade_morning_class'])
-    schedule.twelfth_grade_afternoon_class = str2bool(data['twelfth_grade_afternoon_class'])
+# @app.route('/schedule/sync',methods=['GET','POST'])
+# def sync_schedule():
+#     data = flask.request.form.to_dict()
 
-    schedule.junior_kinder_morning_start = data['junior_kinder_morning_start']
-    schedule.junior_kinder_morning_end = data['junior_kinder_morning_end']
-    schedule.junior_kinder_afternoon_start = data['junior_kinder_afternoon_start']
-    schedule.junior_kinder_afternoon_end = data['junior_kinder_afternoon_end']
-    schedule.senior_kinder_morning_start = data['senior_kinder_morning_start']
-    schedule.senior_kinder_morning_end = data['senior_kinder_morning_end']
-    schedule.senior_kinder_afternoon_start = data['senior_kinder_afternoon_start']
-    schedule.senior_kinder_afternoon_end = data['senior_kinder_afternoon_end']
-    schedule.first_grade_morning_start = data['first_grade_morning_start']
-    schedule.first_grade_morning_end = data['first_grade_morning_end']
-    schedule.first_grade_afternoon_start = data['first_grade_afternoon_start']
-    schedule.first_grade_afternoon_end = data['first_grade_afternoon_end']
-    schedule.second_grade_morning_start = data['second_grade_morning_start']
-    schedule.second_grade_morning_end = data['second_grade_morning_end']
-    schedule.second_grade_afternoon_start = data['second_grade_afternoon_start']
-    schedule.second_grade_afternoon_end = data['second_grade_afternoon_end']
-    schedule.third_grade_morning_start = data['third_grade_morning_start']
-    schedule.third_grade_morning_end = data['third_grade_morning_end']
-    schedule.third_grade_afternoon_start = data['third_grade_afternoon_start']
-    schedule.third_grade_afternoon_end = data['third_grade_afternoon_end']
-    schedule.fourth_grade_morning_start = data['fourth_grade_morning_start']
-    schedule.fourth_grade_morning_end = data['fourth_grade_morning_end']
-    schedule.fourth_grade_afternoon_start = data['fourth_grade_afternoon_start']
-    schedule.fourth_grade_afternoon_end = data['fourth_grade_afternoon_end']
-    schedule.fifth_grade_morning_start = data['fifth_grade_morning_start']
-    schedule.fifth_grade_morning_end = data['fifth_grade_morning_end']
-    schedule.fifth_grade_afternoon_start = data['fifth_grade_afternoon_start']
-    schedule.fifth_grade_afternoon_end = data['fifth_grade_afternoon_end']
-    schedule.sixth_grade_morning_start = data['sixth_grade_morning_start']
-    schedule.sixth_grade_morning_end = data['sixth_grade_morning_end']
-    schedule.sixth_grade_afternoon_start = data['sixth_grade_afternoon_start']
-    schedule.sixth_grade_afternoon_end = data['sixth_grade_afternoon_end']
-    schedule.seventh_grade_morning_start = data['seventh_grade_morning_start']
-    schedule.seventh_grade_morning_end = data['seventh_grade_morning_end']
-    schedule.seventh_grade_afternoon_start = data['seventh_grade_afternoon_start']
-    schedule.seventh_grade_afternoon_end = data['seventh_grade_afternoon_end']
-    schedule.eight_grade_morning_start = data['eight_grade_morning_start']
-    schedule.eight_grade_morning_end = data['eight_grade_morning_end']
-    schedule.eight_grade_afternoon_start = data['eight_grade_afternoon_start']
-    schedule.eight_grade_afternoon_end = data['eight_grade_afternoon_end']
-    schedule.ninth_grade_morning_start = data['ninth_grade_morning_start']
-    schedule.ninth_grade_morning_end = data['ninth_grade_morning_end']
-    schedule.ninth_grade_afternoon_start = data['ninth_grade_afternoon_start']
-    schedule.ninth_grade_afternoon_end = data['ninth_grade_afternoon_end']
-    schedule.tenth_grade_morning_start = data['tenth_grade_morning_start']
-    schedule.tenth_grade_morning_end = data['tenth_grade_morning_end']
-    schedule.tenth_grade_afternoon_start = data['tenth_grade_afternoon_start']
-    schedule.tenth_grade_afternoon_end = data['tenth_grade_afternoon_end']
-    schedule.eleventh_grade_morning_start = data['eleventh_grade_morning_start']
-    schedule.eleventh_grade_morning_end = data['eleventh_grade_morning_end']
-    schedule.eleventh_grade_afternoon_start = data['eleventh_grade_afternoon_start']
-    schedule.eleventh_grade_afternoon_end = data['eleventh_grade_afternoon_end']
-    schedule.twelfth_grade_morning_start = data['twelfth_grade_morning_start']
-    schedule.twelfth_grade_morning_end = data['twelfth_grade_morning_end']
-    schedule.twelfth_grade_afternoon_start = data['twelfth_grade_afternoon_start']
-    schedule.twelfth_grade_afternoon_end = data['twelfth_grade_afternoon_end']
+#     schedule = Schedule.query.filter_by(school_no=data['school_no']).one()
 
+#     schedule.junior_kinder_morning_class = str2bool(data['junior_kinder_morning_class'])
+#     schedule.junior_kinder_afternoon_class = str2bool(data['junior_kinder_afternoon_class'])
+#     schedule.senior_kinder_morning_class = str2bool(data['senior_kinder_morning_class'])
+#     schedule.senior_kinder_afternoon_class = str2bool(data['senior_kinder_afternoon_class'])
+#     schedule.first_grade_morning_class = str2bool(data['first_grade_morning_class'])
+#     schedule.first_grade_afternoon_class = str2bool(data['first_grade_afternoon_class'])
+#     schedule.second_grade_morning_class = str2bool(data['second_grade_morning_class'])
+#     schedule.second_grade_afternoon_class = str2bool(data['second_grade_afternoon_class'])
+#     schedule.third_grade_morning_class = str2bool(data['third_grade_morning_class'])
+#     schedule.third_grade_afternoon_class = str2bool(data['third_grade_afternoon_class'])
+#     schedule.fourth_grade_morning_class = str2bool(data['fourth_grade_morning_class'])
+#     schedule.fourth_grade_afternoon_class = str2bool(data['fourth_grade_afternoon_class'])
+#     schedule.fifth_grade_morning_class = str2bool(data['fifth_grade_morning_class'])
+#     schedule.fifth_grade_afternoon_class = str2bool(data['fifth_grade_afternoon_class'])
+#     schedule.sixth_grade_morning_class = str2bool(data['sixth_grade_morning_class'])
+#     schedule.sixth_grade_afternoon_class = str2bool(data['sixth_grade_afternoon_class'])
+#     schedule.seventh_grade_morning_class = str2bool(data['seventh_grade_morning_class'])
+#     schedule.seventh_grade_afternoon_class = str2bool(data['seventh_grade_afternoon_class'])
+#     schedule.eight_grade_morning_class = str2bool(data['eight_grade_morning_class'])
+#     schedule.eight_grade_afternoon_class = str2bool(data['eight_grade_afternoon_class'])
+#     schedule.ninth_grade_morning_class = str2bool(data['ninth_grade_morning_class'])
+#     schedule.ninth_grade_afternoon_class = str2bool(data['ninth_grade_afternoon_class'])
+#     schedule.tenth_grade_morning_class = str2bool(data['tenth_grade_morning_class'])
+#     schedule.tenth_grade_afternoon_class = str2bool(data['tenth_grade_afternoon_class'])
+#     schedule.eleventh_grade_morning_class = str2bool(data['eleventh_grade_morning_class'])
+#     schedule.eleventh_grade_afternoon_class = str2bool(data['eleventh_grade_afternoon_class'])
+#     schedule.twelfth_grade_morning_class = str2bool(data['twelfth_grade_morning_class'])
+#     schedule.twelfth_grade_afternoon_class = str2bool(data['twelfth_grade_afternoon_class'])
 
-    db.session.commit()
+#     schedule.junior_kinder_morning_start = data['junior_kinder_morning_start']
+#     schedule.junior_kinder_morning_end = data['junior_kinder_morning_end']
+#     schedule.junior_kinder_afternoon_start = data['junior_kinder_afternoon_start']
+#     schedule.junior_kinder_afternoon_end = data['junior_kinder_afternoon_end']
+#     schedule.senior_kinder_morning_start = data['senior_kinder_morning_start']
+#     schedule.senior_kinder_morning_end = data['senior_kinder_morning_end']
+#     schedule.senior_kinder_afternoon_start = data['senior_kinder_afternoon_start']
+#     schedule.senior_kinder_afternoon_end = data['senior_kinder_afternoon_end']
+#     schedule.first_grade_morning_start = data['first_grade_morning_start']
+#     schedule.first_grade_morning_end = data['first_grade_morning_end']
+#     schedule.first_grade_afternoon_start = data['first_grade_afternoon_start']
+#     schedule.first_grade_afternoon_end = data['first_grade_afternoon_end']
+#     schedule.second_grade_morning_start = data['second_grade_morning_start']
+#     schedule.second_grade_morning_end = data['second_grade_morning_end']
+#     schedule.second_grade_afternoon_start = data['second_grade_afternoon_start']
+#     schedule.second_grade_afternoon_end = data['second_grade_afternoon_end']
+#     schedule.third_grade_morning_start = data['third_grade_morning_start']
+#     schedule.third_grade_morning_end = data['third_grade_morning_end']
+#     schedule.third_grade_afternoon_start = data['third_grade_afternoon_start']
+#     schedule.third_grade_afternoon_end = data['third_grade_afternoon_end']
+#     schedule.fourth_grade_morning_start = data['fourth_grade_morning_start']
+#     schedule.fourth_grade_morning_end = data['fourth_grade_morning_end']
+#     schedule.fourth_grade_afternoon_start = data['fourth_grade_afternoon_start']
+#     schedule.fourth_grade_afternoon_end = data['fourth_grade_afternoon_end']
+#     schedule.fifth_grade_morning_start = data['fifth_grade_morning_start']
+#     schedule.fifth_grade_morning_end = data['fifth_grade_morning_end']
+#     schedule.fifth_grade_afternoon_start = data['fifth_grade_afternoon_start']
+#     schedule.fifth_grade_afternoon_end = data['fifth_grade_afternoon_end']
+#     schedule.sixth_grade_morning_start = data['sixth_grade_morning_start']
+#     schedule.sixth_grade_morning_end = data['sixth_grade_morning_end']
+#     schedule.sixth_grade_afternoon_start = data['sixth_grade_afternoon_start']
+#     schedule.sixth_grade_afternoon_end = data['sixth_grade_afternoon_end']
+#     schedule.seventh_grade_morning_start = data['seventh_grade_morning_start']
+#     schedule.seventh_grade_morning_end = data['seventh_grade_morning_end']
+#     schedule.seventh_grade_afternoon_start = data['seventh_grade_afternoon_start']
+#     schedule.seventh_grade_afternoon_end = data['seventh_grade_afternoon_end']
+#     schedule.eight_grade_morning_start = data['eight_grade_morning_start']
+#     schedule.eight_grade_morning_end = data['eight_grade_morning_end']
+#     schedule.eight_grade_afternoon_start = data['eight_grade_afternoon_start']
+#     schedule.eight_grade_afternoon_end = data['eight_grade_afternoon_end']
+#     schedule.ninth_grade_morning_start = data['ninth_grade_morning_start']
+#     schedule.ninth_grade_morning_end = data['ninth_grade_morning_end']
+#     schedule.ninth_grade_afternoon_start = data['ninth_grade_afternoon_start']
+#     schedule.ninth_grade_afternoon_end = data['ninth_grade_afternoon_end']
+#     schedule.tenth_grade_morning_start = data['tenth_grade_morning_start']
+#     schedule.tenth_grade_morning_end = data['tenth_grade_morning_end']
+#     schedule.tenth_grade_afternoon_start = data['tenth_grade_afternoon_start']
+#     schedule.tenth_grade_afternoon_end = data['tenth_grade_afternoon_end']
+#     schedule.eleventh_grade_morning_start = data['eleventh_grade_morning_start']
+#     schedule.eleventh_grade_morning_end = data['eleventh_grade_morning_end']
+#     schedule.eleventh_grade_afternoon_start = data['eleventh_grade_afternoon_start']
+#     schedule.eleventh_grade_afternoon_end = data['eleventh_grade_afternoon_end']
+#     schedule.twelfth_grade_morning_start = data['twelfth_grade_morning_start']
+#     schedule.twelfth_grade_morning_end = data['twelfth_grade_morning_end']
+#     schedule.twelfth_grade_afternoon_start = data['twelfth_grade_afternoon_start']
+#     schedule.twelfth_grade_afternoon_end = data['twelfth_grade_afternoon_end']
 
-    # INITIALIZE PYSCHEDULER HERE
-    initialize_absent(data['school_no'],data['api_key'])
-    return '',201
+#     db.session.commit()
+
+#     morning_absent_thread = threading.Thread(target=initialize_morning_absent,args=[data['school_no'],data['api_key']])
+#     morning_absent_thread.start()
+
+#     afternoon_absent_thread = threading.Thread(target=initialize_afternoon_absent,args=[data['school_no'],data['api_key']])
+#     afternoon_absent_thread.start()
+
+#     return '',201
 
 
 @app.route('/favicon.ico',methods=['GET','POST'])
@@ -2549,35 +3583,50 @@ def rebuild_database():
     db.drop_all()
     db.create_all()
 
-    k12 = K12(
-        school_no = 'sgb-lc2017',
-        id_no = '2011334281',
-        first_name = 'Jasper Oliver',
-        last_name = 'Barcelona',
-        middle_name = 'Estrada',
-        level = '1st Grade',
-        group = 'k12',
-        section = 'St. Jerome',
-        parent_id = 1,
-        parent_relation = 'mother',
-        parent_contact = '09159484200',
-        added_by = 'Jasper Barcelona'
-        )
+    # k12 = K12(
+    #     school_no = 'sgb-lc2017',
+    #     id_no = '2011334281',
+    #     first_name = 'Jasper Oliver',
+    #     last_name = 'Barcelona',
+    #     middle_name = 'Estrada',
+    #     level = '1st Grade',
+    #     group = 'k12',
+    #     section = 'St. Jerome',
+    #     parent_id = 1,
+    #     parent_relation = 'mother',
+    #     parent_contact = '09159484200',
+    #     added_by = 'Jasper Barcelona'
+    #     )
 
-    parent = Parent(
-        school_no = 'sgb-lc2017',
-        mobile_number = '09159484200',
-        name = 'Flora Estrada Barcelona',
-        email = 'barcelona.jasperoliver@gmail.com',
-        address = 'Lucena City'
-        )
+    # lean = K12(
+    #     school_no = 'sgb-lc2017',
+    #     id_no = '2011334282',
+    #     first_name = 'Leanza Mildred',
+    #     last_name = 'Etorma',
+    #     middle_name = 'Zarate',
+    #     level = '1st Grade',
+    #     group = 'k12',
+    #     section = 'St. Jerome',
+    #     parent_id = 1,
+    #     parent_relation = 'mother',
+    #     parent_contact = '09159484200',
+    #     added_by = 'Jasper Barcelona'
+    #     )
 
-    wallet = Wallet(
-        school_no = 'sgb-lc2017',
-        student_id = 1,
-        student_name = 'Barcelona, Jasper Oliver E.',
-        id_no = '2011334281'
-        )
+    # parent = Parent(
+    #     school_no = 'sgb-lc2017',
+    #     mobile_number = '09159484200',
+    #     name = 'Flora Estrada Barcelona',
+    #     email = 'barcelona.jasperoliver@gmail.com',
+    #     address = 'Lucena City'
+    #     )
+
+    # wallet = Wallet(
+    #     school_no = 'sgb-lc2017',
+    #     student_id = 1,
+    #     student_name = 'Barcelona, Jasper Oliver E.',
+    #     id_no = '2011334281'
+    #     )
 
     admin = AdminUser(
         school_no = 'sgb-lc2017',
@@ -2603,10 +3652,10 @@ def rebuild_database():
     school = School(
         school_no='sgb-lc2017',
         api_key='ecc67d28db284a2fb351d58fe18965f9',
-        name="Scuola Gesu Bambino",
-        address="Barcelona Compound, Brgy Isabang",
-        city="Lucena",
-        email="sgb@gmail.com",
+        name="Leon Guinto Memorial College, Inc.",
+        address="Atimonan, Quezon",
+        city="Atimonan",
+        email="lgmc_compdept@yahoo.com",
         contact="(042) 316-5471"
         )
 
@@ -2641,62 +3690,62 @@ def rebuild_database():
         twelfth_grade_morning_class=True,
         twelfth_grade_afternoon_class=True,
 
-        junior_kinder_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        junior_kinder_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        junior_kinder_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        junior_kinder_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        senior_kinder_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        senior_kinder_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        senior_kinder_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        senior_kinder_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        first_grade_morning_start=str(now.replace(hour=5, minute=55, second=0))[11:16],
-        first_grade_morning_end=str(now.replace(hour=6, minute=12, second=0))[11:16],
-        first_grade_afternoon_start=str(now.replace(hour=6, minute=28, second=0))[11:16],
-        first_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        second_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        second_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        second_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        second_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        third_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        third_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        third_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        third_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        fourth_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        fourth_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        fourth_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        fourth_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        fifth_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        fifth_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        fifth_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        fifth_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        sixth_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        sixth_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        sixth_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        sixth_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        seventh_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        seventh_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        seventh_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        seventh_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        eight_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        eight_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        eight_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        eight_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        ninth_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        ninth_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        ninth_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        ninth_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        tenth_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        tenth_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        tenth_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        tenth_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        eleventh_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        eleventh_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        eleventh_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        eleventh_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        twelfth_grade_morning_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        twelfth_grade_morning_end=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        twelfth_grade_afternoon_start=str(now.replace(hour=8, minute=0, second=0))[11:16],
-        twelfth_grade_afternoon_end=str(now.replace(hour=8, minute=0, second=0))[11:16]
+        junior_kinder_morning_start= '08:00AM',
+        junior_kinder_morning_end= '08:00AM',
+        junior_kinder_afternoon_start= '08:00AM',
+        junior_kinder_afternoon_end= '08:00AM',
+        senior_kinder_morning_start= '08:00AM',
+        senior_kinder_morning_end= '08:00AM',
+        senior_kinder_afternoon_start= '08:00AM',
+        senior_kinder_afternoon_end= '08:00AM',
+        first_grade_morning_start= '08:00AM',
+        first_grade_morning_end= '08:00AM',
+        first_grade_afternoon_start= '08:00AM',
+        first_grade_afternoon_end= '08:00AM',
+        second_grade_morning_start= '08:00AM',
+        second_grade_morning_end= '08:00AM',
+        second_grade_afternoon_start= '08:00AM',
+        second_grade_afternoon_end= '08:00AM',
+        third_grade_morning_start= '08:00AM',
+        third_grade_morning_end= '08:00AM',
+        third_grade_afternoon_start= '08:00AM',
+        third_grade_afternoon_end= '08:00AM',
+        fourth_grade_morning_start= '08:00AM',
+        fourth_grade_morning_end= '08:00AM',
+        fourth_grade_afternoon_start= '08:00AM',
+        fourth_grade_afternoon_end= '08:00AM',
+        fifth_grade_morning_start= '08:00AM',
+        fifth_grade_morning_end= '08:00AM',
+        fifth_grade_afternoon_start= '08:00AM',
+        fifth_grade_afternoon_end= '08:00AM',
+        sixth_grade_morning_start= '08:00AM',
+        sixth_grade_morning_end= '08:00AM',
+        sixth_grade_afternoon_start= '08:00AM',
+        sixth_grade_afternoon_end= '08:00AM',
+        seventh_grade_morning_start= '03:51PM',
+        seventh_grade_morning_end= '03:57PM',
+        seventh_grade_afternoon_start= '03:59PM',
+        seventh_grade_afternoon_end= '07:00PM',
+        eight_grade_morning_start= '08:00AM',
+        eight_grade_morning_end= '08:00AM',
+        eight_grade_afternoon_start= '08:00AM',
+        eight_grade_afternoon_end= '08:00AM',
+        ninth_grade_morning_start= '08:00AM',
+        ninth_grade_morning_end= '08:00AM',
+        ninth_grade_afternoon_start= '08:00AM',
+        ninth_grade_afternoon_end= '08:00AM',
+        tenth_grade_morning_start= '08:00AM',
+        tenth_grade_morning_end= '08:00AM',
+        tenth_grade_afternoon_start= '08:00AM',
+        tenth_grade_afternoon_end= '08:00AM',
+        eleventh_grade_morning_start= '08:00AM',
+        eleventh_grade_morning_end= '08:00AM',
+        eleventh_grade_afternoon_start= '08:00AM',
+        eleventh_grade_afternoon_end= '08:00AM',
+        twelfth_grade_morning_start= '08:00AM',
+        twelfth_grade_morning_end= '08:00AM',
+        twelfth_grade_afternoon_start= '08:00AM',
+        twelfth_grade_afternoon_end= '08:00AM'
         )
     db.session.add(school)
     db.session.add(schedule)
@@ -2705,87 +3754,42 @@ def rebuild_database():
 
     d = Section(
         school_no='sgb-lc2017',
-        name='Benedict'
+        name='Prime'
         )
 
     e = Section(
         school_no='sgb-lc2017',
-        name='Anthony'
+        name='Love'
         )
 
     f = Section(
         school_no='sgb-lc2017',
-        name='Ignatius'
+        name='Hope'
         )
 
     g = Section(
         school_no='sgb-lc2017',
-        name='Louis'
+        name='Faith'
         )
 
     h = Section(
         school_no='sgb-lc2017',
-        name='John'
+        name='ICT'
         )
 
     i = Section(
         school_no='sgb-lc2017',
-        name='Francis'
+        name='ABM'
         )
 
     j = Section(
         school_no='sgb-lc2017',
-        name='Lorenzo Ruiz'
+        name='GAS'
         )
 
     k = Section(
         school_no='sgb-lc2017',
-        name='Augustine'
-        )
-
-    l = Section(
-        school_no='sgb-lc2017',
-        name='Vincent'
-        )
-
-    m = Section(
-        school_no='sgb-lc2017',
-        name='Thomas'
-        )
-
-    n = Section(
-        school_no='sgb-lc2017',
-        name='Jerome'
-        )
-
-    o = Department(
-        school_no='sgb-lc2017',
-        name='Faculty'
-        )
-
-    p = Department(
-        school_no='sgb-lc2017',
-        name='Maintenance'
-        )
-
-    q = Department(
-        school_no='sgb-lc2017',
-        name='Guidance'
-        )
-
-    r = Department(
-        school_no='sgb-lc2017',
-        name='Student Affairs'
-        )
-
-    s = CollegeDepartment(
-        school_no='sgb-lc2017',
-        name='CFAD'
-        )
-
-    t = CollegeDepartment(
-        school_no='sgb-lc2017',
-        name='IABF'
+        name='HUMSS'
         )
 
     module = Module(
@@ -2836,14 +3840,14 @@ def rebuild_database():
         name = 'new_id'
         )
 
-    vendor = Device(
-        school_no = 'sgb-lc2017',
-        app_key = '4tqgtah47riyk9475lbmho6847dyth6o',
-        name = 'Canteen POS Main',
-        device_type = 'POS',
-        vendor = 'Canteen',
-        added_by = 'Jasper Barcelona'
-        )
+    # vendor = Device(
+    #     school_no = 'sgb-lc2017',
+    #     app_key = '4tqgtah47riyk9475lbmho6847dyth6o',
+    #     name = 'Canteen POS Main',
+    #     device_type = 'POS',
+    #     vendor = 'Canteen',
+    #     added_by = 'Jasper Barcelona'
+    #     )
 
     db.session.add(d)
     db.session.add(e)
@@ -2853,19 +3857,10 @@ def rebuild_database():
     db.session.add(i)
     db.session.add(j)
     db.session.add(k)
-    db.session.add(l)
-    db.session.add(m)
-    db.session.add(n)
-    db.session.add(o)
-    db.session.add(p)
-    db.session.add(q)
-    db.session.add(r)
-    db.session.add(s)
-    db.session.add(t)
-    db.session.add(vendor)
-    db.session.add(k12)
-    db.session.add(parent)
-    db.session.add(wallet)
+    # db.session.add(k12)
+    # db.session.add(lean)
+    # db.session.add(parent)
+    # db.session.add(wallet)
 
     db.session.add(module)
     db.session.add(module1)
@@ -2879,6 +3874,653 @@ def rebuild_database():
     db.session.add(module9)
     db.session.add(module10)
     db.session.add(module11)
+
+    db.session.commit()
+
+    sched7 = Regular(
+        school_no='sgb-lc2017',
+        day='Saturday',
+        junior_kinder_morning_class=True,
+        junior_kinder_afternoon_class=True,
+        senior_kinder_morning_class=True,
+        senior_kinder_afternoon_class=True,
+        first_grade_morning_class=True,
+        first_grade_afternoon_class=True,
+        second_grade_morning_class=True,
+        second_grade_afternoon_class=True,
+        third_grade_morning_class=True,
+        third_grade_afternoon_class=True,
+        fourth_grade_morning_class=True,
+        fourth_grade_afternoon_class=True,
+        fifth_grade_morning_class=True,
+        fifth_grade_afternoon_class=True,
+        sixth_grade_morning_class=True,
+        sixth_grade_afternoon_class=True,
+        seventh_grade_morning_class=True,
+        seventh_grade_afternoon_class=True,
+        eight_grade_morning_class=True,
+        eight_grade_afternoon_class=True,
+        ninth_grade_morning_class=True,
+        ninth_grade_afternoon_class=True,
+        tenth_grade_morning_class=True,
+        tenth_grade_afternoon_class=True,
+        eleventh_grade_morning_class=True,
+        eleventh_grade_afternoon_class=True,
+        twelfth_grade_morning_class=True,
+        twelfth_grade_afternoon_class=True,
+
+
+        junior_kinder_morning_start='08:00AM',
+        junior_kinder_morning_end='08:00AM',
+        junior_kinder_afternoon_start='08:00AM',
+        junior_kinder_afternoon_end='08:00AM',
+        senior_kinder_morning_start='08:00AM',
+        senior_kinder_morning_end='08:00AM',
+        senior_kinder_afternoon_start='08:00AM',
+        senior_kinder_afternoon_end='08:00AM',
+        first_grade_morning_start='06:40PM',
+        first_grade_morning_end='06:47PM',
+        first_grade_afternoon_start='06:49PM',
+        first_grade_afternoon_end='08:00PM',
+        second_grade_morning_start='08:00AM',
+        second_grade_morning_end='08:00AM',
+        second_grade_afternoon_start='08:00AM',
+        second_grade_afternoon_end='08:00AM',
+        third_grade_morning_start='08:00AM',
+        third_grade_morning_end='08:00AM',
+        third_grade_afternoon_start='08:00AM',
+        third_grade_afternoon_end='08:00AM',
+        fourth_grade_morning_start='08:00AM',
+        fourth_grade_morning_end='08:00AM',
+        fourth_grade_afternoon_start='08:00AM',
+        fourth_grade_afternoon_end='08:00AM',
+        fifth_grade_morning_start='08:00AM',
+        fifth_grade_morning_end='08:00AM',
+        fifth_grade_afternoon_start='08:00AM',
+        fifth_grade_afternoon_end='08:00AM',
+        sixth_grade_morning_start='08:00AM',
+        sixth_grade_morning_end='08:00AM',
+        sixth_grade_afternoon_start='08:00AM',
+        sixth_grade_afternoon_end='08:00AM',
+        seventh_grade_morning_start='4:10PM',
+        seventh_grade_morning_end='4:16PM',
+        seventh_grade_afternoon_start='4:18PM',
+        seventh_grade_afternoon_end='7:00PM',
+        eight_grade_morning_start='08:00AM',
+        eight_grade_morning_end='08:00AM',
+        eight_grade_afternoon_start='08:00AM',
+        eight_grade_afternoon_end='08:00AM',
+        ninth_grade_morning_start='08:00AM',
+        ninth_grade_morning_end='08:00AM',
+        ninth_grade_afternoon_start='08:00AM',
+        ninth_grade_afternoon_end='08:00AM',
+        tenth_grade_morning_start='08:00AM',
+        tenth_grade_morning_end='08:00AM',
+        tenth_grade_afternoon_start='08:00AM',
+        tenth_grade_afternoon_end='08:00AM',
+        eleventh_grade_morning_start='08:00AM',
+        eleventh_grade_morning_end='08:00AM',
+        eleventh_grade_afternoon_start='08:00AM',
+        eleventh_grade_afternoon_end='08:00AM',
+        twelfth_grade_morning_start='08:00AM',
+        twelfth_grade_morning_end='08:00AM',
+        twelfth_grade_afternoon_start='08:00AM',
+        twelfth_grade_afternoon_end='08:00AM',
+        )
+
+    sched8 = Regular(
+        school_no='sgb-lc2017',
+        day='Sunday',
+        junior_kinder_morning_class=True,
+        junior_kinder_afternoon_class=True,
+        senior_kinder_morning_class=True,
+        senior_kinder_afternoon_class=True,
+        first_grade_morning_class=True,
+        first_grade_afternoon_class=True,
+        second_grade_morning_class=True,
+        second_grade_afternoon_class=True,
+        third_grade_morning_class=True,
+        third_grade_afternoon_class=True,
+        fourth_grade_morning_class=True,
+        fourth_grade_afternoon_class=True,
+        fifth_grade_morning_class=True,
+        fifth_grade_afternoon_class=True,
+        sixth_grade_morning_class=True,
+        sixth_grade_afternoon_class=True,
+        seventh_grade_morning_class=True,
+        seventh_grade_afternoon_class=True,
+        eight_grade_morning_class=True,
+        eight_grade_afternoon_class=True,
+        ninth_grade_morning_class=True,
+        ninth_grade_afternoon_class=True,
+        tenth_grade_morning_class=True,
+        tenth_grade_afternoon_class=True,
+        eleventh_grade_morning_class=True,
+        eleventh_grade_afternoon_class=True,
+        twelfth_grade_morning_class=True,
+        twelfth_grade_afternoon_class=True,
+
+
+        junior_kinder_morning_start='08:00AM',
+        junior_kinder_morning_end='08:00AM',
+        junior_kinder_afternoon_start='08:00AM',
+        junior_kinder_afternoon_end='08:00AM',
+        senior_kinder_morning_start='08:00AM',
+        senior_kinder_morning_end='08:00AM',
+        senior_kinder_afternoon_start='08:00AM',
+        senior_kinder_afternoon_end='08:00AM',
+        first_grade_morning_start='06:40PM',
+        first_grade_morning_end='06:47PM',
+        first_grade_afternoon_start='06:49PM',
+        first_grade_afternoon_end='08:00PM',
+        second_grade_morning_start='08:00AM',
+        second_grade_morning_end='08:00AM',
+        second_grade_afternoon_start='08:00AM',
+        second_grade_afternoon_end='08:00AM',
+        third_grade_morning_start='08:00AM',
+        third_grade_morning_end='08:00AM',
+        third_grade_afternoon_start='08:00AM',
+        third_grade_afternoon_end='08:00AM',
+        fourth_grade_morning_start='08:00AM',
+        fourth_grade_morning_end='08:00AM',
+        fourth_grade_afternoon_start='08:00AM',
+        fourth_grade_afternoon_end='08:00AM',
+        fifth_grade_morning_start='08:00AM',
+        fifth_grade_morning_end='08:00AM',
+        fifth_grade_afternoon_start='08:00AM',
+        fifth_grade_afternoon_end='08:00AM',
+        sixth_grade_morning_start='08:00AM',
+        sixth_grade_morning_end='08:00AM',
+        sixth_grade_afternoon_start='08:00AM',
+        sixth_grade_afternoon_end='08:00AM',
+        seventh_grade_morning_start='4:10PM',
+        seventh_grade_morning_end='4:16PM',
+        seventh_grade_afternoon_start='4:18PM',
+        seventh_grade_afternoon_end='7:00PM',
+        eight_grade_morning_start='08:00AM',
+        eight_grade_morning_end='08:00AM',
+        eight_grade_afternoon_start='08:00AM',
+        eight_grade_afternoon_end='08:00AM',
+        ninth_grade_morning_start='08:00AM',
+        ninth_grade_morning_end='08:00AM',
+        ninth_grade_afternoon_start='08:00AM',
+        ninth_grade_afternoon_end='08:00AM',
+        tenth_grade_morning_start='08:00AM',
+        tenth_grade_morning_end='08:00AM',
+        tenth_grade_afternoon_start='08:00AM',
+        tenth_grade_afternoon_end='08:00AM',
+        eleventh_grade_morning_start='08:00AM',
+        eleventh_grade_morning_end='08:00AM',
+        eleventh_grade_afternoon_start='08:00AM',
+        eleventh_grade_afternoon_end='08:00AM',
+        twelfth_grade_morning_start='08:00AM',
+        twelfth_grade_morning_end='08:00AM',
+        twelfth_grade_afternoon_start='08:00AM',
+        twelfth_grade_afternoon_end='08:00AM',
+        )
+
+    sched2 = Regular(
+        school_no='sgb-lc2017',
+        day='Monday',
+        junior_kinder_morning_class=True,
+        junior_kinder_afternoon_class=True,
+        senior_kinder_morning_class=True,
+        senior_kinder_afternoon_class=True,
+        first_grade_morning_class=True,
+        first_grade_afternoon_class=True,
+        second_grade_morning_class=True,
+        second_grade_afternoon_class=True,
+        third_grade_morning_class=True,
+        third_grade_afternoon_class=True,
+        fourth_grade_morning_class=True,
+        fourth_grade_afternoon_class=True,
+        fifth_grade_morning_class=True,
+        fifth_grade_afternoon_class=True,
+        sixth_grade_morning_class=True,
+        sixth_grade_afternoon_class=True,
+        seventh_grade_morning_class=True,
+        seventh_grade_afternoon_class=True,
+        eight_grade_morning_class=True,
+        eight_grade_afternoon_class=True,
+        ninth_grade_morning_class=True,
+        ninth_grade_afternoon_class=True,
+        tenth_grade_morning_class=True,
+        tenth_grade_afternoon_class=True,
+        eleventh_grade_morning_class=True,
+        eleventh_grade_afternoon_class=True,
+        twelfth_grade_morning_class=True,
+        twelfth_grade_afternoon_class=True,
+
+
+        junior_kinder_morning_start='08:00AM',
+        junior_kinder_morning_end='08:00AM',
+        junior_kinder_afternoon_start='08:00AM',
+        junior_kinder_afternoon_end='08:00AM',
+        senior_kinder_morning_start='08:00AM',
+        senior_kinder_morning_end='08:00AM',
+        senior_kinder_afternoon_start='08:00AM',
+        senior_kinder_afternoon_end='08:00AM',
+        first_grade_morning_start='08:00AM',
+        first_grade_morning_end='08:00AM',
+        first_grade_afternoon_start='08:00AM',
+        first_grade_afternoon_end='08:00AM',
+        second_grade_morning_start='08:00AM',
+        second_grade_morning_end='08:00AM',
+        second_grade_afternoon_start='08:00AM',
+        second_grade_afternoon_end='08:00AM',
+        third_grade_morning_start='08:00AM',
+        third_grade_morning_end='08:00AM',
+        third_grade_afternoon_start='08:00AM',
+        third_grade_afternoon_end='08:00AM',
+        fourth_grade_morning_start='08:00AM',
+        fourth_grade_morning_end='08:00AM',
+        fourth_grade_afternoon_start='08:00AM',
+        fourth_grade_afternoon_end='08:00AM',
+        fifth_grade_morning_start='08:00AM',
+        fifth_grade_morning_end='08:00AM',
+        fifth_grade_afternoon_start='08:00AM',
+        fifth_grade_afternoon_end='08:00AM',
+        sixth_grade_morning_start='08:00AM',
+        sixth_grade_morning_end='08:00AM',
+        sixth_grade_afternoon_start='08:00AM',
+        sixth_grade_afternoon_end='08:00AM',
+        seventh_grade_morning_start='4:10PM',
+        seventh_grade_morning_end='4:16PM',
+        seventh_grade_afternoon_start='4:18PM',
+        seventh_grade_afternoon_end='7:00PM',
+        eight_grade_morning_start='08:00AM',
+        eight_grade_morning_end='08:00AM',
+        eight_grade_afternoon_start='08:00AM',
+        eight_grade_afternoon_end='08:00AM',
+        ninth_grade_morning_start='08:00AM',
+        ninth_grade_morning_end='08:00AM',
+        ninth_grade_afternoon_start='08:00AM',
+        ninth_grade_afternoon_end='08:00AM',
+        tenth_grade_morning_start='08:00AM',
+        tenth_grade_morning_end='08:00AM',
+        tenth_grade_afternoon_start='08:00AM',
+        tenth_grade_afternoon_end='08:00AM',
+        eleventh_grade_morning_start='08:00AM',
+        eleventh_grade_morning_end='08:00AM',
+        eleventh_grade_afternoon_start='08:00AM',
+        eleventh_grade_afternoon_end='08:00AM',
+        twelfth_grade_morning_start='08:00AM',
+        twelfth_grade_morning_end='08:00AM',
+        twelfth_grade_afternoon_start='08:00AM',
+        twelfth_grade_afternoon_end='08:00AM',
+        )
+
+    sched3 = Regular(
+        school_no='sgb-lc2017',
+        day='Tuesday',
+        junior_kinder_morning_class=True,
+        junior_kinder_afternoon_class=True,
+        senior_kinder_morning_class=True,
+        senior_kinder_afternoon_class=True,
+        first_grade_morning_class=True,
+        first_grade_afternoon_class=True,
+        second_grade_morning_class=True,
+        second_grade_afternoon_class=True,
+        third_grade_morning_class=True,
+        third_grade_afternoon_class=True,
+        fourth_grade_morning_class=True,
+        fourth_grade_afternoon_class=True,
+        fifth_grade_morning_class=True,
+        fifth_grade_afternoon_class=True,
+        sixth_grade_morning_class=True,
+        sixth_grade_afternoon_class=True,
+        seventh_grade_morning_class=True,
+        seventh_grade_afternoon_class=True,
+        eight_grade_morning_class=True,
+        eight_grade_afternoon_class=True,
+        ninth_grade_morning_class=True,
+        ninth_grade_afternoon_class=True,
+        tenth_grade_morning_class=True,
+        tenth_grade_afternoon_class=True,
+        eleventh_grade_morning_class=True,
+        eleventh_grade_afternoon_class=True,
+        twelfth_grade_morning_class=True,
+        twelfth_grade_afternoon_class=True,
+
+
+        junior_kinder_morning_start='08:00AM',
+        junior_kinder_morning_end='08:00AM',
+        junior_kinder_afternoon_start='08:00AM',
+        junior_kinder_afternoon_end='08:00AM',
+        senior_kinder_morning_start='08:00AM',
+        senior_kinder_morning_end='08:00AM',
+        senior_kinder_afternoon_start='08:00AM',
+        senior_kinder_afternoon_end='08:00AM',
+        first_grade_morning_start='08:00AM',
+        first_grade_morning_end='08:00AM',
+        first_grade_afternoon_start='08:00AM',
+        first_grade_afternoon_end='08:00AM',
+        second_grade_morning_start='08:00AM',
+        second_grade_morning_end='08:00AM',
+        second_grade_afternoon_start='08:00AM',
+        second_grade_afternoon_end='08:00AM',
+        third_grade_morning_start='08:00AM',
+        third_grade_morning_end='08:00AM',
+        third_grade_afternoon_start='08:00AM',
+        third_grade_afternoon_end='08:00AM',
+        fourth_grade_morning_start='08:00AM',
+        fourth_grade_morning_end='08:00AM',
+        fourth_grade_afternoon_start='08:00AM',
+        fourth_grade_afternoon_end='08:00AM',
+        fifth_grade_morning_start='08:00AM',
+        fifth_grade_morning_end='08:00AM',
+        fifth_grade_afternoon_start='08:00AM',
+        fifth_grade_afternoon_end='08:00AM',
+        sixth_grade_morning_start='08:00AM',
+        sixth_grade_morning_end='08:00AM',
+        sixth_grade_afternoon_start='08:00AM',
+        sixth_grade_afternoon_end='08:00AM',
+        seventh_grade_morning_start='08:00AM',
+        seventh_grade_morning_end='08:00AM',
+        seventh_grade_afternoon_start='08:00AM',
+        seventh_grade_afternoon_end='08:00AM',
+        eight_grade_morning_start='08:00AM',
+        eight_grade_morning_end='08:00AM',
+        eight_grade_afternoon_start='08:00AM',
+        eight_grade_afternoon_end='08:00AM',
+        ninth_grade_morning_start='08:00AM',
+        ninth_grade_morning_end='08:00AM',
+        ninth_grade_afternoon_start='08:00AM',
+        ninth_grade_afternoon_end='08:00AM',
+        tenth_grade_morning_start='08:00AM',
+        tenth_grade_morning_end='08:00AM',
+        tenth_grade_afternoon_start='08:00AM',
+        tenth_grade_afternoon_end='08:00AM',
+        eleventh_grade_morning_start='08:00AM',
+        eleventh_grade_morning_end='08:00AM',
+        eleventh_grade_afternoon_start='08:00AM',
+        eleventh_grade_afternoon_end='08:00AM',
+        twelfth_grade_morning_start='08:00AM',
+        twelfth_grade_morning_end='08:00AM',
+        twelfth_grade_afternoon_start='08:00AM',
+        twelfth_grade_afternoon_end='08:00AM',
+        )
+
+    sched4 = Regular(
+        school_no='sgb-lc2017',
+        day='Wednesday',
+        junior_kinder_morning_class=True,
+        junior_kinder_afternoon_class=True,
+        senior_kinder_morning_class=True,
+        senior_kinder_afternoon_class=True,
+        first_grade_morning_class=True,
+        first_grade_afternoon_class=True,
+        second_grade_morning_class=True,
+        second_grade_afternoon_class=True,
+        third_grade_morning_class=True,
+        third_grade_afternoon_class=True,
+        fourth_grade_morning_class=True,
+        fourth_grade_afternoon_class=True,
+        fifth_grade_morning_class=True,
+        fifth_grade_afternoon_class=True,
+        sixth_grade_morning_class=True,
+        sixth_grade_afternoon_class=True,
+        seventh_grade_morning_class=True,
+        seventh_grade_afternoon_class=True,
+        eight_grade_morning_class=True,
+        eight_grade_afternoon_class=True,
+        ninth_grade_morning_class=True,
+        ninth_grade_afternoon_class=True,
+        tenth_grade_morning_class=True,
+        tenth_grade_afternoon_class=True,
+        eleventh_grade_morning_class=True,
+        eleventh_grade_afternoon_class=True,
+        twelfth_grade_morning_class=True,
+        twelfth_grade_afternoon_class=True,
+
+
+        junior_kinder_morning_start='08:00AM',
+        junior_kinder_morning_end='08:00AM',
+        junior_kinder_afternoon_start='08:00AM',
+        junior_kinder_afternoon_end='08:00AM',
+        senior_kinder_morning_start='08:00AM',
+        senior_kinder_morning_end='08:00AM',
+        senior_kinder_afternoon_start='08:00AM',
+        senior_kinder_afternoon_end='08:00AM',
+        first_grade_morning_start='08:00AM',
+        first_grade_morning_end='08:00AM',
+        first_grade_afternoon_start='08:00AM',
+        first_grade_afternoon_end='08:00AM',
+        second_grade_morning_start='08:00AM',
+        second_grade_morning_end='08:00AM',
+        second_grade_afternoon_start='08:00AM',
+        second_grade_afternoon_end='08:00AM',
+        third_grade_morning_start='08:00AM',
+        third_grade_morning_end='08:00AM',
+        third_grade_afternoon_start='08:00AM',
+        third_grade_afternoon_end='08:00AM',
+        fourth_grade_morning_start='08:00AM',
+        fourth_grade_morning_end='08:00AM',
+        fourth_grade_afternoon_start='08:00AM',
+        fourth_grade_afternoon_end='08:00AM',
+        fifth_grade_morning_start='08:00AM',
+        fifth_grade_morning_end='08:00AM',
+        fifth_grade_afternoon_start='08:00AM',
+        fifth_grade_afternoon_end='08:00AM',
+        sixth_grade_morning_start='08:00AM',
+        sixth_grade_morning_end='08:00AM',
+        sixth_grade_afternoon_start='08:00AM',
+        sixth_grade_afternoon_end='08:00AM',
+        seventh_grade_morning_start='08:00AM',
+        seventh_grade_morning_end='08:00AM',
+        seventh_grade_afternoon_start='08:00AM',
+        seventh_grade_afternoon_end='08:00AM',
+        eight_grade_morning_start='08:00AM',
+        eight_grade_morning_end='08:00AM',
+        eight_grade_afternoon_start='08:00AM',
+        eight_grade_afternoon_end='08:00AM',
+        ninth_grade_morning_start='08:00AM',
+        ninth_grade_morning_end='08:00AM',
+        ninth_grade_afternoon_start='08:00AM',
+        ninth_grade_afternoon_end='08:00AM',
+        tenth_grade_morning_start='08:00AM',
+        tenth_grade_morning_end='08:00AM',
+        tenth_grade_afternoon_start='08:00AM',
+        tenth_grade_afternoon_end='08:00AM',
+        eleventh_grade_morning_start='08:00AM',
+        eleventh_grade_morning_end='08:00AM',
+        eleventh_grade_afternoon_start='08:00AM',
+        eleventh_grade_afternoon_end='08:00AM',
+        twelfth_grade_morning_start='08:00AM',
+        twelfth_grade_morning_end='08:00AM',
+        twelfth_grade_afternoon_start='08:00AM',
+        twelfth_grade_afternoon_end='08:00AM',
+        )
+
+    sched5 = Regular(
+        school_no='sgb-lc2017',
+        day='Thursday',
+        junior_kinder_morning_class=True,
+        junior_kinder_afternoon_class=True,
+        senior_kinder_morning_class=True,
+        senior_kinder_afternoon_class=True,
+        first_grade_morning_class=True,
+        first_grade_afternoon_class=True,
+        second_grade_morning_class=True,
+        second_grade_afternoon_class=True,
+        third_grade_morning_class=True,
+        third_grade_afternoon_class=True,
+        fourth_grade_morning_class=True,
+        fourth_grade_afternoon_class=True,
+        fifth_grade_morning_class=True,
+        fifth_grade_afternoon_class=True,
+        sixth_grade_morning_class=True,
+        sixth_grade_afternoon_class=True,
+        seventh_grade_morning_class=True,
+        seventh_grade_afternoon_class=True,
+        eight_grade_morning_class=True,
+        eight_grade_afternoon_class=True,
+        ninth_grade_morning_class=True,
+        ninth_grade_afternoon_class=True,
+        tenth_grade_morning_class=True,
+        tenth_grade_afternoon_class=True,
+        eleventh_grade_morning_class=True,
+        eleventh_grade_afternoon_class=True,
+        twelfth_grade_morning_class=True,
+        twelfth_grade_afternoon_class=True,
+
+
+        junior_kinder_morning_start='08:00AM',
+        junior_kinder_morning_end='08:00AM',
+        junior_kinder_afternoon_start='08:00AM',
+        junior_kinder_afternoon_end='08:00AM',
+        senior_kinder_morning_start='08:00AM',
+        senior_kinder_morning_end='08:00AM',
+        senior_kinder_afternoon_start='08:00AM',
+        senior_kinder_afternoon_end='08:00AM',
+        first_grade_morning_start='08:00AM',
+        first_grade_morning_end='08:00AM',
+        first_grade_afternoon_start='08:00AM',
+        first_grade_afternoon_end='08:00AM',
+        second_grade_morning_start='08:00AM',
+        second_grade_morning_end='08:00AM',
+        second_grade_afternoon_start='08:00AM',
+        second_grade_afternoon_end='08:00AM',
+        third_grade_morning_start='08:00AM',
+        third_grade_morning_end='08:00AM',
+        third_grade_afternoon_start='08:00AM',
+        third_grade_afternoon_end='08:00AM',
+        fourth_grade_morning_start='08:00AM',
+        fourth_grade_morning_end='08:00AM',
+        fourth_grade_afternoon_start='08:00AM',
+        fourth_grade_afternoon_end='08:00AM',
+        fifth_grade_morning_start='08:00AM',
+        fifth_grade_morning_end='08:00AM',
+        fifth_grade_afternoon_start='08:00AM',
+        fifth_grade_afternoon_end='08:00AM',
+        sixth_grade_morning_start='08:00AM',
+        sixth_grade_morning_end='08:00AM',
+        sixth_grade_afternoon_start='08:00AM',
+        sixth_grade_afternoon_end='08:00AM',
+        seventh_grade_morning_start='08:00AM',
+        seventh_grade_morning_end='08:00AM',
+        seventh_grade_afternoon_start='08:00AM',
+        seventh_grade_afternoon_end='08:00AM',
+        eight_grade_morning_start='08:00AM',
+        eight_grade_morning_end='08:00AM',
+        eight_grade_afternoon_start='08:00AM',
+        eight_grade_afternoon_end='08:00AM',
+        ninth_grade_morning_start='08:00AM',
+        ninth_grade_morning_end='08:00AM',
+        ninth_grade_afternoon_start='08:00AM',
+        ninth_grade_afternoon_end='08:00AM',
+        tenth_grade_morning_start='08:00AM',
+        tenth_grade_morning_end='08:00AM',
+        tenth_grade_afternoon_start='08:00AM',
+        tenth_grade_afternoon_end='08:00AM',
+        eleventh_grade_morning_start='08:00AM',
+        eleventh_grade_morning_end='08:00AM',
+        eleventh_grade_afternoon_start='08:00AM',
+        eleventh_grade_afternoon_end='08:00AM',
+        twelfth_grade_morning_start='08:00AM',
+        twelfth_grade_morning_end='08:00AM',
+        twelfth_grade_afternoon_start='08:00AM',
+        twelfth_grade_afternoon_end='08:00AM',
+        )
+
+    sched6 = Regular(
+        school_no='sgb-lc2017',
+        day='Friday',
+        junior_kinder_morning_class=True,
+        junior_kinder_afternoon_class=True,
+        senior_kinder_morning_class=True,
+        senior_kinder_afternoon_class=True,
+        first_grade_morning_class=True,
+        first_grade_afternoon_class=True,
+        second_grade_morning_class=True,
+        second_grade_afternoon_class=True,
+        third_grade_morning_class=True,
+        third_grade_afternoon_class=True,
+        fourth_grade_morning_class=True,
+        fourth_grade_afternoon_class=True,
+        fifth_grade_morning_class=True,
+        fifth_grade_afternoon_class=True,
+        sixth_grade_morning_class=True,
+        sixth_grade_afternoon_class=True,
+        seventh_grade_morning_class=True,
+        seventh_grade_afternoon_class=True,
+        eight_grade_morning_class=True,
+        eight_grade_afternoon_class=True,
+        ninth_grade_morning_class=True,
+        ninth_grade_afternoon_class=True,
+        tenth_grade_morning_class=True,
+        tenth_grade_afternoon_class=True,
+        eleventh_grade_morning_class=True,
+        eleventh_grade_afternoon_class=True,
+        twelfth_grade_morning_class=True,
+        twelfth_grade_afternoon_class=True,
+
+
+        junior_kinder_morning_start='08:00AM',
+        junior_kinder_morning_end='08:00AM',
+        junior_kinder_afternoon_start='08:00AM',
+        junior_kinder_afternoon_end='08:00AM',
+        senior_kinder_morning_start='08:00AM',
+        senior_kinder_morning_end='08:00AM',
+        senior_kinder_afternoon_start='08:00AM',
+        senior_kinder_afternoon_end='08:00AM',
+        first_grade_morning_start='08:00AM',
+        first_grade_morning_end='08:00AM',
+        first_grade_afternoon_start='08:00AM',
+        first_grade_afternoon_end='08:00AM',
+        second_grade_morning_start='08:00AM',
+        second_grade_morning_end='08:00AM',
+        second_grade_afternoon_start='08:00AM',
+        second_grade_afternoon_end='08:00AM',
+        third_grade_morning_start='08:00AM',
+        third_grade_morning_end='08:00AM',
+        third_grade_afternoon_start='08:00AM',
+        third_grade_afternoon_end='08:00AM',
+        fourth_grade_morning_start='08:00AM',
+        fourth_grade_morning_end='08:00AM',
+        fourth_grade_afternoon_start='08:00AM',
+        fourth_grade_afternoon_end='08:00AM',
+        fifth_grade_morning_start='08:00AM',
+        fifth_grade_morning_end='08:00AM',
+        fifth_grade_afternoon_start='08:00AM',
+        fifth_grade_afternoon_end='08:00AM',
+        sixth_grade_morning_start='08:00AM',
+        sixth_grade_morning_end='08:00AM',
+        sixth_grade_afternoon_start='08:00AM',
+        sixth_grade_afternoon_end='08:00AM',
+        seventh_grade_morning_start='08:00AM',
+        seventh_grade_morning_end='08:00AM',
+        seventh_grade_afternoon_start='08:00AM',
+        seventh_grade_afternoon_end='08:00AM',
+        eight_grade_morning_start='08:00AM',
+        eight_grade_morning_end='08:00AM',
+        eight_grade_afternoon_start='08:00AM',
+        eight_grade_afternoon_end='08:00AM',
+        ninth_grade_morning_start='08:00AM',
+        ninth_grade_morning_end='08:00AM',
+        ninth_grade_afternoon_start='08:00AM',
+        ninth_grade_afternoon_end='08:00AM',
+        tenth_grade_morning_start='08:00AM',
+        tenth_grade_morning_end='08:00AM',
+        tenth_grade_afternoon_start='08:00AM',
+        tenth_grade_afternoon_end='08:00AM',
+        eleventh_grade_morning_start='08:00AM',
+        eleventh_grade_morning_end='08:00AM',
+        eleventh_grade_afternoon_start='08:00AM',
+        eleventh_grade_afternoon_end='08:00AM',
+        twelfth_grade_morning_start='08:00AM',
+        twelfth_grade_morning_end='08:00AM',
+        twelfth_grade_afternoon_start='08:00AM',
+        twelfth_grade_afternoon_end='08:00AM',
+        )
+
+    db.session.add(sched2)
+    db.session.add(sched3)
+    db.session.add(sched4)
+    db.session.add(sched5)
+    db.session.add(sched6)
+    db.session.add(sched7)
+    db.session.add(sched8)
 
     db.session.commit()
 

@@ -47,15 +47,17 @@ services:
       - main
 
   rabbitmq:
-      image: rabbitmq
-      ports:
-        - "5672:5672"
-      environment:
-        RABBITMQ_DEFAULT_USER: sgb
-        RABBITMQ_DEFAULT_PASS: sgbsaints
-        RABBITMQ_DEFAULT_VHOST: pisara
+    restart: always
+    image: rabbitmq
+    ports:
+      - "5672:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: sgb
+      RABBITMQ_DEFAULT_PASS: sgbsaints
+      RABBITMQ_DEFAULT_VHOST: pisara
 
   celery:
+    restart: always
     build: ./main
     command: "celery worker -A tasks --loglevel=info"
     user: nobody

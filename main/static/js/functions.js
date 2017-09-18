@@ -972,6 +972,7 @@ function search_absent(){
   var name = $('#absent_search_name').val();
   var level = $('#absent_search_level').val();
   var section = $('#absent_search_section').val();
+  var time_of_day = $('#absent_search_time_of_day').val();
   var reset = 'yes';
 
   $.post('/search/absent',{
@@ -981,6 +982,7 @@ function search_absent(){
       name:name,
       level:level,
       section:section,
+      time_of_day:time_of_day,
       reset:reset
   },
   function(data){
@@ -997,6 +999,7 @@ function absent_next_search(){
   var name = $('#absent_search_name').val();
   var level = $('#absent_search_level').val();
   var section = $('#absent_search_section').val();
+  var time_of_day = $('#absent_search_time_of_day').val();
   var reset = 'no';
 
     $.post('/search/absent',{
@@ -1006,6 +1009,7 @@ function absent_next_search(){
         name:name,
         level:level,
         section:section,
+        time_of_day:time_of_day,
         reset:reset
     },
     function(data){
@@ -1020,6 +1024,7 @@ function search_late(){
   var name = $('#late_search_name').val();
   var level = $('#late_search_level').val();
   var section = $('#late_search_section').val();
+  var time_of_day = $('#late_search_time_of_day').val();
   var reset = 'yes';
 
   $.post('/search/late',{
@@ -1029,6 +1034,7 @@ function search_late(){
       name:name,
       level:level,
       section:section,
+      time_of_day:time_of_day,
       reset:reset
   },
   function(data){
@@ -1045,6 +1051,7 @@ function late_next_search(){
   var name = $('#late_search_name').val();
   var level = $('#late_search_level').val();
   var section = $('#late_search_section').val();
+  var time_of_day = $('#late_search_time_of_day').val();
   var reset = 'no';
 
     $.post('/search/late',{
@@ -1054,6 +1061,7 @@ function late_next_search(){
         name:name,
         level:level,
         section:section,
+        time_of_day:time_of_day,
         reset:reset
     },
     function(data){
@@ -1486,6 +1494,9 @@ function save_calendar_sched(){
         $('#save-calendar-sched').button('complete');
         setTimeout(function(){ 
             $('#save-calendar-sched').attr('disabled',true);
+            $('#calendar-loading').show()
+            $('#calendar-modal-body').html(data);
+            $('#calendar-loading').hide()
         }, 0); 
 
     });
@@ -1813,11 +1824,91 @@ function toggle_search(){
     }
 }
 
-function populate_regular_schedule(date){
+function populate_regular_schedule(date,month,day,year){
+  $('#calendar-schedule-loading').show();
   $('#calendar-schedule-modal-header').html(date)
   $('.no-class-checkbox').show();
   $('.no-class-checkbox').prop('checked',true);
   $('.no-class-checkbox').change();
+  $.post('/schedule/regular/get/specific',{
+      month:month,
+      day:day,
+      year:year
+  },
+  function(data){
+    $('#junior_kinder_morning_start').val(data['junior_kinder_morning_start']);
+    $('#junior_kinder_morning_end').val(data['junior_kinder_morning_end']);
+    $('#junior_kinder_afternoon_start').val(data['junior_kinder_afternoon_start']);
+    $('#junior_kinder_afternoon_end').val(data['junior_kinder_afternoon_end']);
+
+    $('#senior_kinder_morning_start').val(data['senior_kinder_morning_start']);
+    $('#senior_kinder_morning_end').val(data['senior_kinder_morning_end']);
+    $('#senior_kinder_afternoon_start').val(data['senior_kinder_afternoon_start']);
+    $('#senior_kinder_afternoon_end').val(data['senior_kinder_afternoon_end']);
+
+    $('#first_grade_morning_start').val(data['first_grade_morning_start']);
+    $('#first_grade_morning_end').val(data['first_grade_morning_end']);
+    $('#first_grade_afternoon_start').val(data['first_grade_afternoon_start']);
+    $('#first_grade_afternoon_end').val(data['first_grade_afternoon_end']);
+
+    $('#second_grade_morning_start').val(data['second_grade_morning_start']);
+    $('#second_grade_morning_end').val(data['second_grade_morning_end']);
+    $('#second_grade_afternoon_start').val(data['second_grade_afternoon_start']);
+    $('#second_grade_afternoon_end').val(data['second_grade_afternoon_end']);
+
+    $('#third_grade_morning_start').val(data['third_grade_morning_start']);
+    $('#third_grade_morning_end').val(data['third_grade_morning_end']);
+    $('#third_grade_afternoon_start').val(data['third_grade_afternoon_start']);
+    $('#third_grade_afternoon_end').val(data['third_grade_afternoon_end']);
+
+    $('#fourth_grade_morning_start').val(data['fourth_grade_morning_start']);
+    $('#fourth_grade_morning_end').val(data['fourth_grade_morning_end']);
+    $('#fourth_grade_afternoon_start').val(data['fourth_grade_afternoon_start']);
+    $('#fourth_grade_afternoon_end').val(data['fourth_grade_afternoon_end']);
+
+    $('#fifth_grade_morning_start').val(data['fifth_grade_morning_start']);
+    $('#fifth_grade_morning_end').val(data['fifth_grade_morning_end']);
+    $('#fifth_grade_afternoon_start').val(data['fifth_grade_afternoon_start']);
+    $('#fifth_grade_afternoon_end').val(data['fifth_grade_afternoon_end']);
+
+    $('#sixth_grade_morning_start').val(data['sixth_grade_morning_start']);
+    $('#sixth_grade_morning_end').val(data['sixth_grade_morning_end']);
+    $('#sixth_grade_afternoon_start').val(data['sixth_grade_afternoon_start']);
+    $('#sixth_grade_afternoon_end').val(data['sixth_grade_afternoon_end']);
+
+    $('#seventh_grade_morning_start').val(data['seventh_grade_morning_start']);
+    $('#seventh_grade_morning_end').val(data['seventh_grade_morning_end']);
+    $('#seventh_grade_afternoon_start').val(data['seventh_grade_afternoon_start']);
+    $('#seventh_grade_afternoon_end').val(data['seventh_grade_afternoon_end']);
+
+    $('#eight_grade_morning_start').val(data['eight_grade_morning_start']);
+    $('#eight_grade_morning_end').val(data['eight_grade_morning_end']);
+    $('#eight_grade_afternoon_start').val(data['eight_grade_afternoon_start']);
+    $('#eight_grade_afternoon_end').val(data['eight_grade_afternoon_end']);
+
+    $('#ninth_grade_morning_start').val(data['ninth_grade_morning_start']);
+    $('#ninth_grade_morning_end').val(data['ninth_grade_morning_end']);
+    $('#ninth_grade_afternoon_start').val(data['ninth_grade_afternoon_start']);
+    $('#ninth_grade_afternoon_end').val(data['ninth_grade_afternoon_end']);
+
+    $('#tenth_grade_morning_start').val(data['tenth_grade_morning_start']);
+    $('#tenth_grade_morning_end').val(data['tenth_grade_morning_end']);
+    $('#tenth_grade_afternoon_start').val(data['tenth_grade_afternoon_start']);
+    $('#tenth_grade_afternoon_end').val(data['tenth_grade_afternoon_end']);
+
+    $('#eleventh_grade_morning_start').val(data['eleventh_grade_morning_start']);
+    $('#eleventh_grade_morning_end').val(data['eleventh_grade_morning_end']);
+    $('#eleventh_grade_afternoon_start').val(data['eleventh_grade_afternoon_start']);
+    $('#eleventh_grade_afternoon_end').val(data['eleventh_grade_afternoon_end']);
+
+    $('#twelfth_grade_morning_start').val(data['twelfth_grade_morning_start']);
+    $('#twelfth_grade_morning_end').val(data['twelfth_grade_morning_end']);
+    $('#twelfth_grade_afternoon_start').val(data['twelfth_grade_afternoon_start']);
+    $('#twelfth_grade_afternoon_end').val(data['twelfth_grade_afternoon_end']);
+
+    $('#calendar-schedule-modal-header').html(data['date'])
+    $('#calendar-schedule-loading').hide();
+  });
 }
 
 function populate_irregular_schedule(date,month,day,year){

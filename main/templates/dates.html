@@ -18,13 +18,13 @@
 								{% if date.day in events %}
 							    <td class="day current-month current-day event" data-toggle="modal" data-target="#calendar-schedule-modal" onclick="populate_irregular_schedule('{{month_name}} {{date.day}}, {{year}}',{{date.month}},{{date.day}},{{date.year}})">
 							    {% else %}
-							    <td class="day current-month current-day" data-toggle="modal" data-target="#calendar-schedule-modal" onclick="populate_regular_schedule('{{month_name}} {{date.day}}, {{year}}')">
+							    <td class="day current-month current-day" data-toggle="modal" data-target="#calendar-schedule-modal" onclick="populate_regular_schedule('{{month_name}} {{date.day}}, {{year}}', '{{date.day}}')">
 							    {% endif %}
 							    {% else %}
 							    {% if date.day in events %}
 							    <td class="day current-month event" data-toggle="modal" data-target="#calendar-schedule-modal" onclick="populate_irregular_schedule('{{month_name}} {{date.day}}, {{year}}',{{date.month}},{{date.day}},{{date.year}})">
 							    {% else %}
-							    <td class="day current-month" data-toggle="modal" data-target="#calendar-schedule-modal" onclick="populate_regular_schedule('{{month_name}} {{date.day}}, {{year}}')">
+							    <td class="day current-month" data-toggle="modal" data-target="#calendar-schedule-modal" onclick="populate_regular_schedule('{{month_name}} {{date.day}}, {{year}}', {{date.month}}, {{date.day}}, {{year}})">
 							    {% endif %}
 						    {% endif %}
 						    {% else %}

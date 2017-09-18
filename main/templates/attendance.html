@@ -43,6 +43,7 @@
 					<tr>
 						<th class="xs">#</th>
 						<th class="short" id="date">Date</th>
+						<th class="short" id="date">Time of Day</th>
 						<th class="short" id="id_no">ID Number</th>
 						<th class="long" id="name">Name</th>
 						<th class="short" id="level">Grade/Level</th>
@@ -50,7 +51,13 @@
 					</tr>
 					<tr id="absent-search-panel" class="search-panel">
 						<td class="xs"></td>	
-						<td class="short"><input type="text" id="absent_search_date" class="form-control search-text search-absent datepicker"></td>	
+						<td class="short"><input type="text" id="absent_search_date" class="form-control search-text search-absent datepicker"></td>
+						<td class="short">
+							<select class="form-control search-option search-absent-options" id="absent_search_time_of_day">
+							        <option value="">All</option>
+							        <option value="morning">Morning</option>
+							        <option value="afternoon">Afternoon</option>
+						</td>	
 						<td class="short"><input type="text" id="absent_search_id_no" class="form-control search-text search-absent"></td>	
 						<td class="long"><input type="text" id="absent_search_name" class="form-control search-text search-absent"></td>
 						<td class="short">
@@ -87,6 +94,7 @@
 					<tr class="rows">
 						<td class="xs">{{loop.index}}</td>	
 						<td class="short">{{index.date}}</td>
+						<td class="short">{{index.time_of_day}}</td>
 						<td class="short">{{index.id_no}}</td>	
 						<td class="long">{{index.name}}</td>	
 						<td class="short">{{index.level}}</td>
@@ -109,6 +117,7 @@
 					<tr>
 						<th class="xs">#</th>
 						<th class="short" id="date">Date</th>	
+						<th class="short" id="date">Time of Day</th>	
 						<th class="short" id="id_no">ID Number</th>
 						<th class="long" id="name">Name</th>
 						<th class="short" id="level">Grade/Level</th>
@@ -118,6 +127,12 @@
 					<tr id="late-search-panel" class="search-panel">
 						<td class="xs"></td>	
 						<td class="short"><input type="text" id="late_search_date" class="form-control search-text search-late datepicker"></td>	
+						<td class="short">
+							<select class="form-control search-option search-late-options" id="late_search_time_of_day">
+							        <option value="">All</option>
+							        <option value="morning">Morning</option>
+							        <option value="afternoon">Afternoon</option>
+						</td>
 						<td class="short"><input type="text" id="late_search_id_no" class="form-control search-text search-late"></td>	
 						<td class="long"><input type="text" id="late_search_name" class="form-control search-text search-late"></td>
 						<td class="short">
@@ -155,7 +170,8 @@
 					{% for a in late %}
 					<tr class="rows">
 						<td class="xs">{{loop.index}}</td>
-						<td class="short">{{a.date}}</td>	
+						<td class="short">{{a.date}}</td>
+						<td class="short">{{a.time_of_day}}</td>
 						<td class="short">{{a.id_no}}</td>	
 						<td class="long">{{a.name}}</td>					
 						<td class="short">{{a.level}}</td>

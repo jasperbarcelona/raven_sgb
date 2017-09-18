@@ -24,38 +24,49 @@ APP_SECRET = '01c5d1f8d3bfa9966786065c5a2d829d7e84cf26fbfb4a47c91552cb7c091608'
 # 'sqlite:///local.db'
 
 @app.task
-def blast_sms(batch_id,contacts,date,time,message):
+def blast_sms(batch_id,date,time,message_content):
     batch = Message.query.filter_by(id=batch_id).first()
-
-    for msisdn in contacts:
-        contact = Parent.query.filter_by(mobile_number=str(msisdn)).first()
-
-        new_message_status = MessageStatus(
-            message_id = batch.id,
-            date = date,
-            time = time,
-            recipient_name = contact.name,
-            msisdn = contact.mobile_number
-            )
-
-        db.session.add(new_message_status)
-        db.session.commit()
-
-    batch.pending = MessageStatus.query.filter_by(message_id=batch.id,status='pending').count()
-    db.session.commit()
 
     messages = MessageStatus.query.filter_by(message_id=batch_id).all()
     for message in messages:
-        sleep(10)
-        message.status = 'success'
-        message.timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
-        db.session.commit()
+
+        message_options = {
+            'app_id': APP_ID,
+            'app_secret': APP_SECRET,
+            'message': message_content,
+            'address': message.msisdn,
+            'passphrase': PASSPHRASE,
+        }
+
+        try:
+            r = requests.post(IPP_URL,message_options)           
+            if r.status_code == 201:
+                message.status = 'success'
+                message.timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+                db.session.commit()
+
+            elif r.json()['error'] == 'Invalid address.':
+                message.status = 'Invalid address'
+                message.timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+                db.session.commit()
+
+            else:
+                message.status = 'Failed'
+                message.timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+                db.session.commit()
+
+        except requests.exceptions.ConnectionError as e:
+            message.status = 'Failed'
+            message.timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+            db.session.commit()
         
         batch.done = MessageStatus.query.filter_by(message_id=batch.id,status='success').count()
         batch.pending = MessageStatus.query.filter_by(message_id=batch.id,status='pending').count()
         batch.failed = MessageStatus.query.filter_by(message_id=batch.id,status='failed').count()
         db.session.commit()
+
     return
+
 
 def send_absent_message(absent_id,message,msisdn):
     absent = Absent.query.filter_by(id=absent_id).first()
@@ -140,7 +151,7 @@ def create_pdf(pdf_data,file_name,report_id):
     try:
         resultFile = open('static/reports/%s.pdf'%file_name, "w+b")
         pdf = StringIO()
-        pisa.CreatePDF(StringIO(pdf_data.encode('utf-8')), dest=resultFile) 
+        pisa.CreatePDF(StringIO(pdf_data.encode('utf-8')), dest='static/reports/%s.pdf'%file_name) 
         resultFile.close()
 
         report.status = 'success'
@@ -163,10 +174,16 @@ def get_hour(time):
     return hour
 
 @app.task
-def check_if_late(school_no,api_key,id_no,name,level,section,date,group,time,timestamp):
+def check_if_late(school_no,api_key,id_no,name,level,section,date,group,log_time,timestamp):
     now = datetime.datetime.now()
-    time_now = str(now.replace(hour=get_hour(time), minute=int(time[3:5])))[11:16]
-    schedule = Schedule.query.filter_by(school_no=school_no).first()
+    time_now = str(now.replace(hour=get_hour(log_time), minute=int(log_time[3:5])))[11:16]
+
+    irregular_class = Irregular.query.filter_by(school_no=school_no,date=time.strftime("%B %d, %Y")).first()
+    if irregular_class:
+        schedule = irregular_class
+    else:
+        schedule = Regular.query.filter_by(school_no=school_no,day=time.strftime('%A')).first()
+
     if level == 'Junior Kinder':
         educ = 'junior_kinder'
     elif level == 'Senior Kinder':
@@ -207,37 +224,27 @@ def check_if_late(school_no,api_key,id_no,name,level,section,date,group,time,tim
     afternoon_start = eval(query+'_afternoon_start')
     afternoon_end = eval(query+'_afternoon_end')
 
-    print 'time now: %s' % parse_date(time_now)
-    print 'afternoon start: %s' % parse_date(afternoon_start)
-    print 'afternoon end: %s' % parse_date(afternoon_end)
-    print 'afternoon class: %s' % str(afternoon_class)
-
-    # if ((parse_date(time_now) >= parse_date(morning_start) and parse_date(time_now) < parse_date(morning_end)) or \
-    #     (parse_date(time_now) >= parse_date(afternoon_start) and parse_date(time_now) < parse_date(afternoon_end))) and\
-    #     Absent.query.filter_by(school_id=school_id,id_no=id_no,date=date).first() == None:
-
-    #     record_as_late(school_id, id_no, name, level, section, 
-    #                    date, department, time)
-
     if parse_date(time_now) >= parse_date(morning_start) and\
         parse_date(time_now) < parse_date(morning_end) and\
         Absent.query.filter_by(school_no=school_no,id_no=id_no,date=date,time_of_day='morning').first() == None:
         if morning_class:
-            if str(parse_date(time_now) - parse_date(morning_start)) > '00:15:00':
+            if parse_date(time_now) - parse_date(morning_start) > datetime.timedelta(hours=0,minutes=15):
                 mark_specific_absent(school_no,id_no,'morning')
             else:
                 record_as_late(school_no, id_no, name, level, section, 
-                            date, group, time, timestamp)
+                            date, group, log_time, timestamp, 'morning')
 
     elif (parse_date(time_now) >= parse_date(afternoon_start) and\
         parse_date(time_now) < parse_date(afternoon_end)) and\
         Absent.query.filter_by(school_no=school_no,id_no=id_no,date=date,time_of_day='afternoon').first() == None:
         if afternoon_class:
-            if str(parse_date(time_now) - parse_date(afternoon_start)) > '00:15:00':
+            if parse_date(time_now) - parse_date(afternoon_start) > datetime.timedelta(hours=0,minutes=15):
                 mark_specific_absent(school_no,id_no,'afternoon')
             else:
                 record_as_late(school_no, id_no, name, level, section, 
-                            date, group, time, timestamp)
+                            date, group, log_time, timestamp, 'afternoon')
+
+    return
 
 def mark_specific_absent(school_no,id_no,time_of_day):
     student = K12.query.filter_by(school_no=school_no,id_no=id_no).first()
@@ -250,6 +257,7 @@ def mark_specific_absent(school_no,id_no,time_of_day):
             id_no=id_no,
             name=student_name,
             level=student.level,
+            department=student.group,
             section=student.section,
             time_of_day=time_of_day,
             timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
@@ -265,39 +273,37 @@ def afternoon_absent(school_no,api_key,level):
     all_students = K12.query.filter_by(school_no=school_no,level=level).all()
 
     for student in all_students:
-        print 'xxxxxxxxxxxxxxxxxxxxx'
-        print student.id_no
         logged = Log.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no).order_by(Log.timestamp.desc()).first()
+        marked = Absent.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no,time_of_day='afternoon').order_by(Absent.timestamp.desc()).first()
         if not logged or logged == None or logged.time_out != None:
-            student_name = student.last_name+', '+student.first_name
-            if student.middle_name:
-                student_name += ' '+student.middle_name[:1]+'.'
-            absent = Absent(
-                school_no=school_no,
-                date=time.strftime("%B %d, %Y"),
-                id_no=student.id_no,
-                name=student_name,
-                level=student.level,
-                section=student.section,
-                department=student.group,
-                time_of_day='afternoon',
-                timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
-                )
+            if not marked or marked == None:
+                student_name = student.last_name+', '+student.first_name
+                if student.middle_name:
+                    student_name += ' '+student.middle_name[:1]+'.'
+                absent = Absent(
+                    school_no=school_no,
+                    date=time.strftime("%B %d, %Y"),
+                    id_no=student.id_no,
+                    name=student_name,
+                    level=student.level,
+                    section=student.section,
+                    department=student.group,
+                    time_of_day='afternoon',
+                    timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+                    )
 
-            db.session.add(absent)
-            db.session.commit()
-
-            if logged != None and logged.time_out != None:
-                message = '%s left the campus on %s at exactly %s and did not come back.' % (student_name, logged.date, logged.time_out)
-                send_absent_message(absent.id,message,student.parent_contact)
-            else:
-                absent.notification_status = 'Exempted'
+                db.session.add(absent)
                 db.session.commit()
+                if logged and logged != None and logged.time_out != None:
+                    message = '%s left the campus on %s at exactly %s and did not come back.' % (student_name, logged.date, logged.time_out)
+                    send_absent_message(absent.id,message,student.parent_contact)
+                else:
+                    absent.notification_status = 'Exempted'
+                    db.session.commit()
 
-            student.absences=Absent.query.filter_by(id_no=student.id_no, school_no=school_no).count()
-            db.session.commit()
-            absent_count = Absent.query.filter_by(school_no=school_no,date=time.strftime("%B %d, %Y"),time_of_day='afternoon').count()
-    return jsonify(status='Success', absent_count=absent_count),201
+                student.absences=Absent.query.filter_by(id_no=student.id_no, school_no=school_no).count()
+                db.session.commit()
+    return
 
 
 @app.task
@@ -306,25 +312,26 @@ def morning_absent(school_no,api_key,level):
 
     for student in students:
         logged = Log.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no).order_by(Log.timestamp.desc()).first()
+        marked = Absent.query.filter_by(date=time.strftime("%B %d, %Y"),id_no=student.id_no,time_of_day='morning').order_by(Absent.timestamp.desc()).first()
         if not logged or logged == None or logged.time_out != None:
-            student_name = student.last_name+', '+student.first_name
-            if student.middle_name:
-                student_name += ' '+student.middle_name[:1]+'.'
-            absent = Absent(
-            school_no=school_no,
-            date=time.strftime("%B %d, %Y"),
-            id_no=student.id_no,
-            name=student_name,
-            level=student.level,
-            section=student.section,
-            department=student.group,
-            time_of_day='morning',
-            timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
-            )
+            if not marked or marked == None:
+                student_name = student.last_name+', '+student.first_name
+                if student.middle_name:
+                    student_name += ' '+student.middle_name[:1]+'.'
+                absent = Absent(
+                school_no=school_no,
+                date=time.strftime("%B %d, %Y"),
+                id_no=student.id_no,
+                name=student_name,
+                level=student.level,
+                section=student.section,
+                department=student.group,
+                time_of_day='morning',
+                timestamp=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S:%f')
+                )
 
-            db.session.add(absent)
+                db.session.add(absent)
 
-            student.absences=Absent.query.filter_by(id_no=student.id_no, school_no=school_no).count()
-            db.session.commit()
-            absent_count = Absent.query.filter_by(school_no=school_no,date=time.strftime("%B %d, %Y"),time_of_day='morning').count()
-    return jsonify(status='Success', absent_count=absent_count),201
+                student.absences=Absent.query.filter_by(id_no=student.id_no, school_no=school_no).count()
+                db.session.commit()
+    return

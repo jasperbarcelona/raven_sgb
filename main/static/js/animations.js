@@ -77,7 +77,6 @@ $('.clockpicker').clockpicker({
     $('.modal').modal('hide');
 });*/
 
-
 $('#confirm-send').attr('disabled',true);
 
 $('#message').on('keyup', function(){

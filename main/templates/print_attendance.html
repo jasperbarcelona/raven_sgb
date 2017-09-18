@@ -35,8 +35,9 @@
 		<span><strong>{{report_type}} Records</strong> for <strong>{{from_date}} to {{to_date}}</strong></span><br /><br />
 		<span>Prepared by <strong>{{staff_name}}</strong></span><br />
 		<span>on {{date}} at {{time}}</span><br /><br /><br />
+		{% if report_type == 'Absent' %}
+		<h2>Morning</h2>
 		<table class="table">
-			{% if report_type == 'Absent' %}
 			<thead>
 				<tr class="head-row">
 					<td width="100px"><strong>No.</strong></td>
@@ -48,6 +49,7 @@
 			</thead>
 			<tbody>
 				{% for item in result %}
+				{% if item.time_of_day == 'morning' %}
 				<tr class="bottom-row">
 					<td width="100px">{{ loop.index }}</td>
 					<td>{{ item.name }}</td>
@@ -55,9 +57,94 @@
 					<td>{{ item.section }}</td>
 					<td>{{ item.id_no }}</td>
 				</tr>
+				{% endif %}
 				{% endfor %}
 			</tbody>
-			{% elif report_type == 'Log' %}
+		</table>
+		<br /><br />
+		<h2>Afternoon</h2>
+		<table class="table">
+			<thead>
+				<tr class="head-row">
+					<td width="100px"><strong>No.</strong></td>
+					<td><strong>Name</strong></td>
+					<td><strong>Grade/Level</strong></td>
+					<td><strong>Section</strong></td>
+					<td><strong>ID Number</strong></td>
+				</tr>
+			</thead>
+			<tbody>
+				{% for item in result %}
+				{% if item.time_of_day == 'afternoon' %}
+				<tr class="bottom-row">
+					<td width="100px">{{ loop.index }}</td>
+					<td>{{ item.name }}</td>
+					<td>{{ item.level }}</td>
+					<td>{{ item.section }}</td>
+					<td>{{ item.id_no }}</td>
+				</tr>
+				{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+		{% elif report_type == 'Late' %}
+		<h2>Morning</h2>
+		<table class="table">
+			<thead>
+				<tr class="head-row">
+					<td width="100px"><strong>No.</strong></td>
+					<td><strong>Name</strong></td>
+					<td><strong>Grade/Level</strong></td>
+					<td><strong>Section</strong></td>
+					<td><strong>ID Number</strong></td>
+					<td><strong>In</strong></td>
+				</tr>
+			</thead>
+			<tbody>
+				{% for item in result %}
+				{% if item.time_of_day == 'morning' %}
+				<tr class="bottom-row">
+					<td width="100px">{{ loop.index }}</td>
+					<td>{{ item.name }}</td>
+					<td>{{ item.level }}</td>
+					<td>{{ item.section }}</td>
+					<td>{{ item.id_no }}</td>
+					<td>{{ item.time_in }}</td>
+				</tr>
+				{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+		<br /><br />
+		<h2>Afternoon</h2>
+		<table class="table">
+			<thead>
+				<tr class="head-row">
+					<td width="100px"><strong>No.</strong></td>
+					<td><strong>Name</strong></td>
+					<td><strong>Grade/Level</strong></td>
+					<td><strong>Section</strong></td>
+					<td><strong>ID Number</strong></td>
+					<td><strong>In</strong></td>
+				</tr>
+			</thead>
+			<tbody>
+				{% for item in result %}
+				{% if item.time_of_day == 'afternoon' %}
+				<tr class="bottom-row">
+					<td width="100px">{{ loop.index }}</td>
+					<td>{{ item.name }}</td>
+					<td>{{ item.level }}</td>
+					<td>{{ item.section }}</td>
+					<td>{{ item.id_no }}</td>
+					<td>{{ item.time_in }}</td>
+				</tr>
+				{% endif %}
+				{% endfor %}
+			</tbody>
+		</table>
+		{% elif report_type == 'Log' %}
+		<table class="table">
 			<thead>
 				<tr class="head-row">
 					<td width="100px"><strong>No.</strong></td>
@@ -80,8 +167,8 @@
 				</tr>
 				{% endfor %}
 			</tbody>
-			{% endif %}
 		</table>
+		{% endif %}
 		<br /><br /><br />
 		<span>-- END OF REPORT --</span>
 	</body>
