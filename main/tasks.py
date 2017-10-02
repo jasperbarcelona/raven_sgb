@@ -295,7 +295,7 @@ def afternoon_absent(school_no,api_key,level):
                 db.session.add(absent)
                 db.session.commit()
                 if logged and logged != None and logged.time_out != None:
-                    message = '%s left the campus on %s at exactly %s and did not come back.' % (student_name, logged.date, logged.time_out)
+                    message = '%s left the campus on %s at exactly %s.' % (student_name, logged.date, logged.time_out)
                     send_absent_message(absent.id,message,student.parent_contact)
                 else:
                     absent.notification_status = 'Exempted'

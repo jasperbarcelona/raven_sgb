@@ -13,14 +13,14 @@ body, html{
 body{
   color: #373A3C !important;
   font-family: Lato;
-  background-color: #00AF64;
+  background-color: #c43351;
 }
 
 .btn-primary,
 .btn-primary:hover
 .btn-primary:active {
-  background-color: #00795B !important;
-  border-color: #00795B !important; 
+  background-color: #6C1C2D !important;
+  border-color: #6C1C2D !important; 
 }
 
 .loading{

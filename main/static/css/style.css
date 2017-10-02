@@ -22,7 +22,7 @@ body{
 	color: #373A3C !important;
 	font-family: Lato;
 	/*background-color: #DCDBDB;*/
-	background-color: #00AF64;
+	background-color: #c43351;
 	-webkit-user-select: none;  /* Chrome all / Safari all */
   	-moz-user-select: none;     /* Firefox all */
   	-ms-user-select: none;
@@ -44,8 +44,8 @@ textarea{
 /*.btn-primary,
 .btn-primary:hover
 .btn-primary:active {
-  background-color: #00795B !important;
-  border-color: #00795B !important; 
+  background-color: #6C1C2D !important;
+  border-color: #6C1C2D !important; 
 }
 */
 #message{
@@ -93,7 +93,7 @@ a, a:hover, a:active, a:focus{
 .content{
 	height: calc(100vh - 80px);
 	padding: 0;
-	background-color: #00AF64;
+	background-color: #c43351;
 	display: none;
 }
 
@@ -101,7 +101,7 @@ a, a:hover, a:active, a:focus{
 	position: absolute;
 	bottom: 0;
 	left: 0;
-	background-color: #00AF64;
+	background-color: #c43351;
 	height: calc(100% - 78px);
 	padding: 40px 70px 0 70px;
 }
@@ -128,7 +128,7 @@ a, a:hover, a:active, a:focus{
 }
 
 .menu-item:active .menu-icon-container{
-	border: 2px solid #00AF64;
+	border: 2px solid #c43351;
 	border-radius: 15px;
 }
 
@@ -154,7 +154,7 @@ a, a:hover, a:active, a:focus{
 
 .menu-icon-container{
 	position: relative;
-	background-color: rgba(0, 121, 91, 0.6);
+	background-color: rgba(108, 28, 45, 0.6);
 	height: 80px;
 	width: 80px;
 	border-radius: 15px;
@@ -168,7 +168,7 @@ a, a:hover, a:active, a:focus{
 }
 
 .menu-icon-container:hover {
-	background-color: rgba(0, 121, 91, 1);
+	background-color: rgba(108, 28, 45, 1);
 }
 
 .menu-text-container{
@@ -190,19 +190,19 @@ a, a:hover, a:active, a:focus{
 }
 
 .generic-background{
-	background-color: #00795B !important;
+	background-color: #6C1C2D !important;
 }
 
 .colored-font{
-	color: #00AF64;
+	color: #c43351;
 }
 
 .colored-bg{
-	background-color: #00AF64;
+	background-color: #c43351;
 }
 
 #header{
-	background-color: #00795B !important;
+	background-color: #6C1C2D !important;
 	height: 78px;
 	width: 100%;
 	min-width: 800px;
@@ -246,7 +246,7 @@ a, a:hover, a:active, a:focus{
 }
 
 #header-logo{
-	height: calc(100% - 10px);
+	height: calc(100%);
 	margin-right: 10px;
 }
 
@@ -299,7 +299,7 @@ a, a:hover, a:active, a:focus{
 	font-weight: normal !important;
 	padding-left: 4px;
 	font-size: 12px !important;
-	color: #00AF64 !important;
+	color: #c43351 !important;
 }
 
 .ui-datepicker{
@@ -581,13 +581,13 @@ a, a:hover, a:active, a:focus{
 }
 
 .status-success{
-	color: #00AF64;
+	color: #c43351;
 	font-size: 42px;
 	float: left;
 }
 
 .save-status-success{
-	color: #00AF64;
+	color: #c43351;
 	margin-top: -2px;
 	font-size: 42px !important;
 	font-weight: bold;
@@ -608,7 +608,7 @@ a, a:hover, a:active, a:focus{
 	z-index: 950;
 	height: 75px;
 	width: 210px;
-	background-color: #00795B;
+	background-color: #6C1C2D;
 	color: #FFFFFF;
 	display: -webkit-flex;
 	display: flex;
@@ -938,7 +938,7 @@ a, a:hover, a:active, a:focus{
 }
 
 .input-group-addon{
-	background-color: #00AF64 !important;
+	background-color: #c43351 !important;
 	color: #FFFFFF;
 }
 
@@ -1006,7 +1006,7 @@ a, a:hover, a:active, a:focus{
 .sched-label{
 	font-weight: bold;
 	font-size: 16px;
-	color: #00795B;
+	color: #6C1C2D;
 }
 
 .schedule-text{
@@ -1093,7 +1093,7 @@ a, a:hover, a:active, a:focus{
 
 .buttons{
 	color: #FFFFFF !important;
-	background-color: #00795B !important;
+	background-color: #6C1C2D !important;
 	border-radius: 0px;
 	height: 30px;
 	width: 70px;	
@@ -1241,7 +1241,7 @@ a, a:hover, a:active, a:focus{
 }
 
 #messages-btn{
-	background-color: #00795B !important;
+	background-color: #6C1C2D !important;
 	height: 30px;
 	font-size: 21px !important;
 	color: #FFFFFF;
@@ -1353,7 +1353,7 @@ a, a:hover, a:active, a:focus{
 	z-index: 1000;
 	height: 100vh;
 	width: 100%;
-	background-color: #00AF64;
+	background-color: #c43351;
 	display: -webkit-flex;
 	display: flex;
 	-webkit-flex-direction: column;
@@ -1366,11 +1366,11 @@ a, a:hover, a:active, a:focus{
 
 .ui-datepicker-next,.ui-datepicker-prev{
 	background-color: #FFFFFF !important;
-	color: #00AF64 !important;
+	color: #c43351 !important;
 }
 
 .ui-datepicker-next:hover,.ui-datepicker-prev:hover{
-	background-color: #00AF64 !important;
+	background-color: #c43351 !important;
 }
 
 .ui-datepicker-calendar tbody tr td a{
@@ -1619,7 +1619,7 @@ a, a:hover, a:active, a:focus{
 
 .wallet-data-container{
 	padding: 0 40px 0 40px;
-	background-color: #00795B;
+	background-color: #6C1C2D;
 	float: right;
 	height: 80px;
 	display: -webkit-flex;
@@ -1664,7 +1664,7 @@ a, a:hover, a:active, a:focus{
 
 .wallet-options:hover{
 	background-color: #FFFFFF;
-	color: #00795B !important;
+	color: #6C1C2D !important;
 }
 
 .wallet-options:active{
@@ -1808,7 +1808,7 @@ a, a:hover, a:active, a:focus{
 }
 
 .location-label.root:hover {
-	color: #00795B !important;
+	color: #6C1C2D !important;
 }
 
 .separator {
@@ -1852,7 +1852,7 @@ td{
 }
 
 table.table thead:not(.access-thead) tr th {
-	background-color: #00795B;	
+	background-color: #6C1C2D;	
 	color: #ffffff;
 	font-size: 12px;
 	padding-top: 10px;
@@ -1863,7 +1863,7 @@ table.table tbody:not(.access-tbody) tr td {
 }
 
 #options li a:hover{
-	background-color: #00795B !important;
+	background-color: #6C1C2D !important;
 	color: #ffffff;
 }
 
@@ -1890,7 +1890,7 @@ table.table tbody:not(.access-tbody) tr td {
 
 .main-nav-tabs > li > a:hover{
 	color: #FFFFFF !important;
-	background-color: #00795B;
+	background-color: #6C1C2D;
 }
 
 .main-nav-tabs > li.active > a,
@@ -1898,18 +1898,18 @@ table.table tbody:not(.access-tbody) tr td {
 .main-nav-tabs > li.active > a:focus{
 	color: #FFFFFF;
 	cursor: default;
-	background-color: #00795B;	
+	background-color: #6C1C2D;	
 	border: 1px solid #dddddd;
 	border-bottom-color: transparent;
 	outline: none;
 }
 
 .info-tab-item{
-	color: #00795B;
+	color: #6C1C2D;
 	font-size: 12px;
 	font-weight: bold;
 	border-radius: 0 !important;
-	border: 1px solid #00795B !important;
+	border: 1px solid #6C1C2D !important;
 	text-transform: uppercase;
 }
 
@@ -1934,7 +1934,7 @@ table.table tbody:not(.access-tbody) tr td {
 #calendar-container table tr th.fri,
 #calendar-container table tr th.sat{
 	height: 30px;
-	color: #00AF64;
+	color: #c43351;
 	font-weight: bold;
 	text-align: center;
 }
@@ -1958,11 +1958,11 @@ table.table tbody:not(.access-tbody) tr td {
 }
 
 .current-day:hover{
-	background-color: #00AF64 !important;
+	background-color: #c43351 !important;
 }
 
 .current-day {
-	background-color: #00AF64;
+	background-color: #c43351;
 	color: #FFFFFF !important;
 }
 
@@ -1971,7 +1971,7 @@ table.table tbody:not(.access-tbody) tr td {
 }
 
 .event:after {
-	background: #00AF64 !important;
+	background: #c43351 !important;
 	display: block !important;
 	content: '' !important;
 	height: 3px !important;
@@ -2011,7 +2011,7 @@ table.table tbody:not(.access-tbody) tr td {
 	height: 100%;
 	font-weight: bold;
 	border: none !important;
-	background-color: #00795B;
+	background-color: #6C1C2D;
 	margin: 0 !important;
 	padding-top: 15px !important;
 	border: none !important;
@@ -2023,13 +2023,13 @@ table.table tbody:not(.access-tbody) tr td {
 
 .schedule-tab-item:hover{
 	background-color: #FFFFFF !important;
-	color: #00795B !important;
+	color: #6C1C2D !important;
 }
 
 .schedule-nav-tabs > li.active > a,
 .schedule-nav-tabs > li.active > a:hover,
 .schedule-nav-tabs > li.active > a:focus{
-	color: #00795B;
+	color: #6C1C2D;
 	cursor: default;
 	border-bottom-color: transparent;
 	background-color: #FFFFFF !important;
@@ -2046,7 +2046,7 @@ table.table tbody:not(.access-tbody) tr td {
 	float: left;
 	margin-right: 10px;
 	width: 30%;
-	background-color: #00795B;
+	background-color: #6C1C2D;
 	color: #FFFFFF;
 	border: 1px solid #FFFFFF !important;
 	box-shadow: none !important;
@@ -2057,7 +2057,7 @@ table.table tbody:not(.access-tbody) tr td {
 	font-size: 16px;
 	height: 34px;
 	width: 100px;
-	background-color: #00795B;
+	background-color: #6C1C2D;
 	color: #FFFFFF;
 	border: 1px solid #FFFFFF !important;
 	box-shadow: none !important;
@@ -2336,14 +2336,14 @@ table.table tbody:not(.access-tbody) tr td {
 } 
 @keyframes animate2 {
   0% {
-    box-shadow: inset #00AF64 0 0 0 3px;
+    box-shadow: inset #c43351 0 0 0 3px;
     transform: rotate(-140deg);
   }
   50% {
-    box-shadow: inset #00AF64 0 0 0 3px;
+    box-shadow: inset #c43351 0 0 0 3px;
   }
   100% {
-    box-shadow: inset #00AF64 0 0 0 3px;
+    box-shadow: inset #c43351 0 0 0 3px;
     transform: rotate(140deg);
   }
 }
@@ -2423,8 +2423,8 @@ table.table tbody:not(.access-tbody) tr td {
 }
 
 .dropdown-menu > li > a:hover{
-	background: #00AF64 !important;
-	background-color: #00AF64 !important;
+	background: #c43351 !important;
+	background-color: #c43351 !important;
 	color: #FFFFFF !important;
 }
 
@@ -2466,13 +2466,13 @@ table.table tbody:not(.access-tbody) tr td {
 
 .fee-action-btn,
 .fee-action-btn:focus{
-	border: 2px solid #00AF64;
+	border: 2px solid #c43351;
 	background-color: #FFFFFF;
-	color: #00AF64;
+	color: #c43351;
 }
 
 .fee-action-btn:hover{
-	background-color: #00AF64;
+	background-color: #c43351;
 	color: #FFFFFF;
 }
 
