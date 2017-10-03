@@ -695,8 +695,8 @@ def get_schedule():
 @app.route('/records/fetch', methods=['GET', 'POST'])
 def fetch_records():
     path = 'static/records/SGB_RECORDS.xlsx'
-    rows = 47
-    cols = 8
+    rows = 88
+    cols = 9
 
     book = xlrd.open_workbook(path)
  
@@ -731,45 +731,128 @@ def fetch_records():
             db.session.commit()
             parent_id = guardian.id
 
-        if vals[3] != None:
-            if vals[0]:
-                new_record = K12(
-                    school_no=session['school_no'],
-                    id_no='000%s' % str(int(vals[0])).strip().replace('.','').replace(',',''),
-                    first_name=vals[2].strip().title().replace('.','').replace(',',''),
-                    last_name=vals[1].strip().title().replace('.','').replace(',',''),
-                    middle_name=vals[3].strip().title().replace('.','').replace(',',''),
-                    level=vals[7].title().replace('.','').replace(',',''),
-                    group='k12',
-                    section='Unknown',
-                    absences=0,
-                    lates=0,
-                    parent_id=parent_id,
-                    parent_relation='Unknown',
-                    parent_contact=str(vals[6]).strip(),
-                    added_by=vals[5].strip().title().replace('.','').replace(',',''),
-                    )
+        if vals[8] != None:
+            if vals[3] != None:
+                if vals[0]:
+                    new_record = K12(
+                        school_no=session['school_no'],
+                        id_no='000%s' % str(int(vals[0])).strip().replace('.','').replace(',',''),
+                        first_name=vals[2].strip().title().replace('.','').replace(',',''),
+                        last_name=vals[1].strip().title().replace('.','').replace(',',''),
+                        middle_name=vals[3].strip().title().replace('.','').replace(',',''),
+                        level=vals[7].title().replace('.','').replace(',',''),
+                        group='k12',
+                        section=vals[8].title().replace('.','').replace(',',''),
+                        absences=0,
+                        lates=0,
+                        parent_id=parent_id,
+                        parent_relation='Unknown',
+                        parent_contact=str(vals[6]).strip(),
+                        added_by='Super User'
+                        )
+                else:
+                    new_record = K12(
+                        school_no=session['school_no'],
+                        first_name=vals[2].strip().title().replace('.','').replace(',',''),
+                        last_name=vals[1].strip().title().replace('.','').replace(',',''),
+                        middle_name=vals[3].strip().title().replace('.','').replace(',',''),
+                        level=vals[7].title().replace('.','').replace(',',''),
+                        group='k12',
+                        section=vals[8].title().replace('.','').replace(',',''),
+                        absences=0,
+                        lates=0,
+                        parent_id=parent_id,
+                        parent_relation='Unknown',
+                        parent_contact=str(vals[6]).strip(),
+                        added_by='Super User'
+                        )
             else:
-                new_record = K12(
+                if vals[0]:
+                    new_record = K12(
+                        school_no=session['school_no'],
+                        id_no='000%s' % str(int(vals[0])).replace('.','').replace(',',''),
+                        first_name=vals[2].title().replace('.','').replace(',',''),
+                        last_name=vals[1].title().replace('.','').replace(',',''),
+                        level=vals[7].title().replace('.','').replace(',',''),
+                        group='k12',
+                        section=vals[8].title().replace('.','').replace(',',''),
+                        absences=0,
+                        lates=0,
+                        parent_id=parent_id,
+                        parent_relation='Unknown',
+                        parent_contact=str(vals[6]).replace('.','').replace(',',''),
+                        added_by='Super User'
+                        )
+                else:
+                    new_record = K12(
                     school_no=session['school_no'],
-                    first_name=vals[2].strip().title().replace('.','').replace(',',''),
-                    last_name=vals[1].strip().title().replace('.','').replace(',',''),
-                    middle_name=vals[3].strip().title().replace('.','').replace(',',''),
+                    first_name=vals[2].title().replace('.','').replace(',',''),
+                    last_name=vals[1].title().replace('.','').replace(',',''),
                     level=vals[7].title().replace('.','').replace(',',''),
                     group='k12',
-                    section='Unknown',
+                    section=vals[8].title().replace('.','').replace(',',''),
                     absences=0,
                     lates=0,
                     parent_id=parent_id,
                     parent_relation='Unknown',
-                    parent_contact=str(vals[6]).strip(),
-                    added_by=vals[5].strip().title().replace('.','').replace(',',''),
+                    parent_contact=str(vals[6]).replace('.','').replace(',',''),
+                    added_by='Super User'
                     )
         else:
-            if vals[0]:
-                new_record = K12(
+            if vals[3] != None:
+                if vals[0]:
+                    new_record = K12(
+                        school_no=session['school_no'],
+                        id_no='000%s' % str(int(vals[0])).strip().replace('.','').replace(',',''),
+                        first_name=vals[2].strip().title().replace('.','').replace(',',''),
+                        last_name=vals[1].strip().title().replace('.','').replace(',',''),
+                        middle_name=vals[3].strip().title().replace('.','').replace(',',''),
+                        level=vals[7].title().replace('.','').replace(',',''),
+                        group='k12',
+                        section='Unknown',
+                        absences=0,
+                        lates=0,
+                        parent_id=parent_id,
+                        parent_relation='Unknown',
+                        parent_contact=str(vals[6]).strip(),
+                        added_by='Super User'
+                        )
+                else:
+                    new_record = K12(
+                        school_no=session['school_no'],
+                        first_name=vals[2].strip().title().replace('.','').replace(',',''),
+                        last_name=vals[1].strip().title().replace('.','').replace(',',''),
+                        middle_name=vals[3].strip().title().replace('.','').replace(',',''),
+                        level=vals[7].title().replace('.','').replace(',',''),
+                        group='k12',
+                        section='Unknown',
+                        absences=0,
+                        lates=0,
+                        parent_id=parent_id,
+                        parent_relation='Unknown',
+                        parent_contact=str(vals[6]).strip(),
+                        added_by='Super User'
+                        )
+            else:
+                if vals[0]:
+                    new_record = K12(
+                        school_no=session['school_no'],
+                        id_no='000%s' % str(int(vals[0])).replace('.','').replace(',',''),
+                        first_name=vals[2].title().replace('.','').replace(',',''),
+                        last_name=vals[1].title().replace('.','').replace(',',''),
+                        level=vals[7].title().replace('.','').replace(',',''),
+                        group='k12',
+                        section='Unknown',
+                        absences=0,
+                        lates=0,
+                        parent_id=parent_id,
+                        parent_relation='Unknown',
+                        parent_contact=str(vals[6]).replace('.','').replace(',',''),
+                        added_by='Super User'
+                        )
+                else:
+                    new_record = K12(
                     school_no=session['school_no'],
-                    id_no='000%s' % str(int(vals[0])).replace('.','').replace(',',''),
                     first_name=vals[2].title().replace('.','').replace(',',''),
                     last_name=vals[1].title().replace('.','').replace(',',''),
                     level=vals[7].title().replace('.','').replace(',',''),
@@ -780,28 +863,68 @@ def fetch_records():
                     parent_id=parent_id,
                     parent_relation='Unknown',
                     parent_contact=str(vals[6]).replace('.','').replace(',',''),
-                    added_by=vals[5].title().replace('.','').replace(',',''),
+                    added_by='Super User'
                     )
-            else:
-                new_record = K12(
-                school_no=session['school_no'],
-                first_name=vals[2].title().replace('.','').replace(',',''),
-                last_name=vals[1].title().replace('.','').replace(',',''),
-                level=vals[7].title().replace('.','').replace(',',''),
-                group='k12',
-                section='Unknown',
-                absences=0,
-                lates=0,
-                parent_id=parent_id,
-                parent_relation='Unknown',
-                parent_contact=str(vals[6]).replace('.','').replace(',',''),
-                added_by=vals[5].title().replace('.','').replace(',',''),
-                )
+
         db.session.add(new_record)
         db.session.commit()
         total_students += 1
 
-    return jsonify(status='success',total_students=total_students),201
+
+    rows = 15
+    cols = 7
+
+    book = xlrd.open_workbook(path)
+    sheet = book.sheet_by_index(1)
+
+    school = School.query.filter_by(school_no=session['school_no']).first()
+
+    total_staff = 0
+ 
+    for row in range(rows-1):
+        vals = []
+        for col in range(cols):
+            cell = sheet.cell(row+1,col)
+            if cell.value == '':
+                vals.append(None)
+            else:
+                vals.append(cell.value)
+
+        if vals[3] != None:       
+            new_staff = Staff(
+                school_no = session['school_no'],
+                id_no = '000%s' % str(int(vals[0])).replace('.','').replace(',',''),
+                first_name = vals[2].title().replace('.','').replace(',',''),
+                last_name = vals[1].title().replace('.','').replace(',',''),
+                middle_name = vals[3].title().replace('.','').replace(',',''),
+                department = 'Unknown',
+                group = 'staff',
+                email = 'n/a',
+                mobile = vals[5].title().replace('.','').replace(',',''),
+                added_by = 'Super User'
+            )
+        else:
+            new_staff = Staff(
+                school_no = session['school_no'],
+                id_no = '000%s' % str(int(vals[0])).replace('.','').replace(',',''),
+                first_name = vals[2].title().replace('.','').replace(',',''),
+                last_name = vals[1].title().replace('.','').replace(',',''),
+                department = 'Unknown',
+                group = 'staff',
+                email = 'n/a',
+                mobile = vals[5].title().replace('.','').replace(',',''),
+                added_by = 'Super User'
+            )
+
+        db.session.add(new_staff)
+        db.session.commit()
+        total_staff += 1
+
+    return jsonify(
+        status='success',
+        total_students=total_students,
+        total_staff=total_staff
+        ),201
 
 
 @app.route('/', methods=['GET', 'POST'])
