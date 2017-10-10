@@ -685,6 +685,7 @@ a, a:hover, a:active, a:focus{
 }
 
 .recipient-label{
+	width: 140px;
 	font-size: 14px;
 }
 
@@ -705,10 +706,10 @@ a, a:hover, a:active, a:focus{
 
 .compose-message-middle{
 	float: left;
-	height: 50px;
 	width: 100%;
 	border-bottom: 1px solid #e5e5e5;
 	border-top: 1px solid #e5e5e5;
+	position: relative;
 }
 
 .compose-message-lower{
@@ -746,14 +747,19 @@ a, a:hover, a:active, a:focus{
 	-webkit-justify-content: left;
 	justify-content: left;
 	padding-left: 15px;
-	border-right: 1px solid #e5e5e5;
+	padding-top: 5px;
 }
 
 .compose-message-middle-right{
 	float: left;
-	height: 100%;
 	width: 85%;
 	padding-top: 3px !important;
+	position: relative;
+}
+
+.recipient-row {
+	height: 30px;
+	width: 100%;
 	display: -webkit-flex;
 	display: flex;
 	-webkit-flex-direction: row;
@@ -820,7 +826,7 @@ a, a:hover, a:active, a:focus{
 }
 
 #compose-message-modal-body{
-	height: 200px !important;
+	height: 300px !important;
 	position: relative;
 	width: 100%;
 	padding: 0;
@@ -1028,7 +1034,7 @@ a, a:hover, a:active, a:focus{
 }
 
 .message-modal-dialog{
-	width: 700px;
+	width: 900px;
 }
 
 .new-message-modal-dialog{

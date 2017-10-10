@@ -1711,8 +1711,8 @@ def blast_message():
     db.session.add(new_message)
     db.session.commit()
 
-    if 'Parents' in recipients:
-        contacts = K12.query.all()
+    for level in recipients:
+        contacts = K12.query.filter_by(level=level)
         for contact in contacts:
             in_list = MessageStatus.query.filter_by(message_id=new_message.id,msisdn=contact.parent_contact).first()
             if not in_list or in_list == None:
@@ -1730,14 +1730,6 @@ def blast_message():
 
                 db.session.add(new_message_status)
                 db.session.commit()
-
-    if 'College' in recipients:
-        for msisdn in db.session.query(College.mobile).distinct():
-            contacts.append(msisdn)
-
-    if 'Staff' in recipients:
-        for msisdn in db.session.query(Staff.mobile).distinct():
-            contacts.append(msisdn)
 
     new_message.batch_size = MessageStatus.query.filter_by(message_id=new_message.id).count()
     new_message.pending = MessageStatus.query.filter_by(message_id=new_message.id,status='pending').count()
