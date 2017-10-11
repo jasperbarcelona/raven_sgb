@@ -37,6 +37,7 @@ import db_conn
 from db_conn import db, app
 from models import *
 import xlrd
+import string
 
 API_KEY = 'ecc67d28db284a2fb351d58fe18965f9'
 SCHOOL_NO = 'sgb-lc2017'
@@ -662,8 +663,8 @@ def nocache(view):
 def send_email(new_user,email_address,user_name,school_name,password):
     try:
         s = smtplib.SMTP('smtp.gmail.com', 587)
-        myGmail = 'barcelona.jasperoliver@gmail.com'
-        myGMPasswd = 'royalpsalms11'
+        myGmail = 'hello@pisara.tech'
+        myGMPasswd = 'tivoli08'
         message = text(('Hi, %s!\r\n \r\nWelcome to Pisara! %s has added you as administrator for %s. '
                    'Please go to your school\'s Pisara Dashboard URL and login with your email.\r\n \r\n'
                    'Your temporary password is: %s\r\n \r\nWe strongly recommend that you change it '
@@ -740,7 +741,7 @@ def fetch_records():
                         first_name=vals[2].strip().title().replace('.','').replace(',',''),
                         last_name=vals[1].strip().title().replace('.','').replace(',',''),
                         middle_name=vals[3].strip().title().replace('.','').replace(',',''),
-                        level=vals[7].title().replace('.','').replace(',',''),
+                        level=string.capwords(vals[7]).replace('.','').replace(',',''),
                         group='k12',
                         section=vals[8].title().replace('.','').replace(',',''),
                         absences=0,
@@ -756,7 +757,7 @@ def fetch_records():
                         first_name=vals[2].strip().title().replace('.','').replace(',',''),
                         last_name=vals[1].strip().title().replace('.','').replace(',',''),
                         middle_name=vals[3].strip().title().replace('.','').replace(',',''),
-                        level=vals[7].title().replace('.','').replace(',',''),
+                        level=string.capwords(vals[7]).replace('.','').replace(',',''),
                         group='k12',
                         section=vals[8].title().replace('.','').replace(',',''),
                         absences=0,
@@ -773,7 +774,7 @@ def fetch_records():
                         id_no='000%s' % str(int(vals[0])).replace('.','').replace(',',''),
                         first_name=vals[2].title().replace('.','').replace(',',''),
                         last_name=vals[1].title().replace('.','').replace(',',''),
-                        level=vals[7].title().replace('.','').replace(',',''),
+                        level=string.capwords(vals[7]).replace('.','').replace(',',''),
                         group='k12',
                         section=vals[8].title().replace('.','').replace(',',''),
                         absences=0,
@@ -788,7 +789,7 @@ def fetch_records():
                     school_no=session['school_no'],
                     first_name=vals[2].title().replace('.','').replace(',',''),
                     last_name=vals[1].title().replace('.','').replace(',',''),
-                    level=vals[7].title().replace('.','').replace(',',''),
+                    level=string.capwords(vals[7]).replace('.','').replace(',',''),
                     group='k12',
                     section=vals[8].title().replace('.','').replace(',',''),
                     absences=0,
@@ -807,7 +808,7 @@ def fetch_records():
                         first_name=vals[2].strip().title().replace('.','').replace(',',''),
                         last_name=vals[1].strip().title().replace('.','').replace(',',''),
                         middle_name=vals[3].strip().title().replace('.','').replace(',',''),
-                        level=vals[7].title().replace('.','').replace(',',''),
+                        level=string.capwords(vals[7]).replace('.','').replace(',',''),
                         group='k12',
                         section='Unknown',
                         absences=0,
@@ -823,7 +824,7 @@ def fetch_records():
                         first_name=vals[2].strip().title().replace('.','').replace(',',''),
                         last_name=vals[1].strip().title().replace('.','').replace(',',''),
                         middle_name=vals[3].strip().title().replace('.','').replace(',',''),
-                        level=vals[7].title().replace('.','').replace(',',''),
+                        level=string.capwords(vals[7]).replace('.','').replace(',',''),
                         group='k12',
                         section='Unknown',
                         absences=0,
@@ -840,7 +841,7 @@ def fetch_records():
                         id_no='000%s' % str(int(vals[0])).replace('.','').replace(',',''),
                         first_name=vals[2].title().replace('.','').replace(',',''),
                         last_name=vals[1].title().replace('.','').replace(',',''),
-                        level=vals[7].title().replace('.','').replace(',',''),
+                        level=string.capwords(vals[7]).replace('.','').replace(',',''),
                         group='k12',
                         section='Unknown',
                         absences=0,
@@ -855,7 +856,7 @@ def fetch_records():
                     school_no=session['school_no'],
                     first_name=vals[2].title().replace('.','').replace(',',''),
                     last_name=vals[1].title().replace('.','').replace(',',''),
-                    level=vals[7].title().replace('.','').replace(',',''),
+                    level=string.capwords(vals[7]).replace('.','').replace(',',''),
                     group='k12',
                     section='Unknown',
                     absences=0,
@@ -872,7 +873,7 @@ def fetch_records():
 
 
     rows = 15
-    cols = 7
+    cols = 8
 
     book = xlrd.open_workbook(path)
     sheet = book.sheet_by_index(1)
@@ -897,7 +898,7 @@ def fetch_records():
                 first_name = vals[2].title().replace('.','').replace(',',''),
                 last_name = vals[1].title().replace('.','').replace(',',''),
                 middle_name = vals[3].title().replace('.','').replace(',',''),
-                department = 'Unknown',
+                department = vals[7].title().replace('.','').replace(',',''),
                 group = 'staff',
                 email = 'n/a',
                 mobile = vals[5].title().replace('.','').replace(',',''),
@@ -909,7 +910,7 @@ def fetch_records():
                 id_no = '000%s' % str(int(vals[0])).replace('.','').replace(',',''),
                 first_name = vals[2].title().replace('.','').replace(',',''),
                 last_name = vals[1].title().replace('.','').replace(',',''),
-                department = 'Unknown',
+                department = vals[7].title().replace('.','').replace(',',''),
                 group = 'staff',
                 email = 'n/a',
                 mobile = vals[5].title().replace('.','').replace(',',''),
@@ -3345,42 +3346,72 @@ def rebuild_database():
 
     d = Section(
         school_no='sgb-lc2017',
-        name='Prime'
+        name='St. Agnes'
         )
 
     e = Section(
         school_no='sgb-lc2017',
-        name='Love'
+        name='St. Anthony'
         )
 
     f = Section(
         school_no='sgb-lc2017',
-        name='Hope'
+        name='St. John'
         )
 
     g = Section(
         school_no='sgb-lc2017',
-        name='Faith'
+        name='St. Fancis'
         )
 
     h = Section(
         school_no='sgb-lc2017',
-        name='ICT'
+        name='St. Benedict'
         )
 
     i = Section(
         school_no='sgb-lc2017',
-        name='ABM'
+        name='St. Jerome'
         )
 
     j = Section(
         school_no='sgb-lc2017',
-        name='GAS'
+        name='St. Vincent'
         )
 
     k = Section(
         school_no='sgb-lc2017',
-        name='HUMSS'
+        name='St. Ignatius'
+        )
+
+    l = Section(
+        school_no='sgb-lc2017',
+        name='St. Lorenzo Ruiz'
+        )
+
+    m = Section(
+        school_no='sgb-lc2017',
+        name='St. Augustine'
+        )
+
+    n = Section(
+        school_no='sgb-lc2017',
+        name='St. Clare'
+        )
+
+    o = Section(
+        school_no='sgb-lc2017',
+        name='St. Thomas'
+        )
+
+    p = Section(
+        school_no='sgb-lc2017',
+        name='St. Louise'
+        )
+
+    q= Section(
+        school_no='sgb-lc2017',
+        name='St. Agnes'
         )
 
     module = Module(
@@ -3448,6 +3479,12 @@ def rebuild_database():
     db.session.add(i)
     db.session.add(j)
     db.session.add(k)
+    db.session.add(l)
+    db.session.add(m)
+    db.session.add(n)
+    db.session.add(o)
+    db.session.add(p)
+    db.session.add(q)
     # db.session.add(k12)
     # db.session.add(lean)
     # db.session.add(parent)

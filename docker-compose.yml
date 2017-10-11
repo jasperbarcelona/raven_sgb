@@ -18,7 +18,6 @@ services:
       POSTGRES_PASSWORD: sgbsaints
       POSTGRES_DB: sgb
     volumes:
-      # - /var/lib/postgresql/data
       - ./main/data:/var/lib/postgresql/data
 
   main:
@@ -27,24 +26,13 @@ services:
     volumes:
       - ./main:/usr/src/app/
     ports:
-      - "8000:8000"
-    command: /usr/local/bin/gunicorn -w 2 -b :8000 admin:app
+      - "5000:5000"
+    command: /usr/local/bin/gunicorn -w 2 -b :5000 admin:app
     depends_on:
       - db
     links:
       - celery
       - rabbitmq
-
-  ravenclock:
-    restart: always
-    build: ./ravenclock
-    volumes:
-      - ./ravenclock:/usr/src/app/
-    ports:
-      - "5000:5000"
-    command: /usr/local/bin/gunicorn -w 2 -b :5000 clock:app
-    depends_on:
-      - main
 
   rabbitmq:
     restart: always
