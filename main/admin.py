@@ -696,7 +696,7 @@ def get_schedule():
 @app.route('/records/fetch', methods=['GET', 'POST'])
 def fetch_records():
     path = 'static/records/SGB_RECORDS.xlsx'
-    rows = 88
+    rows = 92
     cols = 9
 
     book = xlrd.open_workbook(path)
